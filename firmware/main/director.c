@@ -250,7 +250,9 @@ static void run(tank_t *t, char *line) {
         for (int i = 0; i < n; i++) {               /* (the console runs in the tank task: poll here, the task is blocked) */
             imu_port_poll(esp_timer_get_time());
             int16_t a[3]; int m; imu_port_last(a, &m);
-            ESP_LOGI(TAG, "imu poll: g=[%6d %6d %6d] motion %5d %s", a[0], a[1], a[2], m, imu_port_moving() ? "MOVING" : "still");
+            float ux, uy; imu_port_bubble_up(&ux, &uy);
+            ESP_LOGI(TAG, "imu poll: g=[%6d %6d %6d] motion %5d %s | bubble up [%.2f %.2f] inverted %d",
+                     a[0], a[1], a[2], m, imu_port_moving() ? "MOVING" : "still", ux, uy, imu_port_inverted());
             vTaskDelay(pdMS_TO_TICKS(250));
         }
     } else if (!strcmp(c, "settings")) {

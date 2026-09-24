@@ -209,6 +209,7 @@ typedef struct tank {
     food_t   food[MAX_FOOD];
     bubble_t bubble[MAX_BUBBLE];
     float    bubble_x, bubble_y;   /* bubble column anchor */
+    float    bubble_up_x, bubble_up_y; /* transient screen-space unit vector; never saved */
     float    reef_x, reef_y;
     float    clock;                /* seconds since start */
     bool     night;                /* the tank light is off: fish rest, the palette dims */

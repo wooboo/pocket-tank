@@ -233,6 +233,7 @@ int tank_add_fish(tank_t *t, int parent_a, int parent_b) {
 
 void tank_init(tank_t *t, uint32_t seed) {
     t->rng = seed ? seed : 0xC0FFEE;
+    t->bubble_up_x = 0; t->bubble_up_y = -1;
     t->n_fish = 0;                 /* progression_boot restores or calls tank_new_population */
     for (int i = 0; i < MAX_FOOD; i++) t->food[i].alive = false;
     t->bubble_x = BUBBLE_X_DEFAULT; t->bubble_y = TANK_H * 0.5f;   /* matches gen_traces.py; setup may move x */
@@ -1539,16 +1540,31 @@ void tank_tick(tank_t *t, float dt, advisor_fn advise) {
     }
     snail_tick(t, dt);
 
-    /* bubbles rise */
+    /* Buoyancy follows screen-space up. Wobble is perpendicular to it.
+     * The aerator stays attached to the tank floor, even upside down. */
     for (int i = 0; i < MAX_BUBBLE; i++) {
         bubble_t *b = &t->bubble[i];
         b->wobble += dt * 2.5f;
-        b->y -= b->vy * dt;
-        b->x += sinf(b->wobble) * dt * (b->column ? 9 : 4);
-        if (b->y < -6) {
-            b->y = TANK_H + tank_randf(t, 4, 24);
-            b->x = b->column ? t->bubble_x + tank_randf(t, -10, 10)
-                             : tank_randf(t, 12, TANK_W - 12);
+        float drift = sinf(b->wobble) * (b->column ? 9 : 4);
+        b->x += (t->bubble_up_x * b->vy - t->bubble_up_y * drift) * dt;
+        b->y += (t->bubble_up_y * b->vy + t->bubble_up_x * drift) * dt;
+        if (b->x < -6 || b->x > TANK_W + 6 || b->y < -6 || b->y > TANK_H + 6) {
+            if (b->column) {
+                b->x = t->bubble_x + tank_randf(t, -10, 10);
+                b->y = TANK_H - 17;  /* the visible aerator */
+            } else {
+                /* Enter from the downstream edge; choose edges in proportion
+                 * to their incoming flux so diagonals populate the whole tank. */
+                float horizontal = fabsf(t->bubble_up_x) * TANK_H;
+                float vertical = fabsf(t->bubble_up_y) * TANK_W;
+                if (tank_randf(t, 0, horizontal + vertical) < horizontal) {
+                    b->x = t->bubble_up_x > 0 ? 0 : TANK_W;
+                    b->y = tank_randf(t, 12, TANK_H - 12);
+                } else {
+                    b->x = tank_randf(t, 12, TANK_W - 12);
+                    b->y = t->bubble_up_y < 0 ? TANK_H : 0;
+                }
+            }
         }
     }
 

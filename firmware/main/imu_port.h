@@ -8,6 +8,8 @@
 
 bool imu_port_init(i2c_master_bus_handle_t bus);  /* false = no IMU, never inverted */
 void imu_port_poll(int64_t now_us);               /* call every frame; rate-limited inside */
+/* Smoothed buoyancy direction in the current framebuffer orientation. */
+void imu_port_bubble_up(float *x, float *y);
 bool imu_port_inverted(void);                     /* true = device is upside down */
 /* handling detector (2026-09-15, for the audio port): true while the
  * device has moved within the last IMU_MOTION_HOLD_US - picked up, in a
