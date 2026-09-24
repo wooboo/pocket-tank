@@ -211,6 +211,7 @@ typedef struct tank {
     float    bubble_x, bubble_y;   /* bubble column anchor */
     float    bubble_up_x, bubble_up_y; /* transient screen-space unit vector; never saved */
     float    water_push, veg_bend[VEG_BEDS_MAX], veg_velocity[VEG_BEDS_MAX];
+    bool     shake_startled; /* whole-school startle, unlike a local glass tap */
     bool     motion_inverted; /* transient motion only; save format unchanged */
     float    reef_x, reef_y;
     float    clock;                /* seconds since start */
@@ -460,6 +461,7 @@ void  tank_light_auto(tank_t *t);
 #define FEED_ZONE_Y 26.0f
 void  tank_touch_hold(tank_t *t, float x, float y);
 void  tank_touch_tap(tank_t *t, float x, float y);
+void  tank_shake(tank_t *t); /* called only after sustained shaking is recognised */
 /* tank_touch_drag: call EVERY FRAME while a finger is down at x,y (moving or
  * not; tank.c tracks travel). Once a stroke has moved far enough it becomes a
  * WIPE: algae cells along the path are squeegeed clean. A mostly-HORIZONTAL

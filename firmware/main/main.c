@@ -373,6 +373,10 @@ static void tank_task(void *arg) {
         sleep_button_poll(now);
         pwr_key_poll(now);
         imu_port_poll(now);
+        if (imu_port_take_shake()) {
+            tank_shake(&tank);
+            ESP_LOGI(TAG, "shake: sustained movement startled the school");
+        }
         if (imu_port_moving()) audio_port_prewarm();   /* in a hand: the codec stays warm (docs/AUDIO.md) */
         if (imu_port_handled()) tank_handled(&tank);   /* ... and the light stays on (two polls of motion: a bump on the desk is not a pick-up) */
         float ux, uy; imu_port_bubble_up(&ux, &uy);

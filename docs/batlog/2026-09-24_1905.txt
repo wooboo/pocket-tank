@@ -1,0 +1,79 @@
+# pocket-tank preflight 2026-09-24_1905 on /dev/cu.usbmodem1424301
+I (1029895) batlog: 56 samples (h:mm since the first | SoC | VBAT | bright | state | mA since previous)
+I (1029895) batlog:     0:00 |  74% | 3880 mV |   0 | asleep | bed
+I (1029900) batlog:     0:34 |  68% | 3754 mV |  45 | awake  | boot     20.9 mA
+I (1029907) batlog:     0:39 |  65% | 3733 mV |  45 | awake  |          72.0 mA
+I (1029914) batlog:     0:44 |  61% | 3697 mV |  45 | awake  |          96.0 mA
+I (1029921) batlog:     0:49 |  57% | 3657 mV |  45 | awake  |          96.0 mA
+I (1029928) batlog:     0:54 |  53% | 3658 mV |  45 | awake  |          96.0 mA
+I (1029935) batlog:     0:59 |  49% | 3615 mV |  45 | awake  |          96.0 mA
+I (1029942) batlog:     1:04 |  45% | 3607 mV |  45 | awake  |          96.0 mA
+I (1029949) batlog:     1:09 |  40% | 3595 mV |  45 | awake  |         120.0 mA
+I (1029956) batlog:     1:14 |  35% | 3581 mV |  45 | awake  |         120.0 mA
+I (1029963) batlog:     1:19 |  30% | 3569 mV |  45 | awake  |         120.0 mA
+I (1029970) batlog:     1:24 |  25% | 3563 mV |  45 | awake  |         120.0 mA
+I (1029977) batlog:     1:29 |  20% | 3542 mV |  45 | awake  |         120.0 mA
+I (1029984) batlog:     1:34 |  17% | 3514 mV |  76 | awake  |          72.0 mA
+I (1029991) batlog:     1:39 |  14% | 3515 mV |  45 | awake  |          72.0 mA
+I (1029998) batlog:     1:44 |  12% | 3499 mV |  45 | awake  |          48.0 mA
+I (1030005) batlog:     1:49 |  10% | 3474 mV |  45 | awake  |          48.0 mA
+I (1030012) batlog:     1:54 |   8% | 3436 mV |  45 | awake  |          48.0 mA
+I (1030019) batlog:     1:59 |   8% | 3598 mV |  45 | awake  |           0.0 mA
+I (1030026) batlog:     2:04 |  10% | 3632 mV |  45 | awake  |         -48.0 mA
+I (1030033) batlog:     2:09 |  13% | 3649 mV |  45 | awake  |         -72.0 mA
+I (1030040) batlog:     2:14 |  15% | 3665 mV |  45 | awake  |         -48.0 mA
+I (1030047) batlog:     2:19 |  16% | 3678 mV |  45 | awake  |         -24.0 mA
+I (1030054) batlog:     2:24 |  18% | 3692 mV |  45 | awake  |         -48.0 mA
+I (1030061) batlog:     2:29 |  19% | 3706 mV |  45 | awake  |         -24.0 mA
+I (1030068) batlog:     2:34 |  20% | 3720 mV |  45 | awake  |         -24.0 mA
+I (1030075) batlog:     2:39 |  21% | 3734 mV |  45 | awake  |         -24.0 mA
+I (1030082) batlog:     2:44 |  22% | 3752 mV |  45 | awake  |         -24.0 mA
+I (1030089) batlog:     2:49 |  24% | 3771 mV |  45 | awake  |         -47.8 mA
+I (1030097) batlog:     2:54 |  26% | 3792 mV |  45 | awake  |         -48.0 mA
+I (1030104) batlog:     2:59 |  27% | 3817 mV |  45 | awake  |         -24.0 mA
+I (1030111) batlog:     3:04 |  30% | 3844 mV |  45 | awake  |         -72.0 mA
+I (1030118) batlog:     3:09 |  33% | 3875 mV |  45 | awake  |         -72.0 mA
+I (1030125) batlog:     3:14 |  36% | 3909 mV |  45 | awake  |         -72.0 mA
+I (1030132) batlog:     3:19 |  41% | 3947 mV |  45 | awake  |        -120.0 mA
+I (1030139) batlog:     3:24 |  46% | 3984 mV |  45 | awake  |        -120.0 mA
+I (1030146) batlog:     3:29 |  53% | 4024 mV |  76 | awake  |        -168.0 mA
+I (1030153) batlog:     3:34 |  60% | 4065 mV |  45 | awake  |        -168.0 mA
+I (1030160) batlog:     3:39 |  67% | 4111 mV |  45 | awake  |        -168.0 mA
+I (1030167) batlog:     3:44 |  74% | 4160 mV |  45 | awake  |        -168.0 mA
+I (1030174) batlog:     3:49 | 100% | 4119 mV |  45 | awake  |        -624.0 mA
+I (1030181) batlog:     3:54 | 100% | 4156 mV |  45 | awake  |           0.0 mA
+I (1030188) batlog:     3:59 | 100% | 4121 mV |  45 | awake  |           0.0 mA
+I (1030195) batlog:     4:04 | 100% | 4130 mV |  45 | awake  |           0.0 mA
+I (1030202) batlog:     4:09 | 100% | 4120 mV |  45 | awake  |           0.0 mA
+I (1030209) batlog:     4:14 | 100% | 4117 mV |  76 | awake  |           0.0 mA
+I (1030216) batlog:     4:19 | 100% | 4115 mV |  45 | awake  |           0.0 mA
+I (1030223) batlog:     4:24 | 100% | 4129 mV |  76 | awake  |           0.0 mA
+I (1030230) batlog:     4:29 | 100% | 4086 mV |  76 | awake  |           0.0 mA
+I (1030237) batlog:     4:40 |  97% | 4064 mV | 153 | awake  | boot     31.5 mA
+I (1030244) batlog:     4:45 |  96% | 4050 mV | 153 | awake  |          24.0 mA
+I (1030251) batlog:     4:52 |  94% | 4038 mV | 153 | awake  | boot     36.9 mA
+I (1030258) batlog:     4:57 |  93% | 4044 mV |  91 | awake  |          24.0 mA
+I (1030265) batlog:     5:06 |  92% | 4027 mV | 153 | awake  | boot     13.9 mA
+I (1030272) batlog:     5:11 |  89% | 3947 mV |  91 | awake  |          72.0 mA
+I (1030279) batlog:     5:16 |  86% | 3916 mV | 153 | awake  |          72.0 mA
+I (1030286) batlog:   awake:  4.7 h, -36 mAh -> -8 mA average
+I (1030292) batlog:   asleep: 0.6 h, 12.0 mAh -> 20.86 mA average
+I (1030297) batlog:   (SoC is 1% = 2 mAh; short awake windows are coarse, a night is not)
+I (1033938) director: 0 dolt   adult age 22.4h size 1.15 hunger 7.0 energy 10.0 stress 0.0 curiosity 0.9 trust 10.0 ms 73f  rest at 273,273
+I (1033940) director: 1 zori   adult age 22.4h size 1.23 hunger 6.2 energy 9.1 stress 0.0 curiosity 0.0 trust 10.0 ms 73f  visit_bubbles at 136,98
+I (1033952) director: 2 chip   adult age 21.9h size 1.10 hunger 3.9 energy 9.8 stress 0.0 curiosity 0.5 trust 10.0 ms 73f  visit_bubbles at 110,133
+I (1033965) director: 3 gira   adult age 20.7h size 1.33 hunger 4.7 energy 6.3 stress 0.0 curiosity 0.0 trust 10.0 ms 73f  seek_food at 86,183
+I (1033978) director: 4 help   adult age 15.6h size 1.06 hunger 4.2 energy 10.0 stress 0.0 curiosity 2.3 trust 7.5 ms 73f  rest at 191,265
+I (1033990) director: pellets 0 | trickle on | ravenous 0 | night idle 54s | veg 0.26 0.14 0.24 | algae cells 0/644 | courting no | arrival -
+I (1034002) director: sand dollars 248 (earned 858) | shop: plant snail | colonies 49 | 771.6 in trimmed
+I (1034012) director: snail at 152,344 heading 0 deg | no target, cell -1 at -1,-1 (film 0) | 0 cells on the glass | 271 grazed so far
+I (1034024) director: bed 0 fronds (x from 19, pitch 12): 0.25 0.25 0.20 0.18 0.16 0.16 0.16 0.25 0.25 0.25 0.25 0.38 0.38 0.39 0.39
+I (1034035) director: bed 1 fronds (x from 376, pitch 12): 0.14 0.14 0.14 0.14 0.14
+I (1034043) director: bed 2 fronds (x from 278, pitch 12): 0.35 0.35 0.35 0.36 0.14 0.14 0.14 0.14
+I (1034051) director: bed 3 leaves (x from 220, pitch 14): 0.36 0.35 0.35 0.35
+I (1034058) director: plant placed: centre x 241 (the keeper's), depth BEHIND the fish
+I (1034066) director: castle placed: centre x 122 (the keeper's), BEHIND the grass
+I (1034073) director: coral placed: centre x 252 (the keeper's), IN FRONT, colour 8a5be0, growth 0.45 of 1.25 (growing)
+I (1034084) director: reef cluster placed: centre x 346 (the keeper's), IN FRONT, look LAGOON, growth 0.00 of 2 (filling out)
+I (1034095) director: nursery bed 3 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (1034103) director: battery 85% charging, VBAT 3931 mV | brightness 91/255 (level 60%)

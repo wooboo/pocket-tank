@@ -49,3 +49,21 @@ silhouettes instead of assuming straight stems.
 Defining `GRASS_RENDER` for the grass test and linking render.c, icons.c,
 progression.c, setup.c and sim/persist_port_sim.c writes upright/left/right
 PPM previews under /tmp. Device `imu 3` logs the water impulse and bed-0 bend.
+
+## Fish react to excessive shaking
+
+A separate three-axis detector subtracts a slow acceleration baseline and
+requires impulses above 0.45 g with at least three opposing directions over
+at least 350 ms. The sequence expires after 1.5 seconds or 400 ms without a
+strong impulse. Ordinary smooth tilt, a single bump and saturated sensor
+readings do not qualify. A qualifying event has a six-second cooldown.
+
+The whole school scatters using the existing startle reflex and gains 2.5
+stress points (capped at 10). Stress remains part of the model's normal input
+and calms through the existing recovery rules. Trust is unchanged. Shake
+history is transient and resets on wake; the existing save format persists
+fish stress as before.
+
+`firmware/host_test/shake_host.c` tests all three axes, quiet/tilt/bump rejection,
+rate limiting, school stress, recovery, the stress cap and unchanged trust.
+Compile with common/tank.c and common/advisor.c, like the other host tests.

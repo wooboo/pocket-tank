@@ -40,4 +40,45 @@ static inline void imu_water_sample(imu_water_t *w, float ax, float dt) {
     if (w->push > 1.5f) w->push = 1.5f;
     if (w->push < -1.5f) w->push = -1.5f;
 }
+/* Recognise sustained back-and-forth acceleration on any axis. A single
+ * bump, steady tilt, or sensor saturation cannot startle the tank. */
+typedef struct {
+    float baseline[3], previous[3], elapsed, quiet, cooldown;
+    int reversals;
+    bool ready, active;
+} imu_shake_t;
+static inline bool imu_shake_sample(imu_shake_t *s, const float a[3], float dt) {
+    if (dt <= 0 || dt > .1f) return false;
+    s->cooldown = fmaxf(0, s->cooldown-dt);
+    if (s->active) { s->elapsed += dt; s->quiet += dt; }
+    if (s->elapsed > 1.5f || s->quiet > .4f) {
+        s->active = false; s->reversals = 0; s->elapsed = s->quiet = 0;
+    }
+    for (int i=0;i<3;i++) if (fabsf(a[i]) >= 1.99f) return false;
+    if (!s->ready) {
+        for (int i=0;i<3;i++) s->baseline[i]=a[i];
+        s->ready=true; return false;
+    }
+    float v[3], strength=0;
+    for (int i=0;i<3;i++) {
+        s->baseline[i] += (a[i]-s->baseline[i])*dt/(.35f+dt);
+        v[i]=a[i]-s->baseline[i]; strength+=v[i]*v[i];
+    }
+    if (s->cooldown > 0 || strength < .45f*.45f) return false;
+    s->quiet=0;
+    if (!s->active) {
+        s->active=true; s->elapsed=0; s->reversals=0;
+        for (int i=0;i<3;i++) s->previous[i]=v[i];
+    } else {
+        float dot=0;
+        for (int i=0;i<3;i++) dot+=v[i]*s->previous[i];
+        if (dot < -.1f) {
+            s->reversals++;
+            for (int i=0;i<3;i++) s->previous[i]=v[i];
+        }
+    }
+    if (s->reversals < 3 || s->elapsed < .35f) return false;
+    s->cooldown=6; s->active=false; s->reversals=0; s->elapsed=s->quiet=0;
+    return true;
+}
 #endif

@@ -253,7 +253,7 @@ void tank_init(tank_t *t, uint32_t seed) {
     t->light_override = false; t->light_on = true;
     t->hold_active = false; t->hold_time = 0; t->hold_approached = false;
     t->tap_count = 0; t->tap_burst_t = 99; t->startled = false;
-    t->startle_cooldown = 0;
+    t->startle_cooldown = 0; t->shake_startled = false;
     t->feed_spot_x = -1; t->player_feedings = 0; t->feed_open = false; t->hold_approaches = 0; t->greet_timer = 0;
     t->courting = false; t->court_a = t->court_b = -1;
     t->court_cool = 30; t->court_active = 0;
@@ -986,6 +986,20 @@ void tank_feed(tank_t *t, float x, int n) {
     t->feed_open = true;                         /* a meal once somebody eats from it */
 }
 
+void tank_shake(tank_t *t) {
+    tank_handled(t);
+    t->shake_startled = t->startled = true;
+    t->startle_x = TANK_W*.5f; t->startle_y = TANK_H*.5f;
+    t->startle_cooldown = STARTLE_COOLDOWN;
+    /* Cancel an unfinished double tap rather than toggling lights later. */
+    t->tap_count = 0;
+    for (int i=0;i<t->n_fish;i++) {
+        fish_t *f = &t->fish[i];
+        f->stress = fminf(10, f->stress + 2.5f);
+    }
+    tank_emit(TEV_SPOOK, -1);
+}
+
 void tank_touch_tap(tank_t *t, float x, float y) {
     tank_handled(t);
     if (y < FEED_ZONE_Y) { tank_feed(t, x, 3); return; }     /* surface tap = feed */
@@ -1021,7 +1035,7 @@ static void touch_tick(tank_t *t, float dt) {
     if (t->tap_count >= 3 && t->tap_burst_t > TAP_WINDOW) t->tap_count = 0;
     if (t->startled) {
         t->startle_cooldown -= dt;
-        if (t->startle_cooldown <= 0) { t->startled = false; t->tap_count = 0; }
+        if (t->startle_cooldown <= 0) { t->startled = false; t->shake_startled = false; t->tap_count = 0; }
     }
     if (t->hold_active) {                           /* calm presence earns trust */
         float was = t->hold_time;
@@ -1423,7 +1437,7 @@ static void update_fish(tank_t *t, int idx, float dt) {
     float touch_speed = -1;
     if (t->startled && f->goal.id != GOAL_FLEE_SHADOW) {
         float d = tank_dist(f->x, f->y, t->startle_x, t->startle_y);
-        if (d < STARTLE_RADIUS * 1.6f) {
+        if (t->shake_startled || d < STARTLE_RADIUS * 1.6f) {
             float away = atan2f(f->y - t->startle_y, f->x - t->startle_x);
             desired = norm_ang(desired + norm_ang(away - desired) * 0.85f);
             touch_speed = lerpf(55, 90, f->bold);
