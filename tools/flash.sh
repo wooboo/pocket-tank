@@ -8,13 +8,19 @@
 #   tools/flash.sh              # preflight, build, flash app
 #   tools/flash.sh --model      # ... and model/out/model_q4.bin at 0x290000
 #   tools/flash.sh --no-build   # preflight, flash the existing build
-set -u
+set -euo pipefail
 cd "$(dirname "$0")/.."
-BUILD=~/.cache/pocket-tank/fw-build
-PORT=$(ls /dev/cu.usbmodem* 2>/dev/null | head -1)
+BUILD=${BUILD:-$HOME/.cache/pocket-tank/fw-build}
+if [ -z "${PORT:-}" ]; then
+  shopt -s nullglob
+  ports=(/dev/cu.usbmodem*)
+  [ "${#ports[@]}" -le 1 ] || { echo "flash: multiple devices connected; set PORT explicitly"; exit 1; }
+  PORT=${ports[0]:-}
+fi
+export PORT
 [ -n "$PORT" ] || { echo "flash: no /dev/cu.usbmodem* - wake the tank (BOOT) first"; exit 1; }
-tools/preflight.py || exit 1
-. ~/esp/esp-idf/export.sh > /dev/null 2>&1 || { echo "flash: ESP-IDF export failed"; exit 1; }
+. "${IDF_PATH:-$HOME/esp/esp-idf}/export.sh" > /dev/null 2>&1 || { echo "flash: ESP-IDF export failed"; exit 1; }
+python tools/preflight.py || exit 1
 cd firmware
 if [[ " $* " != *" --no-build "* ]]; then
   idf.py -B "$BUILD" build 2>&1 | grep -E "error|binary size|build complete"

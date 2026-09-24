@@ -1,4 +1,4 @@
-#!/Users/strato/.espressif/python_env/idf5.4_py3.13_env/bin/python
+#!/usr/bin/env python3
 """preflight.py - archive what the tank knows BEFORE anything resets it.
 
 Run before every flash (tools/flash.sh does), and any morning after a night
@@ -17,7 +17,11 @@ import glob, os, sys, time, datetime
 import serial
 
 quiet = "--quiet" in sys.argv
-port = next(iter(sorted(glob.glob("/dev/cu.usbmodem*"))), None)
+ports = sorted(glob.glob("/dev/cu.usbmodem*"))
+port = os.environ.get("PORT")
+if not port and len(ports) > 1:
+    sys.exit("preflight: multiple devices connected; set PORT explicitly")
+port = port or next(iter(ports), None)
 if not port:
     sys.exit("preflight: no /dev/cu.usbmodem* - wake the tank (BOOT) and plug it in; refusing to continue")
 here = os.path.dirname(os.path.abspath(__file__))
