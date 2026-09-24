@@ -2,7 +2,11 @@
 
 Bubbles rise along the accelerometer's estimate of up, projected onto the
 screen. This is a visual effect: the aerator, fish bubble-visit targets,
-food, decorations and water remain in tank coordinates. Grass additionally
+decorations and water remain in tank coordinates. Food sinks opposite the
+bubble direction at its original speed, with perpendicular drift while
+moving. Pellets slide along the glass, settle at the downhill boundary and
+resume moving when tilt changes; their lifetime and feeding rules remain
+unchanged. Grass additionally
 responds to motion as described in [grass-motion.md](grass-motion.md). No model or save
 format changes are needed.
 
@@ -40,3 +44,6 @@ On hardware, `imu 3` reports both raw acceleration and the bubble-up vector.
 Visually check right/left tilt, the automatic upside-down screen flip,
 and laying the board flat. Fish continue visiting their original landmark;
 following the tilted stream is a separate gameplay change.
+
+`firmware/host_test/food_host.c` verifies eight sinking directions, boundary
+containment, settling, wall sliding, release on inversion and unchanged decay.

@@ -1604,9 +1604,15 @@ void tank_tick(tank_t *t, float dt, advisor_fn advise) {
         if (!p->alive) continue;
         live_food++;
         p->age += dt;
-        if (p->y < TANK_H - 14) {
-            p->y += 8 * dt;
-            p->x += sinf(p->age * 1.5f) * dt * 2;
+        /* Pellets sink opposite buoyancy. Clamp each component so they
+         * slide along the glass, settle in corners and move again on tilt. */
+        float gx = -t->bubble_up_x, gy = -t->bubble_up_y;
+        float nx = clampf(p->x + gx*8*dt, 4, TANK_W-4);
+        float ny = clampf(p->y + gy*8*dt, 4, TANK_H-14);
+        if (fabsf(nx-p->x) + fabsf(ny-p->y) > .00001f) {
+            float drift = sinf(p->age*1.5f)*dt*2;
+            p->x = clampf(nx + gy*drift, 4, TANK_W-4);
+            p->y = clampf(ny - gx*drift, 4, TANK_H-14);
         }
         if (p->age > 45) p->alive = false;
     }
