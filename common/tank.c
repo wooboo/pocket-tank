@@ -989,7 +989,7 @@ void tank_feed(tank_t *t, float x, int n) {
 void tank_update_battery(tank_t *t, float fraction, bool charging, float dt) {
     if (fraction < 0 || fraction > 1) return; /* unavailable gauge */
     if (charging) { t->low_battery=false; t->battery_recovery_s=0; }
-    else if (fraction <= .25f) { t->low_battery=true; t->battery_recovery_s=0; }
+    else if (fraction <= .15f) { t->low_battery=true; t->battery_recovery_s=0; }
     else if (t->low_battery) {
         t->battery_recovery_s += fmaxf(0,dt);
         if (t->battery_recovery_s >= 30) { t->low_battery=false; t->battery_recovery_s=0; }

@@ -60,12 +60,12 @@ static void occlusion(bool coral,bool cached) {
 }
 int main(void) {
     tank_init(&tank,123);
-    tank_update_battery(&tank,.26f,false,1); assert(!tank.low_battery);
-    tank_update_battery(&tank,.25f,false,1); assert(tank.low_battery);
-    tank_update_battery(&tank,.26f,false,29); assert(tank.low_battery);
-    tank_update_battery(&tank,.24f,false,1); assert(tank.low_battery);
-    tank_update_battery(&tank,.26f,false,29); assert(tank.low_battery);
-    tank_update_battery(&tank,.26f,false,1); assert(!tank.low_battery);
+    tank_update_battery(&tank,.16f,false,1); assert(!tank.low_battery);
+    tank_update_battery(&tank,.15f,false,1); assert(tank.low_battery);
+    tank_update_battery(&tank,.16f,false,29); assert(tank.low_battery);
+    tank_update_battery(&tank,.14f,false,1); assert(tank.low_battery);
+    tank_update_battery(&tank,.16f,false,29); assert(tank.low_battery);
+    tank_update_battery(&tank,.16f,false,1); assert(!tank.low_battery);
     tank_update_battery(&tank,.10f,false,1); assert(tank.low_battery);
     tank_update_battery(&tank,.10f,true,1); assert(!tank.low_battery);
 
