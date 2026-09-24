@@ -78,7 +78,7 @@ static inline bool imu_shake_sample(imu_shake_t *s, const float a[3], float dt) 
         }
     }
     if (s->reversals < 3 || s->elapsed < .35f) return false;
-    s->cooldown=6; s->active=false; s->reversals=0; s->elapsed=s->quiet=0;
+    s->cooldown=2; s->active=false; s->reversals=0; s->elapsed=s->quiet=0;
     return true;
 }
 #endif

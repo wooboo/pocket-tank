@@ -28,7 +28,7 @@ int main(void) {
             float a[3]={0,0,-1}; a[axis]+=.8f*sinf(i*.04f*6.2831853f*3);
             events+=imu_shake_sample(&s,a,.04f);
         }
-        assert(events==1); /* six-second rate limit */
+        assert(events==2); /* repeated stress during five seconds of shaking */
         for(int i=0;i<200;i++) assert(!sample(&s,0,0,-1));
     }
     tank_t t; tank_init(&t,123); tank_new_population(&t);
@@ -37,10 +37,13 @@ int main(void) {
     t.tap_count=2;
     tank_shake(&t);
     assert(t.startled && t.shake_startled && spooks==1 && t.tap_count==0);
-    for(int i=0;i<t.n_fish;i++) { assert(t.fish[i].stress==3.5f); assert(t.fish[i].trust==6); }
-    for(int i=0;i<250;i++) tank_tick(&t,.04f,advisor_rules);
+    for(int i=0;i<t.n_fish;i++) { assert(t.fish[i].stress==5.0f); assert(t.fish[i].trust==6); }
+    for(int i=0;i<25;i++) tank_tick(&t,.04f,advisor_rules);
+    assert(!t.startled && !t.shake_startled); /* brief scatter, lasting stress */
+    for(int i=0;i<t.n_fish;i++) assert(t.fish[i].stress>4.0f);
+    for(int i=0;i<225;i++) tank_tick(&t,.04f,advisor_rules);
     assert(!t.startled && !t.shake_startled);
-    for(int i=0;i<t.n_fish;i++) assert(t.fish[i].stress<3.5f);
+    for(int i=0;i<t.n_fish;i++) assert(t.fish[i].stress<5.0f);
     for(int i=0;i<20;i++) tank_shake(&t);
     for(int i=0;i<t.n_fish;i++) assert(t.fish[i].stress==10);
     puts("PASS: gentle tilt/noise/bump rejected; sustained shake on all axes; cooldown; school stress, recovery and cap; trust preserved");

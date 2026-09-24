@@ -990,12 +990,12 @@ void tank_shake(tank_t *t) {
     tank_handled(t);
     t->shake_startled = t->startled = true;
     t->startle_x = TANK_W*.5f; t->startle_y = TANK_H*.5f;
-    t->startle_cooldown = STARTLE_COOLDOWN;
+    t->startle_cooldown = .8f; /* brief flinch; stress outlasts the reflex */
     /* Cancel an unfinished double tap rather than toggling lights later. */
     t->tap_count = 0;
     for (int i=0;i<t->n_fish;i++) {
         fish_t *f = &t->fish[i];
-        f->stress = fminf(10, f->stress + 2.5f);
+        f->stress = fminf(10, f->stress + 4.0f);
     }
     tank_emit(TEV_SPOOK, -1);
 }
@@ -1439,8 +1439,8 @@ static void update_fish(tank_t *t, int idx, float dt) {
         float d = tank_dist(f->x, f->y, t->startle_x, t->startle_y);
         if (t->shake_startled || d < STARTLE_RADIUS * 1.6f) {
             float away = atan2f(f->y - t->startle_y, f->x - t->startle_x);
-            desired = norm_ang(desired + norm_ang(away - desired) * 0.85f);
-            touch_speed = lerpf(55, 90, f->bold);
+            desired = norm_ang(desired + norm_ang(away - desired) * (t->shake_startled ? .35f : .85f));
+            touch_speed = t->shake_startled ? lerpf(28, 42, f->bold) : lerpf(55, 90, f->bold);
         }
     } else if (idx == t->stage_fish) {
         /* on stage (setup): a lazy figure-of-eight round the page's clear

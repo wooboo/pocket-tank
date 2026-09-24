@@ -56,10 +56,12 @@ A separate three-axis detector subtracts a slow acceleration baseline and
 requires impulses above 0.45 g with at least three opposing directions over
 at least 350 ms. The sequence expires after 1.5 seconds or 400 ms without a
 strong impulse. Ordinary smooth tilt, a single bump and saturated sensor
-readings do not qualify. A qualifying event has a six-second cooldown.
+readings do not qualify. A qualifying event has a two-second cooldown.
 
-The whole school scatters using the existing startle reflex and gains 2.5
-stress points (capped at 10). Stress remains part of the model's normal input
+The whole school briefly flinches for 0.8 seconds with softer steering and
+28–42 px/s target speed, and gains 4 stress points (capped at 10).
+Continued shaking can raise stress again after the cooldown without
+keeping fish in a prolonged flee reflex. Stress remains part of the model's normal input
 and calms through the existing recovery rules. Trust is unchanged. Shake
 history is transient and resets on wake; the existing save format persists
 fish stress as before.
