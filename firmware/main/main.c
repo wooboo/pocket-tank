@@ -337,6 +337,7 @@ void device_fake_battery(int pct) { s_bat_fake = pct < 0 ? -1 : pct > 100 ? 100 
 static void battery_frame(int64_t now) {
     static int64_t bat_us, above_since;
     if (now - bat_us < 1000000) return;
+    float battery_dt = (now-bat_us)/1e6f;
     bat_us = now;
     s_bat_ok = battery_port_read(&s_bat_frac, &s_bat_chg);
     if (s_bat_fake >= 0) { s_bat_ok = true; s_bat_frac = s_bat_fake / 100.0f; s_bat_chg = false; }   /* staged: on battery at that level, whatever the cable says */
@@ -351,7 +352,7 @@ static void battery_frame(int64_t now) {
         if (!above_since) above_since = now;
         else if (now - above_since > 30LL * 1000000) { s_bat_low = false; ESP_LOGI(TAG, "battery back above %d%%: pill down", (int)(LOW_BATTERY_FRAC * 100)); }
     } else above_since = 0;
-    tank.low_battery = s_bat_low;
+    tank_update_battery(&tank, s_bat_frac, s_bat_chg, battery_dt);
 }
 
 static void reset_tank(void) {

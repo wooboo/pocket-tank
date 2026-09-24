@@ -234,7 +234,7 @@ int tank_add_fish(tank_t *t, int parent_a, int parent_b) {
 void tank_init(tank_t *t, uint32_t seed) {
     t->rng = seed ? seed : 0xC0FFEE;
     t->bubble_up_x = 0; t->bubble_up_y = -1;
-    t->water_push = 0; t->motion_inverted = false; t->low_battery = false;
+    t->water_push = 0; t->motion_inverted = false; t->low_battery = false; t->battery_recovery_s = 0;
     for (int b = 0; b < VEG_BEDS_MAX; b++) t->veg_bend[b] = t->veg_velocity[b] = 0;
     t->n_fish = 0;                 /* progression_boot restores or calls tank_new_population */
     for (int i = 0; i < MAX_FOOD; i++) t->food[i].alive = false;
@@ -984,6 +984,16 @@ void tank_feed(tank_t *t, float x, int n) {
     if (dropped) tank_emit(TEV_FEED, -1);        /* the plink is for pellets, not for the tap (a full tank drops none) */
     t->feed_spot_x = t->feed_spot_x < 0 ? x : t->feed_spot_x + (x - t->feed_spot_x) * 0.3f;
     t->feed_open = true;                         /* a meal once somebody eats from it */
+}
+
+void tank_update_battery(tank_t *t, float fraction, bool charging, float dt) {
+    if (fraction < 0 || fraction > 1) return; /* unavailable gauge */
+    if (charging) { t->low_battery=false; t->battery_recovery_s=0; }
+    else if (fraction <= .40f) { t->low_battery=true; t->battery_recovery_s=0; }
+    else if (t->low_battery) {
+        t->battery_recovery_s += fmaxf(0,dt);
+        if (t->battery_recovery_s >= 30) { t->low_battery=false; t->battery_recovery_s=0; }
+    }
 }
 
 bool tank_fish_sheltering(const tank_t *t, int fish) {

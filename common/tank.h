@@ -211,6 +211,7 @@ typedef struct tank {
     float    bubble_x, bubble_y;   /* bubble column anchor */
     float    bubble_up_x, bubble_up_y; /* transient screen-space unit vector; never saved */
     float    water_push, veg_bend[VEG_BEDS_MAX], veg_velocity[VEG_BEDS_MAX];
+    float    battery_recovery_s; /* time continuously above shelter threshold */
     bool     low_battery; /* transient: shelter until charging / gauge recovery */
     bool     shake_startled; /* whole-school startle, unlike a local glass tap */
     bool     motion_inverted; /* transient motion only; save format unchanged */
@@ -462,6 +463,7 @@ void  tank_light_auto(tank_t *t);
 #define FEED_ZONE_Y 26.0f
 void  tank_touch_hold(tank_t *t, float x, float y);
 void  tank_touch_tap(tank_t *t, float x, float y);
+void  tank_update_battery(tank_t *t, float fraction, bool charging, float dt);
 bool  tank_fish_sheltering(const tank_t *t, int fish);
 void  tank_shelter_target(const tank_t *t, int fish, float *x, float *y);
 void  tank_shake(tank_t *t); /* called only after sustained shaking is recognised */
