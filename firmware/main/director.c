@@ -117,6 +117,7 @@ static void show_state(const tank_t *t) {
     int pellets = 0, cells = 0;
     for (int i = 0; i < MAX_FOOD; i++) pellets += t->food[i].alive;
     for (int i = 0; i < ALGAE_CELLS; i++) cells += t->algae[i] > 0;
+    ESP_LOGI(TAG, "low-battery shelter: %s", t->low_battery ? "active" : "off");
     ESP_LOGI(TAG, "pellets %d | trickle %s | ravenous %d | %s%s idle %.0fs | veg %.2f %.2f %.2f | algae cells %d/%d | courting %s%s%s%s | arrival %s",
              pellets, t->trickle_off ? "OFF" : "on", (int)t->ravenous,
              t->night ? "night" : "day", t->light_override ? " (manual)" : "",

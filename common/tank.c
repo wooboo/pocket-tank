@@ -234,7 +234,7 @@ int tank_add_fish(tank_t *t, int parent_a, int parent_b) {
 void tank_init(tank_t *t, uint32_t seed) {
     t->rng = seed ? seed : 0xC0FFEE;
     t->bubble_up_x = 0; t->bubble_up_y = -1;
-    t->water_push = 0; t->motion_inverted = false;
+    t->water_push = 0; t->motion_inverted = false; t->low_battery = false;
     for (int b = 0; b < VEG_BEDS_MAX; b++) t->veg_bend[b] = t->veg_velocity[b] = 0;
     t->n_fish = 0;                 /* progression_boot restores or calls tank_new_population */
     for (int i = 0; i < MAX_FOOD; i++) t->food[i].alive = false;
@@ -986,6 +986,37 @@ void tank_feed(tank_t *t, float x, int n) {
     t->feed_open = true;                         /* a meal once somebody eats from it */
 }
 
+bool tank_fish_sheltering(const tank_t *t, int fish) {
+    return t->low_battery && !t->startled && fish != t->stage_fish;
+}
+void tank_shelter_target(const tank_t *t, int fish, float *x, float *y) {
+    float xs[VEG_BEDS_MAX+2], ys[VEG_BEDS_MAX+2]; int count=0;
+    /* Coral refuges first so even a small school uses purchased cover. */
+    if (t->sd_unlocks & SD_ITEM_CORAL) {
+        xs[count]=tank_decor_x(t,3); ys[count++]=TANK_H-38;
+    }
+    if (t->sd_unlocks & SD_ITEM_CLUSTER) {
+        xs[count]=tank_decor_x(t,4)-12; ys[count++]=TANK_H-55;
+    }
+    for (int b=0;b<tank_veg_beds(t);b++) {
+        int n; tank_veg_bed(t,b,NULL,NULL,NULL,&n);
+        int best=-1;
+        for(int j=0;j<n;j++) {
+            int i=(j+fish*3)%n;
+            if(t->veg_h[b][i]>=VEG_BARE && (best<0 || t->veg_h[b][i]>t->veg_h[b][best])) best=i;
+        }
+        if(best<0) continue;
+        veg_shape_t shape; tank_veg_shape(t,b,best,&shape);
+        float cy=clampf(shape.top+24,TANK_H*.60f,TANK_H-28);
+        float cx,half; tank_veg_span(&shape,(int)cy,&cx,&half);
+        xs[count]=cx; ys[count++]=cy;
+    }
+    if(count) { int slot=fish%count; *x=xs[slot]; *y=ys[slot]; }
+    else { *x=t->reef_x+fish*28; *y=TANK_H-40; } /* trimmed / empty garden */
+    *x=clampf(*x,30,TANK_W-30);
+    *y=clampf(*y,TANK_H*.60f,TANK_H-28);
+}
+
 void tank_shake(tank_t *t) {
     tank_handled(t);
     t->shake_startled = t->startled = true;
@@ -1452,6 +1483,13 @@ static void update_fish(tank_t *t, int idx, float dt) {
         float to = atan2f(wy - f->y, wx - f->x);
         desired = norm_ang(desired + norm_ang(to - desired) * 0.85f);
         touch_speed = tank_dist(f->x, f->y, t->stage_x, t->stage_y) > 80 ? 44 : 20;
+    } else if (tank_fish_sheltering(t,idx)) {
+        float sx,sy; tank_shelter_target(t,idx,&sx,&sy);
+        sx += sinf(t->clock*.35f+idx*1.7f)*4;
+        sy += sinf(t->clock*.28f+idx)*2;
+        float d=tank_dist(f->x,f->y,sx,sy);
+        desired=atan2f(sy-f->y,sx-f->x);
+        touch_speed=d>40 ? 28 : d>10 ? 12 : 2;
     } else if (t->spawning && (idx == t->court_a || idx == t->court_b) &&
                f->goal.id != GOAL_FLEE_SHADOW && !(t->ravenous && f->hunger > 6.5f)) {
         /* the spawning (2026-09-24): the courtship that ends in a fry. It
@@ -1525,7 +1563,8 @@ static void update_fish(tank_t *t, int idx, float dt) {
             float d = tank_dist(f->x, f->y, t->fish[i].x, t->fish[i].y), r = 36 * f->size;
             if (d < r) {
                 float away = atan2f(f->y - t->fish[i].y, f->x - t->fish[i].x);
-                desired = norm_ang(desired + norm_ang(away - desired) * (0.35f + 0.5f * (1 - d / r)));
+                desired = norm_ang(desired + norm_ang(away - desired) * (0.35f + 0.5f * (1 - d / r))
+                                   * (tank_fish_sheltering(t,idx) ? .2f : 1));
             }
         }
 

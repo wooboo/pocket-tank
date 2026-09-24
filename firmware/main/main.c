@@ -351,6 +351,7 @@ static void battery_frame(int64_t now) {
         if (!above_since) above_since = now;
         else if (now - above_since > 30LL * 1000000) { s_bat_low = false; ESP_LOGI(TAG, "battery back above %d%%: pill down", (int)(LOW_BATTERY_FRAC * 100)); }
     } else above_since = 0;
+    tank.low_battery = s_bat_low;
 }
 
 static void reset_tank(void) {

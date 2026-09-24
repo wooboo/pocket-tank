@@ -1489,6 +1489,20 @@ void render_tank(const tank_t *t, uint16_t *fb, int stride) {
         if (kplacing && kz == DECOR_Z_BACK) draw_coral(&c, kx, krgb, kg, true);   /* the coral dragged BEHIND: live too */
         if (lplacing && lz == DECOR_Z_BACK) draw_cluster(&c, lx, lscheme, lg, true);
     } else draw_scene(t, fb, stride, dim);
+    /* Sheltering fish are farther back than every plant/coral layer. Draw
+     * them once here, then restore back-layer coral silhouettes over them. */
+    bool sheltered=false;
+    for (int i=0;i<t->n_fish;i++) if (tank_fish_sheltering(t,i)) {
+        sheltered=true;
+        g_bb_on=true; g_bb_x0=g_bb_y0=1<<20; g_bb_x1=g_bb_y1=-1;
+        draw_fish(&c,t,&t->fish[i],i);
+        g_bb_on=false;
+        if(g_bb_x1>=g_bb_x0) DYN_RECT(g_bb_x0,g_bb_y0,g_bb_x1,g_bb_y1);
+    }
+    if(sheltered) {
+        if(kx>=0 && kz==DECOR_Z_BACK) draw_coral(&c,kx,krgb,kg,cached);
+        if(lx>=0 && lz==DECOR_Z_BACK) draw_cluster(&c,lx,lscheme,lg,cached);
+    }
 #define CORAL_CROWN() do { int qx0, qy0, qx1, qy1; draw_coral_crown(&c, kx, krgb, kg, t->clock, &qx0, &qy0, &qx1, &qy1); \
         if (qx1 >= qx0) DYN_RECT(qx0, qy0, qx1, qy1); } while (0)
 #define CLUSTER_CROWN() do { int qx0, qy0, qx1, qy1; draw_cluster_crown(&c, lx, lscheme, lg, t->clock, &qx0, &qy0, &qx1, &qy1); \
@@ -1538,6 +1552,7 @@ void render_tank(const tank_t *t, uint16_t *fb, int stride) {
     PROF_ADD(3, p0);
     /* fish */
     for (int i = 0; i < t->n_fish; i++) {
+        if (tank_fish_sheltering(t,i)) continue;
         g_bb_on = true; g_bb_x0 = g_bb_y0 = 1 << 20; g_bb_x1 = g_bb_y1 = -1;
         draw_fish(&c, t, &t->fish[i], i);
         g_bb_on = false;
