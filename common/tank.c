@@ -990,7 +990,7 @@ void tank_shake(tank_t *t) {
     tank_handled(t);
     t->shake_startled = t->startled = true;
     t->startle_x = TANK_W*.5f; t->startle_y = TANK_H*.5f;
-    t->startle_cooldown = .8f; /* brief flinch; stress outlasts the reflex */
+    t->startle_cooldown = 2.5f; /* stress outlasts the scatter reflex */
     /* Cancel an unfinished double tap rather than toggling lights later. */
     t->tap_count = 0;
     for (int i=0;i<t->n_fish;i++) {

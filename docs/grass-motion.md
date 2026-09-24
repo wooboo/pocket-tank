@@ -58,7 +58,7 @@ at least 350 ms. The sequence expires after 1.5 seconds or 400 ms without a
 strong impulse. Ordinary smooth tilt, a single bump and saturated sensor
 readings do not qualify. A qualifying event has a two-second cooldown.
 
-The whole school briefly flinches for 0.8 seconds with softer steering and
+The whole school scatters for 2.5 seconds with softer steering and
 28–42 px/s target speed, and gains 4 stress points (capped at 10).
 Continued shaking can raise stress again after the cooldown without
 keeping fish in a prolonged flee reflex. Stress remains part of the model's normal input

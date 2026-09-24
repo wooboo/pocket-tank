@@ -38,10 +38,12 @@ int main(void) {
     tank_shake(&t);
     assert(t.startled && t.shake_startled && spooks==1 && t.tap_count==0);
     for(int i=0;i<t.n_fish;i++) { assert(t.fish[i].stress==5.0f); assert(t.fish[i].trust==6); }
-    for(int i=0;i<25;i++) tank_tick(&t,.04f,advisor_rules);
+    for(int i=0;i<60;i++) tank_tick(&t,.04f,advisor_rules);
+    assert(t.startled && t.shake_startled); /* still scattering at 2.4 s */
+    for(int i=0;i<5;i++) tank_tick(&t,.04f,advisor_rules);
     assert(!t.startled && !t.shake_startled); /* brief scatter, lasting stress */
-    for(int i=0;i<t.n_fish;i++) assert(t.fish[i].stress>4.0f);
-    for(int i=0;i<225;i++) tank_tick(&t,.04f,advisor_rules);
+    for(int i=0;i<t.n_fish;i++) assert(t.fish[i].stress>3.0f);
+    for(int i=0;i<185;i++) tank_tick(&t,.04f,advisor_rules);
     assert(!t.startled && !t.shake_startled);
     for(int i=0;i<t.n_fish;i++) assert(t.fish[i].stress<5.0f);
     for(int i=0;i<20;i++) tank_shake(&t);
