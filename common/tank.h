@@ -210,6 +210,8 @@ typedef struct tank {
     bubble_t bubble[MAX_BUBBLE];
     float    bubble_x, bubble_y;   /* bubble column anchor */
     float    bubble_up_x, bubble_up_y; /* transient screen-space unit vector; never saved */
+    float    water_push, veg_bend[VEG_BEDS_MAX], veg_velocity[VEG_BEDS_MAX];
+    bool     motion_inverted; /* transient motion only; save format unchanged */
     float    reef_x, reef_y;
     float    clock;                /* seconds since start */
     bool     night;                /* the tank light is off: fish rest, the palette dims */
@@ -538,6 +540,28 @@ enum { SD_PAID_JUV = 1u << 0, SD_PAID_ADULT = 1u << 1, SD_PAID_ELDER = 1u << 2, 
  * every loop over beds runs to this. tank_veg_kind is the species (render). */
 int   tank_veg_beds(const tank_t *t);
 veg_kind_t tank_veg_kind(const tank_t *t, int b);
+#define VEG_SEG_DY 3.2f
+#define VEG_SEG_RY 2.2f
+#define VEG_MAX_SEGS (VEG_SEGS_FULL + 5)
+typedef struct {
+    int segs, top, bottom;
+    bool sword;
+    float x[VEG_MAX_SEGS + 1];
+} veg_shape_t;
+/* One spine and pixel-row silhouette for drawing, drag arming and scissors. */
+void tank_veg_shape(const tank_t *t, int bed, int frond, veg_shape_t *shape);
+static inline void tank_veg_span(const veg_shape_t *s, int y, float *cx, float *half) {
+    float sp = (TANK_H - 16 - y) / VEG_SEG_DY;
+    if (sp < 0) sp = 0;
+    if (sp > s->segs - 1) sp = (float)(s->segs - 1);
+    int k = (int)sp; float f = sp - k;
+    *cx = s->x[k] + (s->x[k + 1] - s->x[k]) * f;
+    float u = sp / (s->segs > 1 ? s->segs - 1 : 1);
+    *half = s->sword ? 1.2f + 6.0f * (u < .4f ? u/.4f : (1-u)/.6f)
+                     : 2.4f - 2.0f*u;
+    if (*half < .4f) *half = .4f;
+}
+void tank_set_water_motion(tank_t *t, float up_x, float up_y, float push, bool inverted);
 /* the purchases land: the sword plant at VEG_START on the open floor; the
  * snail on the glass, bottom left */
 void  tank_plant_place(tank_t *t);

@@ -919,12 +919,19 @@ static int selftest_tend(void) {
         tank_veg_set(&tank, 1, 1.0f);
     }
     /* First the precision: a short flick across fronds 1 and 2 of bed 1 at
-     * mid-height takes those two to that height and touches nothing else */
+     * mid-height takes the visible blades inside the fingertip span. */
     {
         float fx1, fx2; tank_veg_frond(&tank, 1, 1, &fx1); tank_veg_frond(&tank, 1, 2, &fx2);
         float before[VEG_FRONDS_MAX]; memcpy(before, tank.veg_h[1], sizeof before);
         float sy = 200;                            /* lands and lifts a third of a pitch off the two spines:
-                                                      the pad's reach (SLASH_REACH_PX) must not take 0 or 3 */
+                                                      include the pad and actual bent silhouettes */
+        bool crossed[VEG_FRONDS_MAX] = {0};
+        int visible_n; tank_veg_bed(&tank, 1, NULL, NULL, NULL, &visible_n);
+        for (int i = 0; i < visible_n; i++) {
+            veg_shape_t shape; tank_veg_shape(&tank, 1, i, &shape);
+            float cx, half; tank_veg_span(&shape, (int)sy, &cx, &half);
+            crossed[i] = (int)(cx+half) >= fx1-3-8 && (int)(cx-half) <= fx2+3+8;
+        }
         for (float sx = fx1 - 3; sx <= fx2 + 3; sx += 2) tank_touch_drag(&tank, sx, sy);
         tank_tick(&tank, 1.0f / 60.0f, advisor_rules); tank_tick(&tank, 1.0f / 60.0f, advisor_rules);
         float want = (TANK_H - 16 - sy) / ((VEG_SEGS_FULL - 1) * 3.2f);
@@ -932,7 +939,7 @@ static int selftest_tend(void) {
         printf("selftest-tend: flick at y %.0f: bed 1 fronds 1,2 %.2f/%.2f -> %.2f/%.2f (want %.2f); frond 0 %.2f -> %.2f\n",
                sy, before[1], before[2], tank.veg_h[1][1], tank.veg_h[1][2], want, before[0], tank.veg_h[1][0]);
         for (int i = 0; i < n; i++) {
-            bool cut = i == 1 || i == 2;
+            bool cut = crossed[i];
             float h = tank.veg_h[1][i];
             if (cut && fabsf(h - want) > 0.02f) { printf("FAIL: frond %d not cut to the finger's height (%.2f vs %.2f)\n", i, h, want); return 1; }
             if (!cut && h < before[i]) { printf("FAIL: frond %d cut by a flick that never crossed it\n", i); return 1; }

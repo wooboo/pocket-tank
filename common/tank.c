@@ -234,6 +234,8 @@ int tank_add_fish(tank_t *t, int parent_a, int parent_b) {
 void tank_init(tank_t *t, uint32_t seed) {
     t->rng = seed ? seed : 0xC0FFEE;
     t->bubble_up_x = 0; t->bubble_up_y = -1;
+    t->water_push = 0; t->motion_inverted = false;
+    for (int b = 0; b < VEG_BEDS_MAX; b++) t->veg_bend[b] = t->veg_velocity[b] = 0;
     t->n_fish = 0;                 /* progression_boot restores or calls tank_new_population */
     for (int i = 0; i < MAX_FOOD; i++) t->food[i].alive = false;
     t->bubble_x = BUBBLE_X_DEFAULT; t->bubble_y = TANK_H * 0.5f;   /* matches gen_traces.py; setup may move x */
@@ -424,6 +426,67 @@ int tank_nursery_bed(const tank_t *t) {
         if (t->veg_growth[b] >= VEG_NURSERY && (best < 0 || t->veg_growth[b] > t->veg_growth[best])) best = b;
     return best;
 }
+/* Transient spring motion: each bed has a slightly different period. */
+void tank_set_water_motion(tank_t *t, float ux, float uy, float push, bool inverted) {
+    if (inverted != t->motion_inverted) {
+        for (int b = 0; b < VEG_BEDS_MAX; b++) {
+            t->veg_bend[b] = -t->veg_bend[b];
+            t->veg_velocity[b] = -t->veg_velocity[b];
+        }
+    }
+    t->motion_inverted = inverted;
+    t->bubble_up_x = ux; t->bubble_up_y = uy;
+    t->water_push = clampf(push, -1.5f, 1.5f);
+}
+static void veg_motion_tick(tank_t *t, float dt) {
+    /* Substeps keep the spring stable during a slow frame or console command. */
+    float left = clampf(dt, 0, .25f);
+    while (left > 0) {
+        float h = fminf(left, .01f); left -= h;
+        for (int b = 0; b < VEG_BEDS_MAX; b++) {
+            float spring = b == 3 ? 20 : 13 + b * 2;
+            float target = t->bubble_up_x * (b == 3 ? .45f : .8f);
+            float accel = spring * (target - t->veg_bend[b])
+                        - (b == 3 ? 5 : 3.6f) * t->veg_velocity[b]
+                        - t->water_push * (b == 3 ? 8 : 14);
+            t->veg_velocity[b] = clampf(t->veg_velocity[b] + accel*h, -5, 5);
+            t->veg_bend[b] += t->veg_velocity[b]*h;
+            if (fabsf(t->veg_bend[b]) > 1.2f) {
+                t->veg_bend[b] = clampf(t->veg_bend[b], -1.2f, 1.2f);
+                t->veg_velocity[b] = 0;
+            }
+        }
+    }
+}
+static float veg_sin(float x) {
+    static float lut[256]; static bool filled;
+    if (!filled) { for (int i = 0; i < 256; i++) lut[i] = sinf(i * (TAU / 256)); filled = true; }
+    return lut[(int)(x * (256.0f / TAU)) & 255];
+}
+void tank_veg_shape(const tank_t *t, int b, int i, veg_shape_t *s) {
+    static const int seeds[VEG_BEDS_MAX] = {0, 7, 3, 5};
+    float bx;
+    s->segs = tank_veg_frond(t, b, i, &bx);
+    if (s->segs < 1) s->segs = 1;
+    if (s->segs > VEG_MAX_SEGS) s->segs = VEG_MAX_SEGS;
+    s->sword = tank_veg_kind(t, b) == VEG_KIND_SWORD;
+    s->bottom = (int)(TANK_H - 16 + VEG_SEG_RY);
+    s->top = (int)(TANK_H - 16 - (s->segs - 1)*VEG_SEG_DY - VEG_SEG_RY);
+    if (s->top < 0) s->top = 0;
+    float phase = i + seeds[b];
+    float sway = veg_sin(t->clock * (s->sword ? .6f : .9f) + phase*1.7f);
+    for (int k = 0; k <= s->segs; k++) {
+        float height = k * VEG_SEG_DY;
+        float u = height / ((VEG_SEGS_FULL - 1)*VEG_SEG_DY);
+        /* Absolute height, not fraction of current blade length: cutting a
+         * tip does not suddenly move the remaining stem sideways. */
+        float bend = t->veg_bend[b] * height * (.12f + .20f*u);
+        float wave = sway * (s->sword ? 5 : 8) * u
+                   * veg_sin(k*.4f + t->clock*.6f + phase);
+        s->x[k] = bx + bend + wave;
+    }
+}
+
 /* where the pair circles: low inside the nursery bed, a flat loop that weaves
  * the fronds (body centre ~14 px off the floor line) */
 static void court_site(const tank_t *t, float *cx, float *cy, float *rx) {
@@ -508,13 +571,13 @@ void tank_veg_set(tank_t *t, int b, float g) {
 /* is (x,y) within `side` px of some frond of bed b sideways, and no more than
  * `up` px above its tip? The slash arms only from here. */
 static bool veg_near_frond(const tank_t *t, int b, float x, float y, float side, float up) {
-    float x0, x1; int n;
-    tank_veg_bed(t, b, &x0, &x1, NULL, &n);
-    if (x < x0 - side || x > x1 + side) return false;
+    int n; tank_veg_bed(t, b, NULL, NULL, NULL, &n);
     for (int i = 0; i < n; i++) {
-        float fx; int segs = tank_veg_frond(t, b, i, &fx);
-        float tip = TANK_H - 16 - segs * VEG_SEG_PX;
-        if (fabsf(x - fx) <= side && y >= tip - up) return true;
+        veg_shape_t shape; tank_veg_shape(t, b, i, &shape);
+        if (y < shape.top - up || y > shape.bottom + side) continue;
+        int row = (int)clampf(y, shape.top, shape.bottom);
+        float cx, half; tank_veg_span(&shape, row, &cx, &half);
+        if (x >= (int)(cx-half)-side && x <= (int)(cx+half)+side) return true;
     }
     return false;
 }
@@ -524,35 +587,58 @@ static bool veg_inside(const tank_t *t, int b, float x, float y) {
     return x >= x0 && x <= x1 && y >= ty;
 }
 
-/* the scissors: cut every frond whose spine the stroke segment (x0,y0)-(x1,y1)
- * crosses, to the height where it crosses (only ever DOWN, never below nubs).
- * The segment reaches SLASH_REACH_PX past its far end - the finger is a pad,
- * not a point, and the frond just ahead of the reported point at lift is
- * under it (mid-stroke the next segment crosses that frond anyway, at the
- * same height); `landing` (the retroactive first segment of a stroke) reaches
- * the same distance back past its start, for the frond under the finger as
- * it touched down. A frond in the reach is cut at the height of that end.
- * Returns the number of fronds cut. */
+/* Clip a stroke to the visible pixel row and test its horizontal span.
+ * This includes the blade's width, not just an imaginary centre line. */
+static bool veg_stroke_row(float x0, float y0, float x1, float y1,
+                           int row, int lo, int hi, float *hit_x) {
+    float dy = y1-y0, a = 0, z = 1;
+    if (fabsf(dy) < .0001f) {
+        if (y0 < row-.5f || y0 > row+.5f) return false;
+    } else {
+        float p = (row-.5f-y0)/dy, q = (row+.5f-y0)/dy;
+        a = fmaxf(0, fminf(p,q)); z = fminf(1, fmaxf(p,q));
+        if (a > z) return false;
+    }
+    float xa = x0+(x1-x0)*a, xb = x0+(x1-x0)*z;
+    if (fmaxf(xa,xb) < lo || fminf(xa,xb) > hi) return false;
+    *hit_x = clampf((xa+xb)*.5f, lo, hi);
+    return true;
+}
 static int veg_cut(tank_t *t, float x0, float y0, float x1, float y1, bool landing) {
     int cuts = 0;
-    float lo = x0 < x1 ? x0 : x1, hi = x0 < x1 ? x1 : x0;
-    if (x1 >= x0) hi += SLASH_REACH_PX; else lo -= SLASH_REACH_PX;
-    if (landing) { if (x1 >= x0) lo -= SLASH_REACH_PX; else hi += SLASH_REACH_PX; }
-    float dx = x1 - x0;
+    /* The fingertip can sweep the sand just below the visible roots. Keep
+     * the established floor-mowing gesture, snapping that pad to the root. */
+    float root_row = (int)(TANK_H-16+VEG_SEG_RY);
+    if (y0 > root_row && y0 <= TANK_H) y0 = root_row;
+    if (y1 > root_row && y1 <= TANK_H) y1 = root_row;
+    float sign = x1 >= x0 ? 1 : -1;
     for (int b = 0; b < tank_veg_beds(t); b++) {
-        float bx0; int n; veg_bed_base(t, b, &bx0, &n);
+        int n; tank_veg_bed(t, b, NULL, NULL, NULL, &n);
         for (int i = 0; i < n; i++) {
-            float fx = bx0 + i * veg_pitch(b);
-            if (fx < lo || fx > hi) continue;
-            float u = fabsf(dx) > 0.001f ? clampf((fx - x0) / dx, 0, 1) : 0;
-            float cy = y0 + (y1 - y0) * u;
-            float hf = (TANK_H - 16 - cy) / ((VEG_SEGS_FULL - 1) * VEG_SEG_PX);
-            if (hf < VEG_NUB) hf = VEG_NUB;
-            if (hf >= t->veg_h[b][i]) continue;    /* the stroke passed above the tip */
-            t->trim_px += (t->veg_h[b][i] - hf) * (VEG_SEGS_FULL - 1) * VEG_SEG_PX;   /* the inches (sand dollars) */
+            veg_shape_t shape; tank_veg_shape(t, b, i, &shape);
+            float fx = 0, cy = 0; bool hit = false;
+            int bottom = (int)ceilf(fmaxf(y0,y1)+.5f);
+            int top = (int)floorf(fminf(y0,y1)-.5f);
+            if (bottom > shape.bottom) bottom = shape.bottom;
+            if (top < shape.top) top = shape.top;
+            for (int y = bottom; y >= top; y--) {
+                float cx, half; tank_veg_span(&shape, y, &cx, &half);
+                int lo = (int)(cx-half), hi = (int)(cx+half);
+                hit = veg_stroke_row(x0,y0,x1,y1,y,lo,hi,&fx)
+                   || veg_stroke_row(x1,y1,x1+sign*SLASH_REACH_PX,y1,y,lo,hi,&fx)
+                   || (landing && veg_stroke_row(x0-sign*SLASH_REACH_PX,y0,x0,y0,y,lo,hi,&fx));
+                if (hit) { cy = (float)y; break; } /* lowest crossing wins */
+            }
+            if (!hit) continue;
+            /* Whole segments: the new visible tip is at/below the cut row,
+             * within one 3.2 px segment. Nubs are always protected. */
+            int segs = 1 + (int)floorf((TANK_H-16-VEG_SEG_RY-cy)/VEG_SEG_DY);
+            float hf = fmaxf(VEG_NUB, (segs-2+.001f)/(VEG_SEGS_FULL-2));
+            if (hf >= t->veg_h[b][i]) continue;
+            t->trim_px += (t->veg_h[b][i]-hf)*(VEG_SEGS_FULL-1)*VEG_SEG_PX;
             t->veg_h[b][i] = hf;
             cuts++;
-            int puffs = 2;                         /* cut leaves drift up */
+            int puffs = 2;
             for (int k = 0; k < MAX_BUBBLE && puffs > 0; k++) {
                 if (t->bubble[k].column) continue;
                 t->bubble[k].x = fx + tank_randf(t, -4, 4);
@@ -1482,6 +1568,7 @@ static uint32_t state_signature(const tank_t *t, int idx) {
 
 void tank_tick(tank_t *t, float dt, advisor_fn advise) {
     t->clock += dt;
+    veg_motion_tick(t, dt);
     /* the light: on while the device is handled, off LIGHT_IDLE_S after the
      * last touch or movement (tank_handled) - a tank left on the desk goes
      * dark and the fish sleep. A setup page or a prompt holds it on; the

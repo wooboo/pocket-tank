@@ -2,7 +2,8 @@
 
 Bubbles rise along the accelerometer's estimate of up, projected onto the
 screen. This is a visual effect: the aerator, fish bubble-visit targets,
-food, decorations and water remain in tank coordinates. No model or save
+food, decorations and water remain in tank coordinates. Grass additionally
+responds to motion as described in [grass-motion.md](grass-motion.md). No model or save
 format changes are needed.
 
 The QMI8658 runs with its existing 31.25 Hz accelerometer configuration and

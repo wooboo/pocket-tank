@@ -370,9 +370,6 @@ static void veg_tint_fill(float dim) {
     g_veg_row_dim = dim;
 }
 
-#define VEG_SEG_DY   3.2f                 /* segment pitch, px of height */
-#define VEG_SEG_RY   2.2f                 /* the old segment ellipse's half-height */
-#define VEG_MAX_SEGS (VEG_SEGS_FULL + 5)  /* tank_veg_bed tops out at VEG_SEGS_FULL */
 /* final: the scene cache is live, so each frond span applies its own vignette
  * (see span_final) and needs no re-apply rect - a full canopy used to hand
  * the sweep three bed-sized boxes, the largest PSRAM traffic in the frame. */
@@ -409,42 +406,12 @@ static void draw_veg(ctx_t *c, const tank_t *t, int b, int seed, int layer, bool
     /* the sword plant (bed 3, the shop): broad lanceolate leaves - a narrow
        stem, 7 px half-width at 40% of the way up, a point at the tip - a
        lazier sway, its own yellow-green pair */
-    bool sword = tank_veg_kind(t, b) == VEG_KIND_SWORD;
-    float root = 2.4f, tip = 0.4f, amp = sword ? 2.5f : 4.0f;
     for (int i = 0; i < n; i++) {
         if (layer >= 0 && (i & 1) != layer) continue;
-        float bx;
-        /* each frond's own height (tank_t.veg_h): what the keeper cut is
-           exactly what shows - no render-side variation on top */
-        int segs = tank_veg_frond(t, b, i, &bx);
-        if (segs < 1) segs = 1;                    /* nubs: always a bit of green */
-        if (segs > VEG_MAX_SEGS) segs = VEG_MAX_SEGS;
-        float sway = fast_sin(t->clock * (sword ? 0.6f : 0.9f) + (i + seed) * 1.7f) * amp;
-        /* the swaying chain of segment centres (the frond's spine) */
-        float xs[VEG_MAX_SEGS + 1];
-        for (int seg = 0; seg <= segs; seg++)
-            xs[seg] = bx + sway * seg / (float)segs * fast_sin(seg * 0.4f + t->clock * 0.6f + i + seed);
-        /* one span per pixel row, centred on the spine, half-width tapering
-         * toward the tip: the same silhouette the old chain of overlapping
-         * ellipses drew (their union was a 5 px ribbon), at ~a quarter fewer
-         * pixels and without a sqrt per row. Full canopy = ~1000 segments. */
-        const uint16_t *pal = g_veg_row[(sword ? 2 : 0) + ((i + seed) & 1)];
-        int y_bot = (int)(TANK_H - 16 + VEG_SEG_RY);
-        int y_top = (int)(TANK_H - 16 - (segs - 1) * VEG_SEG_DY - VEG_SEG_RY);
-        for (int y = y_bot; y >= y_top; y--) {
-            float sp = (TANK_H - 16 - y) / VEG_SEG_DY;          /* fractional segment */
-            if (sp < 0) sp = 0;
-            if (sp > segs - 1) sp = (float)(segs - 1);
-            /* taper relative to the frond's own length (2.4 px at the root,
-             * 0.4 at the tip): the old fixed 0.07/segment thinned every frond
-             * to nothing at 29 segments, a hidden height cap now that fronds
-             * grow to the ceiling (VEG_SEGS_FULL) */
-            float u = sp / (segs > 1 ? segs - 1 : 1);
-            float half = sword ? 1.2f + 6.0f * (u < 0.4f ? u / 0.4f : (1 - u) / 0.6f)
-                               : root - (root - tip) * u;
-            if (half < tip) half = tip;
-            int k = (int)sp; float fr = sp - k;
-            float cx = xs[k] + (xs[k + 1] - xs[k]) * fr;
+        veg_shape_t shape; tank_veg_shape(t, b, i, &shape);
+        const uint16_t *pal = g_veg_row[(shape.sword ? 2 : 0) + ((i + seed) & 1)];
+        for (int y = shape.bottom; y >= shape.top; y--) {
+            float cx, half; tank_veg_span(&shape, y, &cx, &half);
             src_t s; s.v = pal[y];                              /* opaque: only .v is read */
             veg_span(c, (int)(cx - half), (int)(cx + half), y, &s, final);
         }

@@ -48,6 +48,7 @@ static bool s_inverted;
 static int s_streak;              /* consecutive polls voting for a flip */
 static int64_t s_next_us, s_detector_next_us, s_sample_us;
 static imu_gravity_t s_gravity = {0, -1};
+static imu_water_t s_water;
 static int16_t s_prev[3]; static bool s_have_prev;
 static int64_t s_moved_us; static int s_motion; static int16_t s_last[3];
 static int64_t s_handled_us; static bool s_prev_moved;   /* two polls in a row over the threshold */
@@ -110,6 +111,7 @@ void imu_port_poll(int64_t now_us) {
     float sample_dt = s_sample_us ? (now_us - s_sample_us) / 1e6f : 0.032f;
     if (sample_dt > 0.1f) sample_dt = 0.032f;
     s_sample_us = now_us;
+    imu_water_sample(&s_water, a[0] / 16384.0f, sample_dt);
     imu_gravity_sample(&s_gravity, a[0] / 16384.0f, a[1] / 16384.0f,
                        a[2] / 16384.0f, sample_dt);
     for (int i = 0; i < 3; i++) s_last[i] = a[i];
@@ -177,6 +179,11 @@ void imu_port_bubble_up(float *x, float *y) {
     imu_gravity_screen(&s_gravity, s_inverted, x, y);
 }
 
+float imu_port_water_push(void) {
+    if (!s_dev || !s_sample_us || esp_timer_get_time()-s_sample_us > 500000) return 0;
+    return s_inverted ? -s_water.push : s_water.push;
+}
+
 bool imu_port_inverted(void) { return s_inverted; }
 void imu_port_last(int16_t out[3], int *motion) { for (int i = 0; i < 3; i++) out[i] = s_last[i]; if (motion) *motion = s_motion; }
 bool imu_port_handled(void) { return s_handled_us && esp_timer_get_time() - s_handled_us < IMU_MOTION_HOLD_US; }
@@ -192,6 +199,7 @@ void imu_port_sleep(void) {
 void imu_port_wake(void) {
     if (!s_dev) return;
     s_sample_us = s_next_us = s_detector_next_us = 0;
+    s_water = (imu_water_t){0};
     s_have_prev = false; s_prev_moved = false; s_streak = 0;
     if (!imu_reset_config()) ESP_LOGW(TAG, "wake reconfig failed");
 }

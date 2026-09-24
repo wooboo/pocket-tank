@@ -29,4 +29,15 @@ static inline void imu_gravity_screen(const imu_gravity_t *g, bool inverted,
     *x = inverted ? -g->x : g->x;
     *y = inverted ? -g->y : g->y;
 }
+/* High-pass acceleration drives transient water movement; unlike buoyancy,
+ * it deliberately keeps shake impulses. The first sample seeds the baseline. */
+typedef struct { float baseline, push; bool ready; } imu_water_t;
+static inline void imu_water_sample(imu_water_t *w, float ax, float dt) {
+    if (fabsf(ax) >= 1.95f) { w->push = 0; return; }
+    if (!w->ready) { w->baseline = ax; w->ready = true; }
+    w->baseline += (ax-w->baseline) * dt/(.35f+dt);
+    w->push = ax-w->baseline;
+    if (w->push > 1.5f) w->push = 1.5f;
+    if (w->push < -1.5f) w->push = -1.5f;
+}
 #endif
