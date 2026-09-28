@@ -127,3 +127,23 @@ and low-battery shelter status were checked on the deployed devices. Evidence:
 `docs/ble/2026-09-28-rebased-hardware.txt`. Before deployment, all seven host
 regressions (tilt, grass, food, shake, shelter, gifts, persistence) and the
 combined firmware build passed. No new battery measurement is in flight.
+
+## Fish gifting deployment — 2026-09-28
+
+Both boards now run `889d2eb` (fish gifts on top of the combined tilt + BLE
+branch). Flashed through `tools/flash.sh --no-backup --no-build`; archives:
+`docs/batlog/2026-09-28_151242_cu.usbmodem311401.txt` and
+`docs/batlog/2026-09-28_151242_cu.usbmodem311101.txt`. No binary backup, model
+replacement, NVS erase or staging/restore was performed. No battery experiment
+was active.
+
+`tools/test_fish_hardware.py` verified the founding-pair restriction, decline
+and return, interrupted offer/re-pair/accept, preserved name/colours/age/paid
+history, and the return trip with the same identity and parent names. `help`
+returned to the original tank: dolt, zori, chip, gira, help; the second tank
+still has nori and sol. Balances at this test were 156 / 81 and were unchanged.
+Evidence: `docs/ble/2026-09-28-fish-hardware.txt`. The test closes both radios.
+
+The existing two-device money regression also passed on this firmware: both
+confirmations required, cancellation, gifts both ways, decline/refund and
+reconnect recovery; final balances remained 156 / 81 and both radios stopped.

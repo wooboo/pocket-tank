@@ -1,0 +1,113 @@
+# pocket-tank preflight 2026-09-28_151242 on /dev/cu.usbmodem311101
+I (1671477) batlog: 12 samples (h:mm since the first | SoC | VBAT | bright | state | mA since previous)
+I (1671477) batlog:     0:00 | 100% | 4123 mV | 255 | awake  | boot
+I (1671482) batlog:     0:05 | 100% | 4119 mV | 255 | awake  |           0.0 mA
+I (1671488) batlog:     0:10 | 100% | 4119 mV | 255 | awake  |           0.0 mA
+I (1671495) batlog:     0:15 | 100% | 4118 mV | 255 | awake  |           0.0 mA
+I (1671502) batlog:     0:20 | 100% | 4117 mV | 255 | awake  |           0.0 mA
+I (1671510) batlog:     0:20 | 100% | 4117 mV | 255 | asleep | sleep     0.0 mA
+I (1671517) batlog:     0:22 | 100% | 4116 mV |   0 | asleep | nap       0.0 mA
+I (1671524) batlog:     0:28 | 100% | 4116 mV | 255 | awake  | boot      0.0 mA
+I (1671531) batlog:     0:33 | 100% | 4116 mV | 255 | awake  |           0.0 mA
+I (1671538) batlog:     0:38 | 100% | 4116 mV | 255 | awake  |           0.0 mA
+I (1671545) batlog:     0:43 | 100% | 4115 mV | 255 | awake  |           0.0 mA
+I (1671552) batlog:     0:48 | 100% | 4116 mV | 255 | awake  |           0.0 mA
+I (1671559) batlog:   awake:  0.7 h, 0 mAh -> 0 mA average
+I (1671564) batlog:   asleep: 0.1 h, 0.0 mAh -> 0.00 mA average
+I (1671570) batlog:   (SoC is 1% = 2 mAh; short awake windows are coarse, a night is not)
+I (1672543) batlog: 12 samples (h:mm since the first | SoC | VBAT | bright | state | mA since previous)
+I (1672543) batlog:     0:00 | 100% | 4123 mV | 255 | awake  | boot
+I (1672548) batlog:     0:05 | 100% | 4119 mV | 255 | awake  |           0.0 mA
+I (1672554) batlog:     0:10 | 100% | 4119 mV | 255 | awake  |           0.0 mA
+I (1672561) batlog:     0:15 | 100% | 4118 mV | 255 | awake  |           0.0 mA
+I (1672568) batlog:     0:20 | 100% | 4117 mV | 255 | awake  |           0.0 mA
+I (1672576) batlog:     0:20 | 100% | 4117 mV | 255 | asleep | sleep     0.0 mA
+I (1672583) batlog:     0:22 | 100% | 4116 mV |   0 | asleep | nap       0.0 mA
+I (1672590) batlog:     0:28 | 100% | 4116 mV | 255 | awake  | boot      0.0 mA
+I (1672597) batlog:     0:33 | 100% | 4116 mV | 255 | awake  |           0.0 mA
+I (1672604) batlog:     0:38 | 100% | 4116 mV | 255 | awake  |           0.0 mA
+I (1672611) batlog:     0:43 | 100% | 4115 mV | 255 | awake  |           0.0 mA
+I (1672618) batlog:     0:48 | 100% | 4116 mV | 255 | awake  |           0.0 mA
+I (1672625) batlog:   awake:  0.7 h, 0 mAh -> 0 mA average
+I (1672630) batlog:   asleep: 0.1 h, 0.0 mAh -> 0.00 mA average
+I (1672636) batlog:   (SoC is 1% = 2 mAh; short awake windows are coarse, a night is not)
+I (1673640) batlog: 12 samples (h:mm since the first | SoC | VBAT | bright | state | mA since previous)
+I (1673641) batlog:     0:00 | 100% | 4123 mV | 255 | awake  | boot
+I (1673645) batlog:     0:05 | 100% | 4119 mV | 255 | awake  |           0.0 mA
+I (1673652) batlog:     0:10 | 100% | 4119 mV | 255 | awake  |           0.0 mA
+I (1673659) batlog:     0:15 | 100% | 4118 mV | 255 | awake  |           0.0 mA
+I (1673666) batlog:     0:20 | 100% | 4117 mV | 255 | awake  |           0.0 mA
+I (1673673) batlog:     0:20 | 100% | 4117 mV | 255 | asleep | sleep     0.0 mA
+I (1673680) batlog:     0:22 | 100% | 4116 mV |   0 | asleep | nap       0.0 mA
+I (1673687) batlog:     0:28 | 100% | 4116 mV | 255 | awake  | boot      0.0 mA
+I (1673694) batlog:     0:33 | 100% | 4116 mV | 255 | awake  |           0.0 mA
+I (1673701) batlog:     0:38 | 100% | 4116 mV | 255 | awake  |           0.0 mA
+I (1673708) batlog:     0:43 | 100% | 4115 mV | 255 | awake  |           0.0 mA
+I (1673715) batlog:     0:48 | 100% | 4116 mV | 255 | awake  |           0.0 mA
+I (1673722) batlog:   awake:  0.7 h, 0 mAh -> 0 mA average
+I (1673727) batlog:   asleep: 0.1 h, 0.0 mAh -> 0.00 mA average
+I (1673733) batlog:   (SoC is 1% = 2 mAh; short awake windows are coarse, a night is not)
+I (1674737) batlog: 12 samples (h:mm since the first | SoC | VBAT | bright | state | mA since previous)
+I (1674737) batlog:     0:00 | 100% | 4123 mV | 255 | awake  | boot
+I (1674742) batlog:     0:05 | 100% | 4119 mV | 255 | awake  |           0.0 mA
+I (1674748) batlog:     0:10 | 100% | 4119 mV | 255 | awake  |           0.0 mA
+I (1674755) batlog:     0:15 | 100% | 4118 mV | 255 | awake  |           0.0 mA
+I (1674762) batlog:     0:20 | 100% | 4117 mV | 255 | awake  |           0.0 mA
+I (1674769) batlog:     0:20 | 100% | 4117 mV | 255 | asleep | sleep     0.0 mA
+I (1674777) batlog:     0:22 | 100% | 4116 mV |   0 | asleep | nap       0.0 mA
+I (1674784) batlog:     0:28 | 100% | 4116 mV | 255 | awake  | boot      0.0 mA
+I (1674791) batlog:     0:33 | 100% | 4116 mV | 255 | awake  |           0.0 mA
+I (1674798) batlog:     0:38 | 100% | 4116 mV | 255 | awake  |           0.0 mA
+I (1674805) batlog:     0:43 | 100% | 4115 mV | 255 | awake  |           0.0 mA
+I (1674812) batlog:     0:48 | 100% | 4116 mV | 255 | awake  |           0.0 mA
+I (1674819) batlog:   awake:  0.7 h, 0 mAh -> 0 mA average
+I (1674824) batlog:   asleep: 0.1 h, 0.0 mAh -> 0.00 mA average
+I (1674830) batlog:   (SoC is 1% = 2 mAh; short awake windows are coarse, a night is not)
+I (1675543) director: 0 nori   juv   age 0.9h size 0.82 hunger 6.7 energy 0.0 stress 1.3 curiosity 0.0 trust 5.8 ms 33f  visit_bubbles at 218,109
+I (1675545) director: 1 sol    juv   age 0.9h size 0.84 hunger 6.8 energy 0.0 stress 1.3 curiosity 8.6 trust 5.8 ms 337  explore at 338,197
+I (1675558) director: low-battery shelter: off
+I (1675562) director: pellets 0 | trickle on | ravenous 0 | day idle 64s | veg 0.04 0.04 0.04 | algae cells 0/644 | courting no | arrival -
+I (1675574) director: sand dollars 81 (earned 41) | shop: plant snail | colonies 0 | 146.5 in trimmed
+I (1675583) director: snail at 251,344 heading 90 deg | no target, cell -1 at -1,-1 (film 0) | 0 cells on the glass | 9 grazed so far
+I (1675595) director: bed 0 fronds (x from 25, pitch 12): 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04
+I (1675606) director: bed 1 fronds (x from 376, pitch 12): 0.04 0.04 0.04 0.04 0.04
+I (1675614) director: bed 2 fronds (x from 278, pitch 12): 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04
+I (1675622) director: bed 3 leaves (x from 208, pitch 14): 0.04 0.04 0.04 0.04
+I (1675629) director: plant placed: centre x 229 (the default), depth AMONG the fish
+I (1675637) director: castle placed: centre x 326 (the keeper's), BEHIND the grass
+I (1675644) director: coral placed: centre x 342 (the keeper's), IN FRONT, colour ff7a1e, growth 0.45 of 1.25 (growing)
+I (1675654) director: reef cluster placed: centre x 102 (the keeper's), IN FRONT, look REEF, growth 0.00 of 2 (filling out)
+I (1675665) director: nursery bed -1 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (1675674) director: battery 100% on battery, VBAT 4115 mV | brightness 255/255 (level 100%)
+I (1676648) director: 0 nori   juv   age 0.9h size 0.82 hunger 6.8 energy 0.0 stress 1.3 curiosity 0.0 trust 5.8 ms 33f  visit_bubbles at 227,106
+I (1676650) director: 1 sol    juv   age 0.9h size 0.84 hunger 6.9 energy 0.0 stress 1.3 curiosity 8.6 trust 5.8 ms 337  explore at 342,203
+I (1676662) director: low-battery shelter: off
+I (1676666) director: pellets 0 | trickle on | ravenous 0 | day idle 65s | veg 0.04 0.04 0.04 | algae cells 0/644 | courting no | arrival -
+I (1676679) director: sand dollars 81 (earned 41) | shop: plant snail | colonies 0 | 146.5 in trimmed
+I (1676688) director: snail at 250,344 heading 90 deg | no target, cell -1 at -1,-1 (film 0) | 0 cells on the glass | 9 grazed so far
+I (1676699) director: bed 0 fronds (x from 25, pitch 12): 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04
+I (1676711) director: bed 1 fronds (x from 376, pitch 12): 0.04 0.04 0.04 0.04 0.04
+I (1676718) director: bed 2 fronds (x from 278, pitch 12): 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04
+I (1676727) director: bed 3 leaves (x from 208, pitch 14): 0.04 0.04 0.04 0.04
+I (1676733) director: plant placed: centre x 229 (the default), depth AMONG the fish
+I (1676741) director: castle placed: centre x 326 (the keeper's), BEHIND the grass
+I (1676748) director: coral placed: centre x 342 (the keeper's), IN FRONT, colour ff7a1e, growth 0.45 of 1.25 (growing)
+I (1676759) director: reef cluster placed: centre x 102 (the keeper's), IN FRONT, look REEF, growth 0.00 of 2 (filling out)
+I (1676770) director: nursery bed -1 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (1676778) director: battery 100% on battery, VBAT 4114 mV | brightness 255/255 (level 100%)
+I (1677751) director: 0 nori   juv   age 0.9h size 0.82 hunger 6.8 energy 0.0 stress 1.3 curiosity 0.0 trust 5.8 ms 33f  visit_bubbles at 220,99
+I (1677754) director: 1 sol    juv   age 0.9h size 0.84 hunger 6.9 energy 0.0 stress 1.3 curiosity 8.7 trust 5.8 ms 337  explore at 346,210
+I (1677766) director: low-battery shelter: off
+I (1677770) director: pellets 0 | trickle on | ravenous 0 | day idle 66s | veg 0.04 0.04 0.04 | algae cells 0/644 | courting no | arrival -
+I (1677782) director: sand dollars 81 (earned 41) | shop: plant snail | colonies 0 | 146.5 in trimmed
+I (1677792) director: snail at 247,344 heading 90 deg | no target, cell -1 at -1,-1 (film 0) | 0 cells on the glass | 9 grazed so far
+I (1677803) director: bed 0 fronds (x from 25, pitch 12): 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04
+I (1677815) director: bed 1 fronds (x from 376, pitch 12): 0.04 0.04 0.04 0.04 0.04
+I (1677822) director: bed 2 fronds (x from 278, pitch 12): 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04
+I (1677831) director: bed 3 leaves (x from 208, pitch 14): 0.04 0.04 0.04 0.04
+I (1677837) director: plant placed: centre x 229 (the default), depth AMONG the fish
+I (1677845) director: castle placed: centre x 326 (the keeper's), BEHIND the grass
+I (1677852) director: coral placed: centre x 342 (the keeper's), IN FRONT, colour ff7a1e, growth 0.45 of 1.25 (growing)
+I (1677863) director: reef cluster placed: centre x 102 (the keeper's), IN FRONT, look REEF, growth 0.00 of 2 (filling out)
+I (1677874) director: nursery bed -1 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (1677882) director: battery 100% on battery, VBAT 4113 mV | brightness 255/255 (level 100%)

@@ -12,9 +12,9 @@ reset prompt. While Friends is open, that reset chord is suppressed. Holding
 BOOT again restarts discovery. First-run setup and reset confirmation must
 be finished or dismissed before pairing. PWR still sleeps/powers off the tank.
 
-This first release supports sand dollars only, in steps of 10 on screen.
-Fish adoption, swaps, and upgrade gifts are future work. Gifts change the
-spendable balance, not lifetime care earnings.
+Friends supports sand dollars (steps of 10 on screen) and individual fish
+(see Fish gifts below). Swaps and upgrade gifts remain future work. Dollar
+gifts change the spendable balance, not lifetime care earnings.
 
 ## Transfers and recovery
 

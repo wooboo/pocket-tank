@@ -370,7 +370,8 @@ Hold **BOOT for two seconds on both awake tanks** to connect over BLE. Compare
 and confirm the code on both screens, then give sand dollars from the FRIENDS
 menu. The recipient accepts or declines. Closing the menu shuts Bluetooth off.
 Interrupted gifts remain pending and resume when those tanks reconnect.
-See [docs/multiplayer.md](docs/multiplayer.md) for behavior, recovery, and testing.
+
+Fish can also move between tanks: in **Friends → FISH**, pick a fish and tap **GIVE FISH**; the other tank previews and accepts it. Its name, look, age, personality and history travel with it. Keep at least two fish at home. Reconnect the same tanks to resume an interrupted gift. See [multiplayer](docs/multiplayer.md).
 
 ## Try it: PC simulator
 
@@ -594,5 +595,3 @@ first boot on real glass, and the tank growing into a pet.
 
 MIT, see [LICENSE](LICENSE). `model/llama2.c/` and `sim/lvgl/` are cloned
 separately and carry their own MIT licenses.
-
-Fish can also move between tanks: in **Friends → FISH**, pick a fish and tap **GIVE FISH**; the other tank previews and accepts it. Its name, look, age, personality and history travel with it. Keep at least two fish at home. Reconnect the same tanks to resume an interrupted gift. See [multiplayer](docs/multiplayer.md).
