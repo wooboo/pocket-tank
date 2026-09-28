@@ -107,3 +107,23 @@ counter to underflow and report 255 connections. Shutdown now lets
 final hardware harness rejects that log signature and passed without it.
 Evidence: `docs/ble/2026-09-28-hardware.txt`. No new battery measurement is in
 flight.
+
+## Combined tilt + BLE deployment — 2026-09-28
+
+Rebased BLE onto `feat/tilt-bubbles` (including main's portable flashing changes)
+and flashed application commit `996a1dc` to both `/dev/cu.usbmodem311401` and
+`/dev/cu.usbmodem311101`. Used `--no-backup --no-build`, as requested; model
+partitions and NVS were not rewritten. Preflight archives:
+`2026-09-28_144330_cu.usbmodem311401.txt` and
+`2026-09-28_144431_cu.usbmodem311101.txt`. The second device's initial preflight
+received an incomplete response and correctly prevented flashing; the retry
+archived its state successfully before proceeding.
+
+Both flash operations verified successfully. The two-device BLE harness passed
+mutual code confirmation, cancellation, gifts both ways, decline/refund,
+reconnect recovery and clean shutdown. Starting/ending balances were 154/44,
+with no pending transfers and both radios off. Tilt/water-motion diagnostics
+and low-battery shelter status were checked on the deployed devices. Evidence:
+`docs/ble/2026-09-28-rebased-hardware.txt`. Before deployment, all seven host
+regressions (tilt, grass, food, shake, shelter, gifts, persistence) and the
+combined firmware build passed. No new battery measurement is in flight.

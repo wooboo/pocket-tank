@@ -1,0 +1,90 @@
+# pocket-tank preflight 2026-09-28_144431 on /dev/cu.usbmodem311101
+I (1588126) batlog: 7 samples (h:mm since the first | SoC | VBAT | bright | state | mA since previous)
+I (1588127) batlog:     0:00 | 100% | 4123 mV | 255 | awake  | boot
+I (1588131) batlog:     0:05 | 100% | 4119 mV | 255 | awake  |           0.0 mA
+I (1588138) batlog:     0:10 | 100% | 4119 mV | 255 | awake  |           0.0 mA
+I (1588145) batlog:     0:15 | 100% | 4118 mV | 255 | awake  |           0.0 mA
+I (1588152) batlog:     0:20 | 100% | 4117 mV | 255 | awake  |           0.0 mA
+I (1588159) batlog:     0:20 | 100% | 4117 mV | 255 | asleep | sleep     0.0 mA
+I (1588166) batlog:     0:22 | 100% | 4116 mV |   0 | asleep | nap       0.0 mA
+I (1588173) batlog:   awake:  0.3 h, 0 mAh -> 0 mA average
+I (1588178) batlog:   asleep: 0.0 h, 0.0 mAh -> 0.00 mA average
+I (1588184) batlog:   (SoC is 1% = 2 mAh; short awake windows are coarse, a night is not)
+I (1589166) batlog: 7 samples (h:mm since the first | SoC | VBAT | bright | state | mA since previous)
+I (1589167) batlog:     0:00 | 100% | 4123 mV | 255 | awake  | boot
+I (1589171) batlog:     0:05 | 100% | 4119 mV | 255 | awake  |           0.0 mA
+I (1589178) batlog:     0:10 | 100% | 4119 mV | 255 | awake  |           0.0 mA
+I (1589185) batlog:     0:15 | 100% | 4118 mV | 255 | awake  |           0.0 mA
+I (1589192) batlog:     0:20 | 100% | 4117 mV | 255 | awake  |           0.0 mA
+I (1589199) batlog:     0:20 | 100% | 4117 mV | 255 | asleep | sleep     0.0 mA
+I (1589206) batlog:     0:22 | 100% | 4116 mV |   0 | asleep | nap       0.0 mA
+I (1589213) batlog:   awake:  0.3 h, 0 mAh -> 0 mA average
+I (1589218) batlog:   asleep: 0.0 h, 0.0 mAh -> 0.00 mA average
+I (1589224) batlog:   (SoC is 1% = 2 mAh; short awake windows are coarse, a night is not)
+I (1590240) batlog: 7 samples (h:mm since the first | SoC | VBAT | bright | state | mA since previous)
+I (1590241) batlog:     0:00 | 100% | 4123 mV | 255 | awake  | boot
+I (1590245) batlog:     0:05 | 100% | 4119 mV | 255 | awake  |           0.0 mA
+I (1590252) batlog:     0:10 | 100% | 4119 mV | 255 | awake  |           0.0 mA
+I (1590259) batlog:     0:15 | 100% | 4118 mV | 255 | awake  |           0.0 mA
+I (1590266) batlog:     0:20 | 100% | 4117 mV | 255 | awake  |           0.0 mA
+I (1590273) batlog:     0:20 | 100% | 4117 mV | 255 | asleep | sleep     0.0 mA
+I (1590280) batlog:     0:22 | 100% | 4116 mV |   0 | asleep | nap       0.0 mA
+I (1590287) batlog:   awake:  0.3 h, 0 mAh -> 0 mA average
+I (1590292) batlog:   asleep: 0.0 h, 0.0 mAh -> 0.00 mA average
+I (1590298) batlog:   (SoC is 1% = 2 mAh; short awake windows are coarse, a night is not)
+I (1591281) batlog: 7 samples (h:mm since the first | SoC | VBAT | bright | state | mA since previous)
+I (1591282) batlog:     0:00 | 100% | 4123 mV | 255 | awake  | boot
+I (1591286) batlog:     0:05 | 100% | 4119 mV | 255 | awake  |           0.0 mA
+I (1591293) batlog:     0:10 | 100% | 4119 mV | 255 | awake  |           0.0 mA
+I (1591300) batlog:     0:15 | 100% | 4118 mV | 255 | awake  |           0.0 mA
+I (1591307) batlog:     0:20 | 100% | 4117 mV | 255 | awake  |           0.0 mA
+I (1591314) batlog:     0:20 | 100% | 4117 mV | 255 | asleep | sleep     0.0 mA
+I (1591321) batlog:     0:22 | 100% | 4116 mV |   0 | asleep | nap       0.0 mA
+I (1591328) batlog:   awake:  0.3 h, 0 mAh -> 0 mA average
+I (1591333) batlog:   asleep: 0.0 h, 0.0 mAh -> 0.00 mA average
+I (1591339) batlog:   (SoC is 1% = 2 mAh; short awake windows are coarse, a night is not)
+I (1592220) director: 0 nori   fry   age 0.5h size 0.57 hunger 1.9 energy 1.5 stress 0.0 curiosity 3.6 trust 5.5 ms 13f  follow_friend at 368,222
+I (1592222) director: 1 sol    fry   age 0.5h size 0.58 hunger 1.2 energy 1.9 stress 0.0 curiosity 6.3 trust 5.5 ms 117  follow_friend at 314,211
+I (1592235) director: pellets 0 | trickle on | ravenous 0 | day idle 23s | veg 0.24 0.24 0.24 | algae cells 0/644 | courting no | arrival -
+I (1592247) director: sand dollars 44 (earned 4) | shop: plant snail | colonies 0 | 48.1 in trimmed
+I (1592256) director: snail at 61,344 heading 180 deg | no target, cell -1 at -1,-1 (film 0) | 0 cells on the glass | 2 grazed so far
+I (1592268) director: bed 0 fronds (x from 25, pitch 12): 0.22 0.22 0.22 0.22 0.22 0.23 0.23 0.23 0.23 0.23 0.23 0.23 0.23 0.37
+I (1592279) director: bed 1 fronds (x from 376, pitch 12): 0.24 0.24 0.24 0.24 0.24
+I (1592287) director: bed 2 fronds (x from 278, pitch 12): 0.24 0.24 0.24 0.24 0.24 0.24 0.24 0.24
+I (1592295) director: bed 3 leaves (x from 208, pitch 14): 0.36 0.36 0.36 0.36
+I (1592302) director: plant placed: centre x 229 (the default), depth AMONG the fish
+I (1592310) director: castle placed: centre x 326 (the keeper's), BEHIND the grass
+I (1592317) director: coral placed: centre x 342 (the keeper's), IN FRONT, colour ff7a1e, growth 0.45 of 1.25 (growing)
+I (1592328) director: reef cluster placed: centre x 102 (the keeper's), IN FRONT, look REEF, growth 0.00 of 2 (filling out)
+I (1592338) director: nursery bed 3 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (1592347) director: battery 100% on battery, VBAT 4117 mV | brightness 255/255 (level 100%)
+I (1593230) director: 0 nori   fry   age 0.5h size 0.57 hunger 1.9 energy 1.5 stress 0.0 curiosity 3.6 trust 5.5 ms 13f  follow_friend at 380,218
+I (1593232) director: 1 sol    fry   age 0.5h size 0.58 hunger 1.2 energy 1.9 stress 0.0 curiosity 6.3 trust 5.5 ms 117  follow_friend at 321,223
+I (1593245) director: pellets 0 | trickle on | ravenous 0 | day idle 24s | veg 0.24 0.24 0.24 | algae cells 0/644 | courting no | arrival -
+I (1593257) director: sand dollars 44 (earned 4) | shop: plant snail | colonies 0 | 48.1 in trimmed
+I (1593266) director: snail at 61,344 heading 180 deg | no target, cell -1 at -1,-1 (film 0) | 0 cells on the glass | 2 grazed so far
+I (1593278) director: bed 0 fronds (x from 25, pitch 12): 0.22 0.22 0.22 0.22 0.22 0.23 0.23 0.23 0.23 0.23 0.23 0.23 0.23 0.37
+I (1593289) director: bed 1 fronds (x from 376, pitch 12): 0.24 0.24 0.24 0.24 0.24
+I (1593297) director: bed 2 fronds (x from 278, pitch 12): 0.24 0.24 0.24 0.24 0.24 0.24 0.24 0.24
+I (1593305) director: bed 3 leaves (x from 208, pitch 14): 0.36 0.36 0.36 0.36
+I (1593312) director: plant placed: centre x 229 (the default), depth AMONG the fish
+I (1593320) director: castle placed: centre x 326 (the keeper's), BEHIND the grass
+I (1593327) director: coral placed: centre x 342 (the keeper's), IN FRONT, colour ff7a1e, growth 0.45 of 1.25 (growing)
+I (1593338) director: reef cluster placed: centre x 102 (the keeper's), IN FRONT, look REEF, growth 0.00 of 2 (filling out)
+I (1593348) director: nursery bed 3 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (1593357) director: battery 100% on battery, VBAT 4117 mV | brightness 255/255 (level 100%)
+I (1594238) director: 0 nori   fry   age 0.5h size 0.57 hunger 1.9 energy 1.5 stress 0.0 curiosity 3.6 trust 5.5 ms 13f  follow_friend at 378,205
+I (1594240) director: 1 sol    fry   age 0.5h size 0.58 hunger 1.2 energy 1.8 stress 0.0 curiosity 6.2 trust 5.5 ms 117  follow_friend at 330,218
+I (1594253) director: pellets 0 | trickle on | ravenous 0 | day idle 25s | veg 0.24 0.24 0.24 | algae cells 0/644 | courting no | arrival -
+I (1594265) director: sand dollars 44 (earned 4) | shop: plant snail | colonies 0 | 48.1 in trimmed
+I (1594274) director: snail at 61,344 heading 180 deg | no target, cell -1 at -1,-1 (film 0) | 0 cells on the glass | 2 grazed so far
+I (1594286) director: bed 0 fronds (x from 25, pitch 12): 0.22 0.22 0.22 0.22 0.22 0.23 0.23 0.23 0.23 0.23 0.23 0.23 0.23 0.37
+I (1594297) director: bed 1 fronds (x from 376, pitch 12): 0.24 0.24 0.24 0.24 0.24
+I (1594305) director: bed 2 fronds (x from 278, pitch 12): 0.24 0.24 0.24 0.24 0.24 0.24 0.24 0.24
+I (1594313) director: bed 3 leaves (x from 208, pitch 14): 0.36 0.36 0.36 0.36
+I (1594320) director: plant placed: centre x 229 (the default), depth AMONG the fish
+I (1594328) director: castle placed: centre x 326 (the keeper's), BEHIND the grass
+I (1594335) director: coral placed: centre x 342 (the keeper's), IN FRONT, colour ff7a1e, growth 0.45 of 1.25 (growing)
+I (1594346) director: reef cluster placed: centre x 102 (the keeper's), IN FRONT, look REEF, growth 0.00 of 2 (filling out)
+I (1594356) director: nursery bed 3 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (1594365) director: battery 100% on battery, VBAT 4118 mV | brightness 255/255 (level 100%)

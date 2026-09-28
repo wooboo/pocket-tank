@@ -1,0 +1,239 @@
+# Combined tilt + BLE firmware 996a1dc, flashed to both devices
+# Hardware BLE harness: PASS; balances before/after 154 / 44
+# No pending transactions at end; radios stopped
+
+COMMAND 0: friends close
+COMMAND 0: setup off
+COMMAND 1: friends close
+COMMAND 1: setup off
+0: I (98674) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=154 out=0 in=0
+1: I (37744) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=44 out=0 in=0
+COMMAND 0: friends open
+COMMAND 1: friends open
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (99743) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=154 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+0: I (99753) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=154 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+1: I (38855) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=44 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+1: I (38865) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=44 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (100763) director: friends active=1 page=2 code=000000 peer=0000000000000000 balance=154 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (39839) director: friends active=1 page=2 code=000000 peer=0000000000000000 balance=44 out=0 in=0 CONNECTING TO NEARBY TANK
+0: I (100847) friends: compare code 328716
+1: I (39923) friends: compare code 328716
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (40834) director: friends active=1 page=1 code=328716 peer=0000000000000000 balance=44 out=0 in=0 CONNECTING TO NEARBY TANK
+0: I (101803) director: friends active=1 page=1 code=328716 peer=0000000000000000 balance=154 out=0 in=0 CONNECTING TO NEARBY TANK
+COMMAND 0: friends confirm
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (40916) director: friends active=1 page=1 code=328716 peer=0000000000000000 balance=44 out=0 in=0 CONNECTING TO NEARBY TANK
+0: I (101913) director: friends active=1 page=2 code=328716 peer=0000000000000000 balance=154 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (101921) director: friends active=1 page=2 code=328716 peer=0000000000000000 balance=154 out=0 in=0 WAITING FOR YOUR FRIEND
+COMMAND 1: friends close
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (102003) director: friends active=1 page=2 code=328716 peer=0000000000000000 balance=154 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (41121) friends: Bluetooth stopped; free internal heap 74831
+1: I (41121) director: friends active=0 page=1 code=328716 peer=0000000000000000 balance=44 out=0 in=0 CONNECTING TO NEARBY TANK
+0: I (102085) friends: Bluetooth stopped; free internal heap 74771
+1: I (41127) director: friends active=0 page=1 code=328716 peer=0000000000000000 balance=44 out=0 in=0 CONNECTING TO NEARBY TANK
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (103010) director: friends active=1 page=4 code=328716 peer=0000000000000000 balance=154 out=0 in=0 PAIRING DECLINED OR FAILED
+1: I (42111) director: friends active=0 page=1 code=328716 peer=0000000000000000 balance=44 out=0 in=0 CONNECTING TO NEARBY TANK
+COMMAND 0: friends close
+COMMAND 1: friends close
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (103087) director: friends active=0 page=4 code=328716 peer=0000000000000000 balance=154 out=0 in=0 PAIRING DECLINED OR FAILED
+1: I (42155) director: friends active=0 page=1 code=328716 peer=0000000000000000 balance=44 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (42156) director: friends active=0 page=1 code=328716 peer=0000000000000000 balance=44 out=0 in=0 CONNECTING TO NEARBY TANK
+COMMAND 0: friends open
+COMMAND 1: friends open
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (103088) director: friends active=0 page=4 code=328716 peer=0000000000000000 balance=154 out=0 in=0 PAIRING DECLINED OR FAILED
+0: I (103133) director: friends active=1 page=0 code=328716 peer=0000000000000000 balance=154 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+0: I (103145) director: friends active=1 page=0 code=328716 peer=0000000000000000 balance=154 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+1: I (42225) director: friends active=1 page=0 code=328716 peer=0000000000000000 balance=44 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+1: I (42236) director: friends active=1 page=0 code=328716 peer=0000000000000000 balance=44 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (104128) director: friends active=1 page=2 code=328716 peer=0000000000000000 balance=154 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (43276) director: friends active=1 page=2 code=328716 peer=0000000000000000 balance=44 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (43277) friends: compare code 236607
+0: I (104290) friends: compare code 236607
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (105161) director: friends active=1 page=1 code=236607 peer=0000000000000000 balance=154 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (44208) director: friends active=1 page=1 code=236607 peer=0000000000000000 balance=44 out=0 in=0 CONNECTING TO NEARBY TANK
+COMMAND 0: friends confirm
+COMMAND 1: friends confirm
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (44293) director: friends active=1 page=2 code=236607 peer=0000000000000000 balance=44 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (105243) director: friends active=1 page=2 code=236607 peer=0000000000000000 balance=154 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (105243) director: friends active=1 page=2 code=236607 peer=0000000000000000 balance=154 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (44294) director: friends active=1 page=2 code=236607 peer=0000000000000000 balance=44 out=0 in=0 WAITING FOR YOUR FRIEND
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (106202) director: friends active=1 page=3 code=236607 peer=2c59b054d853a61f balance=154 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (45363) director: friends active=1 page=3 code=236607 peer=cadb9a72f3f25d16 balance=44 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+COMMAND 0: friends give 10
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (106345) director: friends active=1 page=3 code=236607 peer=2c59b054d853a61f balance=144 out=1 in=0 WAITING FOR YOUR FRIEND
+0: I (106346) director: friends active=1 page=3 code=236607 peer=2c59b054d853a61f balance=144 out=1 in=0 WAITING FOR YOUR FRIEND
+1: I (45448) director: friends active=1 page=3 code=236607 peer=cadb9a72f3f25d16 balance=44 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (46204) friends: gift op 1 seq 12 reply 1 balance 44 pending 0
+COMMAND 1: friends accept
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (107159) director: friends active=1 page=3 code=236607 peer=2c59b054d853a61f balance=144 out=1 in=0 WAITING FOR YOUR FRIEND
+1: I (46295) director: friends active=1 page=3 code=236607 peer=cadb9a72f3f25d16 balance=44 out=0 in=12 RECEIVING GIFT
+1: I (46302) director: friends active=1 page=3 code=236607 peer=cadb9a72f3f25d16 balance=44 out=0 in=12 RECEIVING GIFT
+0: I (107333) friends: gift op 2 seq 12 reply 3 balance 144 pending 3
+1: I (46512) friends: gift op 3 seq 12 reply 4 balance 54 pending 0
+0: I (107511) friends: gift op 4 seq 12 reply 0 balance 144 pending 0
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (47278) director: friends active=1 page=3 code=236607 peer=cadb9a72f3f25d16 balance=54 out=0 in=0 GIFT RECEIVED. THANK YOU
+0: I (108223) director: friends active=1 page=3 code=236607 peer=2c59b054d853a61f balance=144 out=0 in=0 GIFT DELIVERED
+COMMAND 1: friends give 10
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (108302) director: friends active=1 page=3 code=236607 peer=2c59b054d853a61f balance=144 out=0 in=0 GIFT DELIVERED
+1: I (47366) director: friends active=1 page=3 code=236607 peer=cadb9a72f3f25d16 balance=44 out=1 in=0 WAITING FOR YOUR FRIEND
+1: I (47367) director: friends active=1 page=3 code=236607 peer=cadb9a72f3f25d16 balance=44 out=1 in=0 WAITING FOR YOUR FRIEND
+0: I (109105) friends: gift op 1 seq 5 reply 1 balance 144 pending 0
+COMMAND 0: friends accept
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (48275) director: friends active=1 page=3 code=236607 peer=cadb9a72f3f25d16 balance=44 out=1 in=0 WAITING FOR YOUR FRIEND
+0: I (109197) director: friends active=1 page=3 code=236607 peer=2c59b054d853a61f balance=144 out=0 in=5 RECEIVING GIFT
+0: I (109204) director: friends active=1 page=3 code=236607 peer=2c59b054d853a61f balance=144 out=0 in=5 RECEIVING GIFT
+1: I (48380) friends: gift op 2 seq 5 reply 3 balance 44 pending 3
+0: I (109389) friends: gift op 3 seq 5 reply 4 balance 154 pending 0
+1: I (48547) friends: gift op 4 seq 5 reply 0 balance 44 pending 0
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (49287) director: friends active=1 page=3 code=236607 peer=cadb9a72f3f25d16 balance=44 out=0 in=0 GIFT DELIVERED
+0: I (110261) director: friends active=1 page=3 code=236607 peer=2c59b054d853a61f balance=154 out=0 in=0 GIFT RECEIVED. THANK YOU
+COMMAND 0: friends give 10
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (110384) director: friends active=1 page=3 code=236607 peer=2c59b054d853a61f balance=144 out=1 in=0 WAITING FOR YOUR FRIEND
+0: I (110385) director: friends active=1 page=3 code=236607 peer=2c59b054d853a61f balance=144 out=1 in=0 WAITING FOR YOUR FRIEND
+1: I (49453) director: friends active=1 page=3 code=236607 peer=cadb9a72f3f25d16 balance=44 out=0 in=0 GIFT DELIVERED
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (50425) director: friends active=1 page=3 code=236607 peer=cadb9a72f3f25d16 balance=44 out=0 in=0 GIFT DELIVERED
+0: I (111370) director: friends active=1 page=3 code=236607 peer=2c59b054d853a61f balance=144 out=1 in=0 WAITING FOR YOUR FRIEND
+1: I (50545) friends: gift op 1 seq 13 reply 1 balance 44 pending 0
+COMMAND 1: friends decline
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (111531) director: friends active=1 page=3 code=236607 peer=2c59b054d853a61f balance=144 out=1 in=0 WAITING FOR YOUR FRIEND
+1: I (50668) director: friends active=1 page=3 code=236607 peer=cadb9a72f3f25d16 balance=44 out=0 in=0 GIFT DELIVERED
+1: I (50674) director: friends active=1 page=3 code=236607 peer=cadb9a72f3f25d16 balance=44 out=0 in=0 GIFT DELIVERED
+0: I (111712) friends: gift op 5 seq 13 reply 0 balance 154 pending 0
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (112523) director: friends active=1 page=3 code=236607 peer=2c59b054d853a61f balance=154 out=0 in=0 GIFT DECLINED
+COMMAND 0: friends give 10
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (51644) director: friends active=1 page=3 code=236607 peer=cadb9a72f3f25d16 balance=44 out=0 in=0 GIFT DELIVERED
+0: I (112614) director: friends active=1 page=3 code=236607 peer=2c59b054d853a61f balance=144 out=1 in=0 WAITING FOR YOUR FRIEND
+0: I (112615) director: friends active=1 page=3 code=236607 peer=2c59b054d853a61f balance=144 out=1 in=0 WAITING FOR YOUR FRIEND
+1: I (51715) director: friends active=1 page=3 code=236607 peer=cadb9a72f3f25d16 balance=44 out=0 in=0 GIFT DELIVERED
+1: I (52571) friends: gift op 1 seq 14 reply 1 balance 44 pending 0
+COMMAND 0: friends close
+COMMAND 1: friends close
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (113614) friends: Bluetooth stopped; free internal heap 74783
+0: I (113614) director: friends active=0 page=3 code=236607 peer=0000000000000000 balance=144 out=1 in=0 WAITING FOR YOUR FRIEND
+1: I (52692) friends: Bluetooth stopped; free internal heap 79279
+1: I (52692) director: friends active=0 page=3 code=236607 peer=0000000000000000 balance=44 out=0 in=0 GIFT DELIVERED
+COMMAND 0: friends open
+COMMAND 1: friends open
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (113620) director: friends active=0 page=3 code=236607 peer=0000000000000000 balance=144 out=1 in=0 WAITING FOR YOUR FRIEND
+1: I (52697) director: friends active=0 page=3 code=236607 peer=0000000000000000 balance=44 out=0 in=0 GIFT DELIVERED
+1: I (52740) director: friends active=1 page=0 code=236607 peer=0000000000000000 balance=44 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+0: I (113665) director: friends active=1 page=0 code=236607 peer=0000000000000000 balance=144 out=1 in=0 HOLD BOOT ON THE OTHER TANK
+0: I (113676) director: friends active=1 page=0 code=236607 peer=0000000000000000 balance=144 out=1 in=0 HOLD BOOT ON THE OTHER TANK
+1: I (52752) director: friends active=1 page=0 code=236607 peer=0000000000000000 balance=44 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+1: I (53743) friends: compare code 952498
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (114695) director: friends active=1 page=2 code=236607 peer=0000000000000000 balance=144 out=1 in=0 CONNECTING TO NEARBY TANK
+0: I (114696) friends: compare code 952498
+1: I (53813) director: friends active=1 page=1 code=952498 peer=0000000000000000 balance=44 out=0 in=0 CONNECTING TO NEARBY TANK
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (54780) director: friends active=1 page=1 code=952498 peer=0000000000000000 balance=44 out=0 in=0 CONNECTING TO NEARBY TANK
+0: I (115731) director: friends active=1 page=1 code=952498 peer=0000000000000000 balance=144 out=1 in=0 CONNECTING TO NEARBY TANK
+COMMAND 0: friends confirm
+COMMAND 1: friends confirm
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (115815) director: friends active=1 page=2 code=952498 peer=0000000000000000 balance=144 out=1 in=0 WAITING FOR YOUR FRIEND
+0: I (115816) director: friends active=1 page=2 code=952498 peer=0000000000000000 balance=144 out=1 in=0 WAITING FOR YOUR FRIEND
+1: I (54919) director: friends active=1 page=2 code=952498 peer=0000000000000000 balance=44 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (54920) director: friends active=1 page=2 code=952498 peer=0000000000000000 balance=44 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (55884) friends: gift op 1 seq 14 reply 1 balance 44 pending 0
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (116841) director: friends active=1 page=3 code=952498 peer=2c59b054d853a61f balance=144 out=1 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (55954) director: friends active=1 page=3 code=952498 peer=cadb9a72f3f25d16 balance=44 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (56858) friends: gift op 1 seq 14 reply 1 balance 44 pending 0
+1: I (57903) friends: gift op 1 seq 14 reply 1 balance 44 pending 0
+COMMAND 1: friends accept
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (118977) director: friends active=1 page=3 code=952498 peer=2c59b054d853a61f balance=144 out=1 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (58066) director: friends active=1 page=3 code=952498 peer=cadb9a72f3f25d16 balance=44 out=0 in=14 RECEIVING GIFT
+1: I (58073) director: friends active=1 page=3 code=952498 peer=cadb9a72f3f25d16 balance=44 out=0 in=14 RECEIVING GIFT
+0: I (119084) friends: gift op 2 seq 14 reply 3 balance 144 pending 3
+1: I (58221) friends: gift op 3 seq 14 reply 4 balance 54 pending 0
+0: I (119162) friends: gift op 4 seq 14 reply 0 balance 144 pending 0
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (119952) director: friends active=1 page=3 code=952498 peer=2c59b054d853a61f balance=144 out=0 in=0 GIFT DELIVERED
+1: I (59048) director: friends active=1 page=3 code=952498 peer=cadb9a72f3f25d16 balance=54 out=0 in=0 GIFT RECEIVED. THANK YOU
+COMMAND 1: friends give 10
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (120034) director: friends active=1 page=3 code=952498 peer=2c59b054d853a61f balance=144 out=0 in=0 GIFT DELIVERED
+1: I (59140) director: friends active=1 page=3 code=952498 peer=cadb9a72f3f25d16 balance=44 out=1 in=0 WAITING FOR YOUR FRIEND
+1: I (59140) director: friends active=1 page=3 code=952498 peer=cadb9a72f3f25d16 balance=44 out=1 in=0 WAITING FOR YOUR FRIEND
+0: I (120757) friends: gift op 1 seq 6 reply 1 balance 144 pending 0
+COMMAND 0: friends accept
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (59898) director: friends active=1 page=3 code=952498 peer=cadb9a72f3f25d16 balance=44 out=1 in=0 WAITING FOR YOUR FRIEND
+0: I (120866) director: friends active=1 page=3 code=952498 peer=2c59b054d853a61f balance=144 out=0 in=6 RECEIVING GIFT
+0: I (120873) director: friends active=1 page=3 code=952498 peer=2c59b054d853a61f balance=144 out=0 in=6 RECEIVING GIFT
+1: I (60044) friends: gift op 2 seq 6 reply 3 balance 44 pending 3
+0: I (121044) friends: gift op 3 seq 6 reply 4 balance 154 pending 0
+1: I (60202) friends: gift op 4 seq 6 reply 0 balance 44 pending 0
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (121823) director: friends active=1 page=3 code=952498 peer=2c59b054d853a61f balance=154 out=0 in=0 GIFT RECEIVED. THANK YOU
+1: I (60914) director: friends active=1 page=3 code=952498 peer=cadb9a72f3f25d16 balance=44 out=0 in=0 GIFT DELIVERED
+COMMAND 0: friends close
+COMMAND 1: friends close
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (121945) friends: Bluetooth stopped; free internal heap 74779
+0: I (121945) director: friends active=0 page=3 code=952498 peer=0000000000000000 balance=154 out=0 in=0 GIFT RECEIVED. THANK YOU
+1: I (61024) friends: Bluetooth stopped; free internal heap 74815
+1: I (61024) director: friends active=0 page=3 code=952498 peer=0000000000000000 balance=44 out=0 in=0 GIFT DELIVERED
+COMMAND 0: friends close
+COMMAND 1: friends close
