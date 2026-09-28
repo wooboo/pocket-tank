@@ -2,6 +2,7 @@
  * updateFish/targetForGoal/wall handling, with prototype px values scaled by
  * ~0.55 for the 448-wide tank. */
 #include "tank.h"
+#include <string.h>
 #include "tank_events.h"
 #include <math.h>
 #include <stddef.h>
@@ -124,7 +125,7 @@ void tank_set_name(tank_t *t, int slot, const char *name) {
         f->name[n] = c >= 'A' && c <= 'Z' ? (char)(c - 'A' + 'a') : c;
         n++;
     }
-    f->name[n] = 0;
+    while (n <= FISH_NAME_MAX) f->name[n++] = 0;
 }
 static uint32_t fin_for(uint32_t body) {
     for (int i = 0; i < ROSTER_N; i++) if (ROSTER[i].color == body) return ROSTER[i].fin;
@@ -169,6 +170,7 @@ void tank_make_fish(tank_t *t, int slot, int preset, float sociable, float bold,
     f->sig = 0xffffffffu; f->ms_bits = 0; f->ms_seen = 0;
     f->color = p->color; f->fin = p->fin; f->accent = p->accent;
     f->parent_a = f->parent_b = -1;
+    f->age_s = 0; f->family = (fish_family_t){0};
 }
 
 void tank_set_bubble_x(tank_t *t, float x) {
@@ -205,7 +207,7 @@ void tank_new_population(tank_t *t) {
 }
 
 int tank_add_fish(tank_t *t, int parent_a, int parent_b) {
-    if (t->n_fish >= N_FISH_MAX || t->n_fish >= ROSTER_N) return -1;
+    if (t->fish_gift.journal.out_phase || t->fish_gift.journal.in_seq || t->n_fish >= N_FISH_MAX || t->n_fish >= ROSTER_N) return -1;
     int used[ROSTER_N] = {0};
     for (int i = 0; i < t->n_fish; i++) used[t->fish[i].preset] = 1;
     int free_n = 0, free_idx[ROSTER_N];
@@ -225,6 +227,13 @@ int tank_add_fish(tank_t *t, int parent_a, int parent_b) {
     if (tank_randf(t, 0, 1) < 0.5f) { int x = ia; ia = ib; ib = x; pa = &t->fish[ia]; pb = &t->fish[ib]; }
     tank_set_look(t, slot, pa->color, pb->accent);
     t->fish[slot].parent_a = (int8_t)ia; t->fish[slot].parent_b = (int8_t)ib;
+    int parents[2]={ia,ib};
+    for (int j=0;j<2;j++) {
+        const fish_t *p=&t->fish[parents[j]];
+        t->fish[slot].family.parents[j]=p->family.id;
+        memcpy(t->fish[slot].family.parent_names[j],p->name,8);
+        t->fish[slot].family.parent_body[j]=p->color; t->fish[slot].family.parent_accent[j]=p->accent;
+    }
     place_near_reef(t, &t->fish[slot]);
     t->fish[slot].hunger = 4; t->fish[slot].trust = 4;
     t->n_fish++;
@@ -233,6 +242,7 @@ int tank_add_fish(tank_t *t, int parent_a, int parent_b) {
 
 void tank_init(tank_t *t, uint32_t seed) {
     t->gift = (gift_save_t){0};
+    t->fish_gift = (fish_gift_save_t){0}; t->roster_generation = 0;
     t->rng = seed ? seed : 0xC0FFEE;
     t->bubble_up_x = 0; t->bubble_up_y = -1;
     t->water_push = 0; t->motion_inverted = false; t->low_battery = false; t->battery_recovery_s = 0;

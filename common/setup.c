@@ -721,8 +721,10 @@ void render_setup(const tank_t *t, uint16_t *fb, int stride, float clock) {
         const fish_t *f = &t->fish[page_fish()];
         const fish_t *pa = f->parent_a >= 0 && f->parent_a < t->n_fish ? &t->fish[f->parent_a] : NULL;
         const fish_t *pb = f->parent_b >= 0 && f->parent_b < t->n_fish ? &t->fish[f->parent_b] : NULL;
-        const char *na = fish_name(t, f->parent_a), *nb = fish_name(t, f->parent_b);
-        uint32_t ca = pa ? pa->color : C_DIM, cb = pb ? pb->color : C_DIM;
+        const char *na = pa ? pa->name : f->family.parent_names[0][0] ? f->family.parent_names[0] : "?";
+        const char *nb = pb ? pb->name : f->family.parent_names[1][0] ? f->family.parent_names[1] : "?";
+        uint32_t ca = pa ? pa->color : f->family.parent_body[0] ? f->family.parent_body[0] : C_DIM;
+        uint32_t cb = pb ? pb->color : f->family.parent_body[1] ? f->family.parent_body[1] : C_DIM;
         panel(fb, stride);
         text_c(fb, stride, CX, SETUP_Y + 20, 3, C_TEXT, f->name);
         float ps = f->size * 2.0f;                                   /* a portrait, twice life size (a fry) ... */

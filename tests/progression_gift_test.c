@@ -26,9 +26,22 @@ int main(void) {
     assert(b.gift.identity==42 && b.gift.out_peer==99);
     assert(!strcmp(a.fish[0].name,b.fish[0].name));
     /* Pre-BLE saves ended immediately before the appended journal. */
-    blob_len-=sizeof(gift_save_t);
+    blob_len-=sizeof(gift_save_t)+sizeof(fish_gift_save_t);
     tank_init(&b,789); progression_boot(&b);
     assert(b.sd_balance==782 && b.sd_earned==1412 && b.gift.identity==0 && !b.gift.out_phase);
+    /* New passport tail survives real serialization, including escrow. */
+    b.gift.identity=99;
+    tank_add_fish(&b,0,1); b.fish[2].age_s=4567; b.sd_paid_fish[2]=31;
+    assert(fish_gift_offer(&b,42,2,progression_save));
+    fish_passport_t passport=b.fish_gift.outgoing;
+    tank_init(&a,123); progression_boot(&a);
+    assert(a.n_fish==2 && a.fish_gift.journal.out_phase==GIFT_OFFER);
+    assert(!memcmp(&passport,&a.fish_gift.outgoing,sizeof passport));
+    gift_msg_t reject={GIFT_REJECT,a.fish_gift.journal.out_seq,a.fish_gift.journal.out_amount};
+    fish_gift_receive(&a,42,reject,progression_save);
+    tank_init(&b,123); progression_boot(&b);
+    assert(b.n_fish==3 && b.fish[2].age_s==4567 && b.sd_paid_fish[2]==31);
+    assert(b.fish[2].family.id.serial==passport.family.id.serial && b.fish[2].parent_a>=0);
     fail_save=true; assert(!progression_save(&b));
     puts("progression: gift journal round-trip, legacy save migration and failed save passed");
 }

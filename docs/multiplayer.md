@@ -125,3 +125,45 @@ and clean full Bluetooth shutdown. The final run preserved its starting
 balances of 682 and 120. There were no pending transfers at the end. See
 `docs/ble/2026-09-28-hardware.txt`. Power-loss boundaries remain covered by the
 host persistence tests; the hardware recovery test used a BLE disconnect.
+
+## Fish gifts (2026-09-28)
+
+In Friends, tap **FISH**, choose a fish with the arrows, and **GIVE FISH**.
+The other tank sees its portrait, name and age and chooses **ACCEPT** or
+**DECLINE**. At least two fish must stay with the sender; the receiver must
+have space under its normal population cap (five on hardware). Finish a
+new fry's welcome before giving a fish. Dollars remain available through
+**DOLLARS**. Both devices need this firmware for fish gifts.
+
+The sender atomically saves the fish in escrow and removes it from the live
+roster. Declining returns it. Closing Friends does not cancel a transfer:
+reopen Friends on these same two tanks to finish it. There is deliberately no
+timeout refund after acceptance. A pending fish neither ages nor feeds until
+it arrives or returns. New births wait while either fish journal is pending,
+reserving room for arrival or return. A returned fish occupies the last slot.
+
+Passports preserve name, preset, colours, age, stage, size, personality,
+trust, meals, milestones and their seen/paid ledgers. Stable origin/serial IDs
+preserve parent relationships across tanks; absent parents retain their names
+and colours. Local parent links reconnect when a family reunites. Fish roster
+changes invalidate old asynchronous advisor results.
+
+The existing money save layout and receipt stream are unchanged. A new
+append-only save tail holds fish escrow, accepted incoming passport, its own
+sequence/receipt ledger (eight senders, never evicted), identity counter and
+family records. Save failures roll back the entire affected live roster.
+BLE HELLO amount bit 0 advertises fish support; older peers still trade money.
+Fish control opcodes are 17–21 (money protocol opcode + 16), with seq and CRC32
+in the existing 20-byte envelope. Opcode 32 carries a uint16 fragment index,
+uint32 sequence and 12 passport bytes. The 200-byte little-endian v1 passport
+uses IEEE binary32; complete rounds retry, and consent requires a complete,
+validated passport matching the offered CRC. Accepted passports are durable
+before ACCEPT; COMMIT, delivery and DONE remain idempotent across restarts.
+
+Host verification: `tests/fish_gift_test.c` covers save failures at each stage,
+reboots, duplicate/stale messages, out-of-order fragments, corrupt payload,
+capacity, reserved slots, round trips, family links and paid reward history.
+`tests/progression_gift_test.c` exercises the real save serializer and legacy
+migration. Serial `friends fish INDEX` offers a fish; `friends roster` reports
+identity/history for hardware verification. Never restore staged/debug saves
+around a transfer: doing so could replay ownership.

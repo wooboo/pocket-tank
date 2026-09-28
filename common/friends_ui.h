@@ -5,7 +5,8 @@ enum { UI_SEARCH,UI_CODE,UI_WAIT,UI_GIFT,UI_ERROR };
 typedef struct {
     int page;
     uint32_t code, amount, incoming;
-    bool pending;
+    bool pending, fish_mode, fish_incoming;
+    const fish_t *fish;
     const char *status;
 } friends_ui_t;
 void render_friends(const tank_t *t,uint16_t *fb,int stride,const friends_ui_t *ui);

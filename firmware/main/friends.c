@@ -41,6 +41,15 @@ static int page;
 static char status[40];
 static gift_msg_t incoming;
 static uint32_t amount=10;
+static bool fish_mode, incoming_fish, peer_fish;
+static int fish_index, fragment_index;
+static int64_t last_fragment;
+static fish_assembly_t assembly;
+static fish_passport_t incoming_passport;
+static uint32_t pressed_generation;
+static bool pressed_fish;
+static bool fish_pending(const tank_t *t) { return t->fish_gift.journal.out_phase || t->fish_gift.journal.in_seq; }
+static bool any_pending(const tank_t *t) { return fish_pending(t) || t->gift.out_phase || t->gift.in_seq; }
 static bool finger; static int pressed, pressed_page;
 static uint32_t pressed_in_seq, pressed_out_phase;
 static int gap_event(struct ble_gap_event *,void *);
@@ -128,6 +137,8 @@ void friends_open(tank_t *t) {
     }
     active=true; page=UI_SEARCH; conn=BLE_HS_CONN_HANDLE_NONE; peer=0; remote_handle=0; secure=false;
     incoming=(gift_msg_t){0}; finger=false; amount=10;
+    fish_mode=incoming_fish=peer_fish=false; fish_index=fragment_index=0;
+    last_fragment=0; memset(&assembly,0,sizeof assembly);
     deadline=esp_timer_get_time()+30000000; last_send=0;
     snprintf(status,sizeof status,"HOLD BOOT ON THE OTHER TANK"); touch_port_dismiss();
     if (!t->gift.identity) {
@@ -158,6 +169,34 @@ static void send_msg(const tank_t *t,gift_msg_t m) {
     put32(b+12,(uint32_t)t->gift.identity); put32(b+16,(uint32_t)(t->gift.identity>>32));
     int rc=ble_gattc_write_flat(conn,remote_handle,b,sizeof b,NULL,NULL);
     if (rc && rc!=BLE_HS_EBUSY) ESP_LOGW(TAG,"send retry: %d",rc);
+}
+/* At the default ATT MTU every write still fits in 20 bytes. Fragments are
+ * retried as complete rounds; consent binds their CRC and transaction number. */
+static void send_fish(const tank_t *t,gift_msg_t m) { m.op+=16; send_msg(t,m); }
+static void fish_data(tank_t *t,const event_t *e) {
+    if(!peer || !peer_fish) return;
+    if(e->data[1]==32) {
+        unsigned index=(unsigned)e->data[2]|(unsigned)e->data[3]<<8;
+        fish_gift_fragment(&assembly,get32(e->data+4),index,e->data+8); return;
+    }
+    if(e->data[2] || e->data[3]) return;
+    uint64_t id=(uint64_t)get32(e->data+12)|((uint64_t)get32(e->data+16)<<32);
+    if(id!=peer) return;
+    gift_msg_t m={e->data[1]-16,get32(e->data+4),get32(e->data+8)};
+    int r=fish_gift_receive(t,peer,m,progression_save);
+    if(r==GIFT_OFFER) {
+        fish_passport_t p;
+        if(fish_gift_decode(&assembly,m,&p)) {
+            incoming=m; incoming_fish=true; incoming_passport=p;
+            snprintf(status,sizeof status,"A FISH FOR YOUR AQUARIUM");
+        }
+    } else if(r) {
+        send_fish(t,(gift_msg_t){r,m.seq,m.amount});
+        if(r==GIFT_DONE) { incoming=(gift_msg_t){0}; incoming_fish=false; snprintf(status,sizeof status,"FISH RECEIVED. WELCOME HOME"); }
+    }
+    if(m.op==GIFT_DONE && !t->fish_gift.journal.out_phase) snprintf(status,sizeof status,"FISH DELIVERED");
+    if(m.op==GIFT_REJECT) snprintf(status,sizeof status,"FISH RETURNED TO YOUR TANK");
+    ESP_LOGI(TAG,"fish op %u seq %lu reply %d count %d",m.op,(unsigned long)m.seq,r,t->n_fish);
 }
 void friends_tick(tank_t *t,int64_t now) {
     event_t e;
@@ -198,17 +237,22 @@ void friends_tick(tank_t *t,int64_t now) {
             break;
         case EV_CHAR: if(e.conn==conn) remote_handle=e.handle; break;
         case EV_DATA: {
-            if(!secure || e.conn!=conn || e.data[0]!=1 || e.data[2] || e.data[3]) break;
+            if(!secure || e.conn!=conn || e.data[0]!=1) break;
+            if(e.data[1]==32 || (e.data[1]>=17 && e.data[1]<=21)) {
+                fish_data(t,&e); deadline=now+120000000; break;
+            }
+            if(e.data[2] || e.data[3]) break;
             uint64_t id=(uint64_t)get32(e.data+12)|((uint64_t)get32(e.data+16)<<32);
             if(!id || id==t->gift.identity || (peer && peer!=id)) break;
             if(!peer && e.data[1]!=0) break;
             peer=id;
             if(page==UI_WAIT) { page=UI_GIFT; snprintf(status,sizeof status,"CHOOSE A GIFT FOR YOUR FRIEND"); ESP_LOGI(TAG,"paired with %016llx",(unsigned long long)peer); }
             gift_msg_t m={e.data[1],get32(e.data+4),get32(e.data+8)};
-            if(!m.op) break;
+            if(!m.op) { peer_fish=(m.amount&1)!=0; break; }
             deadline=now+120000000;
             int r=gift_receive(t,peer,m,progression_save);
-            if(r==GIFT_OFFER) incoming=m;
+            if(r==GIFT_OFFER && fish_pending(t)) r=GIFT_REJECT;
+            if(r==GIFT_OFFER) { if(!incoming_fish) { incoming=m; incoming_fish=false; } }
             else if(r) { send_msg(t,(gift_msg_t){r,m.seq,m.amount});
                 if(r==GIFT_DONE) { incoming=(gift_msg_t){0}; snprintf(status,sizeof status,"GIFT RECEIVED. THANK YOU"); } }
             if(m.op==GIFT_DONE && !t->gift.out_phase) snprintf(status,sizeof status,"GIFT DELIVERED");
@@ -222,8 +266,23 @@ void friends_tick(tank_t *t,int64_t now) {
     if(!active) return;
     if(now>deadline) { friends_close(); ESP_LOGI(TAG,"session timed out; radio discovery stopped"); return; }
     if(secure && remote_handle && now-last_send>1000000) {
-        last_send=now; send_msg(t,(gift_msg_t){0});
+        last_send=now; send_msg(t,(gift_msg_t){.amount=1});
         gift_msg_t m; if(peer && gift_pending(t,peer,&m)) send_msg(t,m);
+        const gift_save_t *g=&t->fish_gift.journal;
+        if(peer==g->out_peer && peer_fish && g->out_phase==GIFT_COMMIT)
+            send_fish(t,(gift_msg_t){GIFT_COMMIT,g->out_seq,g->out_amount});
+    }
+    const gift_save_t *g=&t->fish_gift.journal;
+    if(secure && remote_handle && peer_fish && peer==g->out_peer && g->out_phase==GIFT_OFFER && now-last_fragment>100000) {
+        last_fragment=now;
+        if(fragment_index==FISH_FRAGMENTS) {
+            send_fish(t,(gift_msg_t){GIFT_OFFER,g->out_seq,g->out_amount}); fragment_index=0;
+        } else {
+            uint8_t b[20]={1,32,(uint8_t)fragment_index,0}; put32(b+4,g->out_seq);
+            unsigned offset=fragment_index*12, n=FISH_PACKET_BYTES-offset; if(n>12) n=12;
+            memcpy(b+8,(const uint8_t *)&t->fish_gift.outgoing+offset,n);
+            if(!ble_gattc_write_flat(conn,remote_handle,b,sizeof b,NULL,NULL)) fragment_index++;
+        }
     }
 }
 static void action(tank_t *t,int a) {
@@ -234,14 +293,37 @@ static void action(tank_t *t,int a) {
         if(ble_sm_inject_io(conn,&io)) fail("CONFIRMATION FAILED");
         else { page=UI_WAIT; snprintf(status,sizeof status,"WAITING FOR YOUR FRIEND"); }
     } else if(page==UI_GIFT) {
-        if(incoming.op) {
+        if(incoming.op && incoming_fish) {
+            if(a==2) {
+                if(fish_gift_accept(t,peer,incoming,&incoming_passport,progression_save)) {
+                    send_fish(t,(gift_msg_t){GIFT_ACCEPT,incoming.seq,incoming.amount}); incoming=(gift_msg_t){0}; incoming_fish=false;
+                    snprintf(status,sizeof status,"RECEIVING YOUR NEW FISH");
+                } else snprintf(status,sizeof status,t->n_fish>=POP_CAP?"TANK FULL. DECLINE THIS FISH":"FINISH OTHER GIFTS OR RETRY");
+            } else if(a==3 || a==5) {
+                send_fish(t,(gift_msg_t){GIFT_REJECT,incoming.seq,incoming.amount}); incoming=(gift_msg_t){0}; incoming_fish=false;
+            }
+        } else if(incoming.op) {
+            if(a==2 && fish_pending(t)) { snprintf(status,sizeof status,"FINISH THE FISH GIFT FIRST"); return; }
             if(a==2 && gift_accept(t,peer,incoming,progression_save)) {
                 send_msg(t,(gift_msg_t){GIFT_ACCEPT,incoming.seq,incoming.amount}); incoming=(gift_msg_t){0};
                 snprintf(status,sizeof status,"RECEIVING GIFT");
             } else if(a==2) {
                 snprintf(status,sizeof status,"CANNOT SAVE GIFT. CLOSE AND RETRY");
-            } else if(a==3) { send_msg(t,(gift_msg_t){GIFT_REJECT,incoming.seq,incoming.amount}); incoming=(gift_msg_t){0}; }
-        } else if(!t->gift.out_phase && !t->gift.in_seq) {
+            } else if(a==3 || a==5) { send_msg(t,(gift_msg_t){GIFT_REJECT,incoming.seq,incoming.amount}); incoming=(gift_msg_t){0}; }
+        } else if(!any_pending(t)) {
+            if(a==5) { fish_mode=!fish_mode; fish_index=0; return; }
+            if(fish_mode) {
+                if(a==3) fish_index=(fish_index+t->n_fish-1)%t->n_fish;
+                if(a==4) fish_index=(fish_index+1)%t->n_fish;
+                if(a==2) {
+                    if(!peer_fish) snprintf(status,sizeof status,"UPDATE THE OTHER TANK FIRST");
+                    else if(progression_newborn()>=0) snprintf(status,sizeof status,"MEET YOUR NEW FRY FIRST");
+                    else if(fish_gift_offer(t,peer,fish_index,progression_save)) {
+                        fragment_index=0; snprintf(status,sizeof status,"WAITING FOR YOUR FRIEND");
+                    } else snprintf(status,sizeof status,t->n_fish<=2?"TWO FISH MUST STAY HERE":"SAVE FAILED. TRY AGAIN");
+                }
+                return;
+            }
             if(a==3 && amount>10) amount-=10;
             if(a==4 && amount<GIFT_MAX) amount+=10;
             if(a==2) {
@@ -253,22 +335,30 @@ static void action(tank_t *t,int a) {
 }
 static int hit(float x,float y) {
     if(y>=292 && y<=340 && x>=34 && x<=414) return 1;
-    if(y>=225 && y<=277) { if(x>=234 && x<=414) return 2; if(x>=34 && x<=214) return 3; }
-    if(y>=156 && y<=208) { if(x>=34 && x<=114) return 3; if(x>=334 && x<=414) return 4; }
+    if(y>=225 && y<=277) { if(x>=234 && x<=414) return 2; if(x>=34 && x<=214) return 5; }
+    if(y>=142 && y<=208) { if(x>=34 && x<=114) return 3; if(x>=334 && x<=414) return 4; }
     return 0;
 }
 void friends_touch(tank_t *t,float x,float y,bool down) {
     if(down && !finger) {
         pressed=hit(x,y); pressed_page=page;
+        pressed_generation=t->roster_generation; pressed_fish=incoming_fish;
         pressed_in_seq=incoming.seq; pressed_out_phase=t->gift.out_phase;
     }
     if(!down && finger && pressed && pressed==hit(x,y) && page==pressed_page &&
-       incoming.seq==pressed_in_seq && t->gift.out_phase==pressed_out_phase) action(t,pressed);
+       incoming.seq==pressed_in_seq && incoming_fish==pressed_fish && t->roster_generation==pressed_generation && t->gift.out_phase==pressed_out_phase) action(t,pressed);
     finger=down;
 }
 void friends_render(const tank_t *t,uint16_t *fb,int stride) {
-    friends_ui_t ui={.page=page,.code=code,.amount=amount,.incoming=incoming.amount,
-        .pending=t->gift.out_phase || t->gift.in_seq,.status=status};
+    fish_t preview={0};
+    if(incoming_fish) {
+        memcpy(preview.name,incoming_passport.name,8); preview.color=incoming_passport.color;
+        preview.fin=incoming_passport.fin; preview.accent=incoming_passport.accent;
+        preview.stage=incoming_passport.stage; preview.age_s=incoming_passport.age;
+    }
+    friends_ui_t ui={.fish_mode=fish_mode,.fish_incoming=incoming_fish,
+        .fish=incoming_fish?&preview:&t->fish[fish_index%t->n_fish],.page=page,.code=code,.amount=amount,.incoming=incoming.amount,
+        .pending=any_pending(t),.status=status};
     render_friends(t,fb,stride,&ui);
 }
 void friends_command(tank_t *t,int argc,char **argv) {
@@ -277,9 +367,21 @@ void friends_command(tank_t *t,int argc,char **argv) {
     else if(argc>1 && !strcmp(argv[1],"confirm") && page==UI_CODE) action(t,2);
     else if(argc>1 && !strcmp(argv[1],"accept") && incoming.op) action(t,2);
     else if(argc>1 && !strcmp(argv[1],"decline") && incoming.op) action(t,3);
+    else if(argc>2 && !strcmp(argv[1],"fish") && active && page==UI_GIFT && !incoming.op) {
+        char *end; long idx=strtol(argv[2],&end,10);
+        if(!*end && idx>=0 && idx<t->n_fish) { fish_mode=true; fish_index=idx; action(t,2); }
+    }
     else if(argc>2 && !strcmp(argv[1],"give") && active && page==UI_GIFT && !incoming.op) {
         char *end; unsigned long n=strtoul(argv[2],&end,10);
-        if(!*end && n && n<=GIFT_MAX) { amount=(uint32_t)n; action(t,2); }
+        if(!*end && n && n<=GIFT_MAX) { fish_mode=false; amount=(uint32_t)n; action(t,2); }
     }
+    if(argc>1 && !strcmp(argv[1],"roster")) for(int i=0;i<t->n_fish;i++) {
+        const fish_t *f=&t->fish[i];
+        ESP_LOGI("director","roster %d name=%s id=%016llx:%llu age=%.1f body=%06lx accent=%06lx paid=%lu parents=%s,%s",i,f->name,
+            (unsigned long long)f->family.id.tank,(unsigned long long)f->family.id.serial,(double)f->age_s,
+            (unsigned long)f->color,(unsigned long)f->accent,(unsigned long)t->sd_paid_fish[i],
+            f->family.parent_names[0],f->family.parent_names[1]);
+    }
+    ESP_LOGI("director","fish count=%d out=%lu in=%lu offered=%lu name=%s",t->n_fish,(unsigned long)t->fish_gift.journal.out_phase,(unsigned long)t->fish_gift.journal.in_seq,(unsigned long)(incoming_fish?incoming.seq:0),incoming_fish?incoming_passport.name:"-");
     ESP_LOGI("director","friends active=%d page=%d code=%06lu peer=%016llx balance=%ld out=%lu in=%lu %s",active,page,(unsigned long)code,(unsigned long long)peer,(long)t->sd_balance,(unsigned long)t->gift.out_phase,(unsigned long)t->gift.in_seq,status);
 }

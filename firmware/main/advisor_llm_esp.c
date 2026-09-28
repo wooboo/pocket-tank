@@ -17,6 +17,7 @@ static const char *TAG = "advisor";
 static bool g_ok;
 static SemaphoreHandle_t g_mx, g_req_sem;
 static char g_req_state[400]; static int g_req_fish = -1;
+static uint32_t g_req_generation, g_resp_generation, g_seen_generation;
 static goal_t g_resp_goal; static int g_resp_fish = -1; static bool g_busy;
 static bool g_pending[N_FISH_MAX]; static int g_next;
 static uint32_t g_decisions, g_last_ms; static float g_tok_s;
@@ -38,6 +39,7 @@ static void worker(void *arg) {
     for (;;) {
         xSemaphoreTake(g_req_sem, portMAX_DELAY);
         xSemaphoreTake(g_mx, portMAX_DELAY);
+        uint32_t generation = g_req_generation;
         int fish = g_req_fish; char st[400]; strcpy(st, g_req_state); g_req_fish = -1; g_busy = true;
         xSemaphoreGive(g_mx);
         int ntok = 0; int64_t t0 = esp_timer_get_time();
@@ -52,7 +54,7 @@ static void worker(void *arg) {
                  q4_prof_us[0] / 1000, q4_prof_us[1] / 1000, q4_prof_us[2] / 1000,
                  q4_prof_us[3] / 1000, q4_prof_us[4] / 1000, q4_prof_us[5] / 1000);
         xSemaphoreTake(g_mx, portMAX_DELAY);
-        g_resp_goal = g; g_resp_fish = fish; g_busy = false; g_decisions++;
+        g_resp_goal = g; g_resp_fish = fish; g_resp_generation = generation; g_busy = false; g_decisions++;
         xSemaphoreGive(g_mx);
     }
 }
@@ -102,6 +104,10 @@ goal_t advisor_llm_esp(const tank_t *t, int fish_idx, bool request) {
     goal_t out = f->goal;
     if (!g_ok) return out;
     xSemaphoreTake(g_mx, portMAX_DELAY);
+    if (g_seen_generation != t->roster_generation) {
+        memset(g_pending,0,sizeof g_pending); g_seen_generation=t->roster_generation;
+    }
+    if (g_resp_fish >= 0 && g_resp_generation != t->roster_generation) g_resp_fish=-1;
     if (g_resp_fish == fish_idx) {
         if (g_resp_goal.id < GOAL_COUNT) out = g_resp_goal;
         g_resp_fish = -1;
@@ -111,6 +117,7 @@ goal_t advisor_llm_esp(const tank_t *t, int fish_idx, bool request) {
         g_pending[fish_idx] = false;
         g_next = (fish_idx + 1) % (t->n_fish > 0 ? t->n_fish : 1);
         advisor_core_encode(t, fish_idx, g_req_state, sizeof g_req_state);
+        g_req_generation = t->roster_generation;
         g_req_fish = fish_idx;
         xSemaphoreGive(g_req_sem);
     }

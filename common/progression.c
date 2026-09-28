@@ -108,6 +108,7 @@ typedef struct {
     uint8_t  cluster_z1, cluster_scheme, pad_cluster[2];
     float    cluster_growth;
     gift_save_t gift; /* BLE transfers: balance and journal in one NVS blob */
+    fish_gift_save_t fish_gift;
 } save_t;
 /* the smallest PTK2 save (pre-upkeep, 2026-08-30): anything shorter is not
  * ours. Every later build wrote sizeof(save_t) of its day - 448, 1112, 1304,
@@ -131,7 +132,7 @@ _Static_assert(offsetof(save_t, bubble_x) + sizeof(((save_t *)0)->ms_seen) + siz
 
 float progression_time_scale = 1.0f;
 
-static float s_age[N_FISH_MAX];      /* seconds of tended life per fish */
+
 static float s_since_save, s_dirty_since;
 static bool  s_dirty;
 static bool  s_ravenous;             /* begging/frenzy active until everyone's fed / give-up */
@@ -149,7 +150,7 @@ static int32_t s_sd_prev_feedings = -1;   /* player_feedings at the last tick (-
 static float clampf(float v, float lo, float hi) { return v < lo ? lo : v > hi ? hi : v; }
 static void mark_dirty(void) { if (!s_dirty) { s_dirty = true; s_dirty_since = 0; } }
 
-float progression_age_s(const tank_t *t, int idx) { (void)t; return idx >= 0 && idx < N_FISH_MAX ? s_age[idx] : 0; }
+float progression_age_s(const tank_t *t, int idx) { (void)t; return idx >= 0 && idx < N_FISH_MAX ? t->fish[idx].age_s : 0; }
 bool  progression_arrival_pending(void) { return s_arrival_pending; }
 bool  progression_setup_pending(void)   { return s_setup_pending; }
 void  progression_setup_done(tank_t *t) { s_setup_pending = false; progression_save(t); }
@@ -274,6 +275,7 @@ static void pick_parents(const tank_t *t, int *pa, int *pb) {
 /* the arrival itself: a fry in the nursery grass, traits inherited from the
  * parents; the stage clock starts from zero */
 static void do_arrival(tank_t *t) {
+    if (t->fish_gift.journal.out_phase || t->fish_gift.journal.in_seq) return;
     int a, b;
     pick_parents(t, &a, &b);
     int slot = tank_add_fish(t, a, b);
@@ -285,7 +287,7 @@ static void do_arrival(tank_t *t) {
         float x0, x1; tank_veg_bed(t, nb, &x0, &x1, NULL, NULL);
         t->fish[slot].x = (x0 + x1) * 0.5f; t->fish[slot].y = TANK_H - 16 - 18;
     }
-    s_age[slot] = 0;
+    t->fish[slot].age_s = 0;
     t->fish[slot].ms_bits = MS_ARRIVED;
     t->sd_paid_fish[slot] = 0;               /* a new ledger for the new fish */
     if (t->n_fish <= N_FISH_MAX) set_tms(t, POP_TMS[t->n_fish]);
@@ -306,7 +308,7 @@ static int care_gates(const tank_t *t, gate_t g[CARE_GATES_MAX]) {
     for (int i = 0; i < t->n_fish; i++)
         if (t->fish[i].trust < min_trust) min_trust = t->fish[i].trust;
     int last = t->n_fish - 1;
-    float age = last >= 0 ? s_age[last] : 0;
+    float age = last >= 0 ? t->fish[last].age_s : 0;
     int n = 0;
 #define GATE(k, h, nd, m) do { g[n].kind = (k); g[n].have = (h); g[n].need = (nd); g[n].met = (m); \
         g[n].frac = g[n].met ? 1.0f : (nd) > 0 ? (h) / (nd) : 0; if (g[n].frac > 1) g[n].frac = 1; n++; } while (0)
@@ -477,7 +479,7 @@ void progression_stage_arrival(tank_t *t) { (void)t; if (!s_arrival_pending) { s
 void progression_fresh(tank_t *t) {
     tank_new_population(t);          /* a new tank: two FRY, contrasting -
                                       * the keeper watches them grow up */
-    for (int i = 0; i < N_FISH_MAX; i++) s_age[i] = 0;
+    for (int i = 0; i < N_FISH_MAX; i++) t->fish[i].age_s = 0;
     t->tank_ms_bits = TMS_PAIR;
     for (int i = 0; i < t->n_fish; i++) { t->fish[i].ms_bits = MS_ARRIVED; apply_growth(&t->fish[i]); }
     s_arrival_pending = false; s_spawn_in = -1; s_prev_night = t->night;
@@ -498,8 +500,8 @@ void progression_reset(tank_t *t, uint32_t seed) {
 
 void progression_set_age(tank_t *t, int idx, float seconds) {
     if (idx < 0 || idx >= t->n_fish) return;
-    s_age[idx] = seconds < 0 ? 0 : seconds;
-    apply_stage(&t->fish[idx], s_age[idx]);
+    t->fish[idx].age_s = seconds < 0 ? 0 : seconds;
+    apply_stage(&t->fish[idx], t->fish[idx].age_s);
     apply_growth(&t->fish[idx]);
     mark_dirty();
 }
@@ -531,7 +533,7 @@ static bool load_save(tank_t *t, int64_t *saved_unix) {
         f->ms_seen = sv.ms_seen[i] & f->ms_bits;
         f->rest_dx = s->rest_dx; f->rest_dy = s->rest_dy;
         f->drift_acc = sv.drift_acc[i];
-        s_age[i] = s->age_s;
+        t->fish[i].age_s = s->age_s;
         t->n_fish = i + 1;
         if (sv.names[i][0]) { sv.names[i][FISH_NAME_MAX] = 0; tank_set_name(t, i, sv.names[i]); }
         tank_set_look(t, i, sv.body[i], sv.accent[i]);        /* zeros keep the preset's */
@@ -560,6 +562,8 @@ static bool load_save(tank_t *t, int64_t *saved_unix) {
     t->trims = sv.trims; t->cells_cleaned = sv.cells_cleaned;
     /* the sand dollar tail (zeros for an older save: the ledger back-pays) */
     t->gift = sv.gift;
+    t->fish_gift = sv.fish_gift;
+    for (int i=0;i<t->n_fish;i++) t->fish[i].family = sv.fish_gift.family[i];
     t->sd_balance = sv.sd_balance; t->sd_earned = sv.sd_earned; t->sd_unlocks = sv.sd_unlocks & ((1u << SD_ITEM_COUNT) - 1);
     for (int i = 0; i < N_FISH_MAX; i++) t->sd_paid_fish[i] = i < t->n_fish ? sv.sd_paid_fish[i] : 0;
     t->sd_colonies_paid = sv.sd_colonies_paid; t->sd_inches_paid = sv.sd_inches_paid;
@@ -606,8 +610,8 @@ void progression_slept(tank_t *t, float seconds) {
     if (seconds <= 0) return;
     tank_tick_sleep(t, seconds);
     for (int i = 0; i < t->n_fish; i++) {     /* and they grew, slowly, in the dark */
-        s_age[i] += seconds * SLEEP_GROWTH_FRAC;
-        apply_stage(&t->fish[i], s_age[i]); apply_growth(&t->fish[i]);
+        t->fish[i].age_s += seconds * SLEEP_GROWTH_FRAC;
+        apply_stage(&t->fish[i], t->fish[i].age_s); apply_growth(&t->fish[i]);
     }
     /* the tank milestone (2026-09-15, was "first quiet night" - every fish
        resting under the old day/night cycle): one unbroken stretch of device
@@ -638,8 +642,8 @@ void progression_tick(tank_t *t, float dt) {
     int n_dart = 0; bool changed_someone = false;
     for (int i = 0; i < t->n_fish; i++) {
         fish_t *f = &t->fish[i];
-        s_age[i] += aged;
-        apply_stage(f, s_age[i]);
+        t->fish[i].age_s += aged;
+        apply_stage(f, t->fish[i].age_s);
         apply_growth(f);
         /* trait drift, slow: calm + fed -> bolder/more social; startled -> shyer */
         float k = tended / (DRIFT_HOURS * 3600.0f);          /* full unit per DRIFT_HOURS of pressure */
@@ -745,6 +749,8 @@ void progression_tick(tank_t *t, float dt) {
 bool progression_save(tank_t *t) {
     save_t sv; memset(&sv, 0, sizeof sv);
     sv.gift = t->gift;
+    sv.fish_gift = t->fish_gift;
+    for (int i=0;i<t->n_fish;i++) sv.fish_gift.family[i] = t->fish[i].family;
     sv.magic = SAVE_MAGIC; sv.saved_unix = clock_port_now_unix(); sv.clock = t->clock;
     /* light_override / light_on stay zero in the save (2026-09-15) */
     sv.light_idle_s = (uint16_t)t->light_idle_s; sv.light_auto = t->light_auto; sv.light_manual_off = t->light_manual_off;
@@ -783,7 +789,7 @@ bool progression_save(tank_t *t) {
         s->size = f->size; s->trust = f->trust; s->bold = f->bold; s->sociable = f->sociable;
         s->bold0 = f->bold0; s->sociable0 = f->sociable0;
         s->hunger = f->hunger; s->energy = f->energy; s->stress = f->stress; s->curiosity = f->curiosity;
-        s->age_s = s_age[i]; s->rest_dx = f->rest_dx; s->rest_dy = f->rest_dy;
+        s->age_s = t->fish[i].age_s; s->rest_dx = f->rest_dx; s->rest_dy = f->rest_dy;
         s->eaten = f->eaten; s->eaten_player = f->eaten_player; s->ms_bits = f->ms_bits;
         sv.ms_seen[i] = f->ms_seen;
         sv.drift_acc[i] = f->drift_acc;

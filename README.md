@@ -594,3 +594,5 @@ first boot on real glass, and the tank growing into a pet.
 
 MIT, see [LICENSE](LICENSE). `model/llama2.c/` and `sim/lvgl/` are cloned
 separately and carry their own MIT licenses.
+
+Fish can also move between tanks: in **Friends → FISH**, pick a fish and tap **GIVE FISH**; the other tank previews and accepts it. Its name, look, age, personality and history travel with it. Keep at least two fish at home. Reconnect the same tanks to resume an interrupted gift. See [multiplayer](docs/multiplayer.md).

@@ -58,7 +58,7 @@ static void nvs_drop(const char *key) {
     else if (nvs_has(key)) ESP_LOGW(TAG, "drop %s: still there after the erase", key);
 }
 static bool stash(tank_t *t) {
-    if (t->gift.out_phase || t->gift.in_seq || !progression_save(t)) return false;
+    if (t->gift.out_phase || t->gift.in_seq || t->fish_gift.journal.out_phase || t->fish_gift.journal.in_seq || !progression_save(t)) return false;
     bool ok = nvs_copy("save", "bk");
     ESP_LOGI(TAG, "%s", ok ? "real tank stashed (restore brings it back)" : "STASH FAILED - not touching the tank");
     return ok;
@@ -66,7 +66,7 @@ static bool stash(tank_t *t) {
 /* a staged tank replaces the live one: park the real save first unless a
  * stash is already parked (a second staging must not overwrite it) */
 static bool stage_guard(tank_t *t) {
-    if (t->gift.out_phase || t->gift.in_seq) { ESP_LOGW(TAG, "finish the pending gift before staging"); return false; }
+    if (t->gift.out_phase || t->gift.in_seq || t->fish_gift.journal.out_phase || t->fish_gift.journal.in_seq) { ESP_LOGW(TAG, "finish the pending gift before staging"); return false; }
     if (nvs_has("bk")) { ESP_LOGI(TAG, "stash already parked; staging over the current tank"); return true; }
     return stash(t);
 }
