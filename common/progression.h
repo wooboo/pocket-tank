@@ -66,8 +66,8 @@ void progression_slept(tank_t *t, float seconds);
 void progression_settings_changed(void);
 /* call every frame after tank_tick */
 void progression_tick(tank_t *t, float dt);
-/* call on light-off / shutdown (autosaves on events + heartbeat anyway) */
-void progression_save(tank_t *t);
+/* Call on light-off / shutdown; false means persistence failed (dirty state retained). */
+bool progression_save(tank_t *t);
 
 /* sim/debug: multiply time (aging, drift) - `./fishsim --fast 60` */
 extern float progression_time_scale;

@@ -79,7 +79,11 @@ bool display_port_init(void) {
 
     for (int i = 0; i < 2; i++) {
         s_stripe[i] = heap_caps_malloc(PANEL_W * STRIPE_ROWS * 2, MALLOC_CAP_DMA);
-        if (!s_stripe[i]) return false;
+        if (!s_stripe[i]) {
+            ESP_LOGE(TAG, "display DMA allocation failed (%u bytes)", PANEL_W * STRIPE_ROWS * 2);
+            for (int j=0;j<i;j++) { free(s_stripe[j]); s_stripe[j]=NULL; }
+            return false;
+        }
     }
     s_stripe_free = xSemaphoreCreateCounting(2, 2);
     const spi_bus_config_t spi = SH8601_PANEL_BUS_QSPI_CONFIG(PIN_LCD_PCLK, PIN_LCD_DATA0, PIN_LCD_DATA1,
@@ -146,6 +150,7 @@ uint8_t display_port_brightness(void) { return s_brightness; }
  * stripe buffer; two stripe buffers ping-pong so the transpose of stripe N+1
  * overlaps the DMA of stripe N. */
 void display_port_flush(const uint16_t *fb) {
+    if (!s_panel || !s_stripe_free) return;
     int cur = 0;
     for (int py0 = 0; py0 < PANEL_H; py0 += STRIPE_ROWS) {
         xSemaphoreTake(s_stripe_free, portMAX_DELAY);

@@ -232,6 +232,7 @@ int tank_add_fish(tank_t *t, int parent_a, int parent_b) {
 }
 
 void tank_init(tank_t *t, uint32_t seed) {
+    t->gift = (gift_save_t){0};
     t->rng = seed ? seed : 0xC0FFEE;
     t->bubble_up_x = 0; t->bubble_up_y = -1;
     t->water_push = 0; t->motion_inverted = false; t->low_battery = false; t->battery_recovery_s = 0;

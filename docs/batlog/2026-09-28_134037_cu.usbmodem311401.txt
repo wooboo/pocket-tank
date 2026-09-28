@@ -1,0 +1,23 @@
+# pocket-tank preflight 2026-09-28_134037 on /dev/cu.usbmodem311401
+I (265810) batlog: 1 samples (h:mm since the first | SoC | VBAT | bright | state | mA since previous)
+I (265810) batlog:     0:00 |  95% | 4082 mV |   0 | asleep | bed
+I (265814) batlog:   (SoC is 1% = 2 mAh; short awake windows are coarse, a night is not)
+I (269879) director: 0 dolt   elder age 64.5h size 1.36 hunger 4.6 energy 9.0 stress 0.0 curiosity 0.0 trust 8.8 ms f3f  visit_bubbles at 104,95
+I (269881) director: 1 zori   elder age 64.5h size 1.45 hunger 4.6 energy 10.0 stress 0.0 curiosity 0.0 trust 9.1 ms f3f  rest at 120,305
+I (269893) director: 2 chip   elder age 64.0h size 1.31 hunger 5.8 energy 9.5 stress 0.0 curiosity 0.0 trust 9.5 ms f3f  visit_bubbles at 123,139
+I (269906) director: 3 gira   elder age 62.8h size 1.57 hunger 4.5 energy 10.0 stress 0.0 curiosity 2.5 trust 9.5 ms f3f  rest at 152,256
+I (269918) director: 4 help   elder age 57.8h size 1.25 hunger 4.3 energy 10.0 stress 0.0 curiosity 0.0 trust 8.1 ms f3f  rest at 195,274
+I (269930) director: low-battery shelter: off
+I (269934) director: pellets 0 | trickle on | ravenous 0 | night idle 246s | veg 0.17 0.23 0.15 | algae cells 9/644 | courting no | arrival -
+I (269947) director: sand dollars 802 (earned 1412) | shop: plant snail | colonies 103 | 1909.2 in trimmed
+I (269956) director: snail at 30,299 heading -93 deg | after cell 504 at 8,296 (film 36) | 9 cells on the glass | 849 grazed so far
+I (269968) director: bed 0 fronds (x from 19, pitch 12): 0.20 0.19 0.18 0.17 0.17 0.17 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16
+I (269979) director: bed 1 fronds (x from 376, pitch 12): 0.18 0.18 0.19 0.25 0.36
+I (269987) director: bed 2 fronds (x from 278, pitch 12): 0.13 0.13 0.13 0.13 0.15 0.16 0.18 0.18
+I (269995) director: bed 3 leaves (x from 220, pitch 14): 0.16 0.16 0.13 0.12
+I (270002) director: plant placed: centre x 241 (the keeper's), depth BEHIND the fish
+I (270009) director: castle placed: centre x 122 (the keeper's), BEHIND the grass
+I (270017) director: coral placed: centre x 233 (the keeper's), IN FRONT, colour 8a5be0, growth 0.58 of 1.25 (growing)
+I (270027) director: reef cluster placed: centre x 324 (the keeper's), BEHIND, look REEF, growth 0.27 of 2 (filling out)
+I (270038) director: nursery bed 1 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (270046) director: battery 93% charging, VBAT 4175 mV | brightness 91/255 (level 60%)

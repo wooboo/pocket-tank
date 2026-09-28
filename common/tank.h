@@ -18,6 +18,7 @@
 #define POCKET_TANK_TANK_H
 
 #include <stdbool.h>
+#include "gift.h"
 #include <stdint.h>
 
 #define TANK_W 448
@@ -204,6 +205,7 @@ typedef struct { float x, y, age; bool alive, from_player; } food_t;
 typedef struct { float x, y, vy, wobble; bool column; } bubble_t;
 
 typedef struct tank {
+    gift_save_t gift;
     fish_t   fish[N_FISH_MAX];
     int      n_fish;               /* live fish = fish[0..n_fish-1] */
     food_t   food[MAX_FOOD];

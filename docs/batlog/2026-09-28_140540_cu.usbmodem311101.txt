@@ -1,0 +1,6 @@
+# pocket-tank preflight 2026-09-28_140540 on /dev/cu.usbmodem311101
+# Authorized replacement of foreign firmware; Pocket Tank batlog/state unavailable. Full flash backup required before writing.
+I (3665746) Main: [main.cpp:0191](operator()):
+	           Biggest /     Free /    Total
+	  SRAM : [  139264 /   190167 /   251787]
+	 PSRAM : [ 3604480 /  3648228 /  3837892]

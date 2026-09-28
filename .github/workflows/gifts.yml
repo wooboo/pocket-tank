@@ -1,0 +1,19 @@
+name: gift-protocol
+on:
+  push:
+    paths: ['common/**', 'tests/**', '.github/workflows/gifts.yml']
+  pull_request:
+    paths: ['common/**', 'tests/**', '.github/workflows/gifts.yml']
+permissions:
+  contents: read
+jobs:
+  host-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Transfer recovery and persistence
+        run: |
+          cc -std=c11 -Wall -Wextra -Werror -fsanitize=address,undefined -Icommon tests/gift_test.c common/gift.c -o /tmp/gift-test
+          /tmp/gift-test
+          cc -std=c11 -O1 -g -fsanitize=address,undefined -Icommon tests/progression_gift_test.c common/gift.c common/tank.c common/progression.c common/advisor.c -lm -o /tmp/progression-gift-test
+          /tmp/progression-gift-test

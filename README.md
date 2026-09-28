@@ -364,6 +364,14 @@ appears over the water with a NO and a YES. YES wipes the save and two new
 fry take the tank, with the first-run setup to name them; NO, a sleep, or
 twenty seconds of silence keep everything.
 
+## Nearby gifts
+
+Hold **BOOT for two seconds on both awake tanks** to connect over BLE. Compare
+and confirm the code on both screens, then give sand dollars from the FRIENDS
+menu. The recipient accepts or declines. Closing the menu shuts Bluetooth off.
+Interrupted gifts remain pending and resume when those tanks reconnect.
+See [docs/multiplayer.md](docs/multiplayer.md) for behavior, recovery, and testing.
+
 ## Try it: PC simulator
 
 The simulator runs the exact same `common/` code inside an LVGL + SDL2

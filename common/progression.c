@@ -107,6 +107,7 @@ typedef struct {
     float    cluster_x;
     uint8_t  cluster_z1, cluster_scheme, pad_cluster[2];
     float    cluster_growth;
+    gift_save_t gift; /* BLE transfers: balance and journal in one NVS blob */
 } save_t;
 /* the smallest PTK2 save (pre-upkeep, 2026-08-30): anything shorter is not
  * ours. Every later build wrote sizeof(save_t) of its day - 448, 1112, 1304,
@@ -558,6 +559,7 @@ static bool load_save(tank_t *t, int64_t *saved_unix) {
     memcpy(t->algae, sv.algae, ALGAE_CELLS);
     t->trims = sv.trims; t->cells_cleaned = sv.cells_cleaned;
     /* the sand dollar tail (zeros for an older save: the ledger back-pays) */
+    t->gift = sv.gift;
     t->sd_balance = sv.sd_balance; t->sd_earned = sv.sd_earned; t->sd_unlocks = sv.sd_unlocks & ((1u << SD_ITEM_COUNT) - 1);
     for (int i = 0; i < N_FISH_MAX; i++) t->sd_paid_fish[i] = i < t->n_fish ? sv.sd_paid_fish[i] : 0;
     t->sd_colonies_paid = sv.sd_colonies_paid; t->sd_inches_paid = sv.sd_inches_paid;
@@ -740,8 +742,9 @@ void progression_tick(tank_t *t, float dt) {
         progression_save(t);
 }
 
-void progression_save(tank_t *t) {
+bool progression_save(tank_t *t) {
     save_t sv; memset(&sv, 0, sizeof sv);
+    sv.gift = t->gift;
     sv.magic = SAVE_MAGIC; sv.saved_unix = clock_port_now_unix(); sv.clock = t->clock;
     /* light_override / light_on stay zero in the save (2026-09-15) */
     sv.light_idle_s = (uint16_t)t->light_idle_s; sv.light_auto = t->light_auto; sv.light_manual_off = t->light_manual_off;
@@ -785,8 +788,9 @@ void progression_save(tank_t *t) {
         sv.ms_seen[i] = f->ms_seen;
         sv.drift_acc[i] = f->drift_acc;
     }
-    persist_port_save(&sv, sizeof sv);
+    if (!persist_port_save(&sv, sizeof sv)) return false;
     s_since_save = 0; s_dirty = false; s_dirty_since = 0;
+    return true;
 }
 
 void progression_ack_milestones(tank_t *t) {

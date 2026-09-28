@@ -12,6 +12,7 @@
 #include "progression.h"
 #include "setup.h"
 #include "director.h"
+#include "friends.h"
 #include "touch_port.h"
 #include "battery_port.h"
 #include "display_port.h"
@@ -57,7 +58,7 @@ static void nvs_drop(const char *key) {
     else if (nvs_has(key)) ESP_LOGW(TAG, "drop %s: still there after the erase", key);
 }
 static bool stash(tank_t *t) {
-    progression_save(t);
+    if (t->gift.out_phase || t->gift.in_seq || !progression_save(t)) return false;
     bool ok = nvs_copy("save", "bk");
     ESP_LOGI(TAG, "%s", ok ? "real tank stashed (restore brings it back)" : "STASH FAILED - not touching the tank");
     return ok;
@@ -65,6 +66,7 @@ static bool stash(tank_t *t) {
 /* a staged tank replaces the live one: park the real save first unless a
  * stash is already parked (a second staging must not overwrite it) */
 static bool stage_guard(tank_t *t) {
+    if (t->gift.out_phase || t->gift.in_seq) { ESP_LOGW(TAG, "finish the pending gift before staging"); return false; }
     if (nvs_has("bk")) { ESP_LOGI(TAG, "stash already parked; staging over the current tank"); return true; }
     return stash(t);
 }
@@ -173,6 +175,7 @@ static void help(void) {
     ESP_LOGI(TAG, "stash (park the real tank now) | restore (bring it back) | age <fish> <hours>");
     ESP_LOGI(TAG, "milestones [off] (the page, on cue; on the device: tap the open stats card)");
     ESP_LOGI(TAG, "shop [off] (the sand dollar page) | dollars [n] (grant n; the balance and the chore counts) | buy plant|snail|castle|coral (at the price) | place [plant|castle|coral] [x [behind|among|front]] (the piece's spot; no x = the page; the castle has no among) | coral <0-7|rrggbb> (its colour) | coral grow <g> (its growth, 1 = the fan, 1.25 = the crown) | cluster look <0-2> | cluster grow <g> (1 = full size, 2 = every tentacle) | sell plant|castle|coral|cluster (20%% back)");
+    ESP_LOGI(TAG, "friends open|close|confirm|give N|accept|decline (nearby BLE gifts)");
     ESP_LOGI(TAG, "reset (the keeper's confirm prompt, as BOOT + tap opens it) | reset yes|no (answer it here) - YES WIPES EVERY SAVE, a parked tank too");
     ESP_LOGI(TAG, "setup [off] (the first-run flow: welcome, names, colours; off drops the panel - the birth flow too) | name <fish|idx> <newname> (up to %d letters, saved)", FISH_NAME_MAX);
     ESP_LOGI(TAG, "battery <pct>|real (a STAGED gauge, as if on battery at pct: the card's pill, and at 10 or less the low-battery notice + cue + the pill that stays; not saved) | snd battery (just the notice + cue)");
@@ -190,7 +193,11 @@ static void run(tank_t *t, char *line) {
     if (!argc) return;
     for (char *p = argv[0]; *p; p++) *p = (char)tolower((unsigned char)*p);
     const char *c = argv[0];
+    if (friends_active() && strcmp(c,"friends") && strcmp(c,"state") && strcmp(c,"batlog") && strcmp(c,"help")) {
+        ESP_LOGW(TAG,"close Friends before other director commands"); return;
+    }
     if (!strcmp(c, "help")) help();
+    else if (!strcmp(c, "friends")) friends_command(t, argc, argv);
     else if (!strcmp(c, "state")) show_state(t);
     else if (!strcmp(c, "hungry")) {
         int n = argc > 1 ? atoi(argv[1]) : t->n_fish;

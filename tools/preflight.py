@@ -13,37 +13,49 @@ a PMIC cut still clears it; the archive is the record.
   tools/preflight.py              # archive + print the summary lines
   tools/preflight.py --quiet      # archive only (flash.sh)
 """
-import glob, os, sys, time, datetime
+import argparse, glob, os, sys, time, datetime
 import serial
 
-quiet = "--quiet" in sys.argv
+ap = argparse.ArgumentParser()
+ap.add_argument("--port", default=os.environ.get("PORT"))
+ap.add_argument("--quiet", action="store_true")
+ap.add_argument("--foreign-firmware", action="store_true", help="archive raw serial output before an explicitly authorized fresh install")
+a = ap.parse_args()
+quiet = a.quiet
 ports = sorted(glob.glob("/dev/cu.usbmodem*"))
-port = os.environ.get("PORT")
-if not port and len(ports) > 1:
-    sys.exit("preflight: multiple devices connected; set PORT explicitly")
-port = port or next(iter(ports), None)
+if not a.port and len(ports) > 1:
+    sys.exit("preflight: multiple devices; specify --port")
+port = a.port or next(iter(ports), None)
 if not port:
     sys.exit("preflight: no /dev/cu.usbmodem* - wake the tank (BOOT) and plug it in; refusing to continue")
 here = os.path.dirname(os.path.abspath(__file__))
 out_dir = os.path.join(here, "..", "docs", "batlog")
 os.makedirs(out_dir, exist_ok=True)
-stamp = datetime.datetime.now().strftime("%Y-%m-%d_%H%M")
-path = os.path.join(out_dir, f"{stamp}.txt")
+stamp = datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S")
+path = os.path.join(out_dir, f"{stamp}_{os.path.basename(port)}.txt")
 
 s = serial.Serial(); s.port, s.baudrate, s.timeout = port, 115200, 0.1
 s.open(); s.reset_input_buffer()          # a plain open: DTR/RTS untouched, the tank keeps running
 lines = []
-for cmd, secs in (("batlog", 4), ("state", 3)):
-    s.write((cmd + "\n").encode()); s.flush()
+for cmd, secs in (((None, 5),) if a.foreign_firmware else (("batlog", 4), ("state", 3))):
+    if cmd:
+        s.write((cmd + "\n").encode()); s.flush()
     end = time.time() + secs
+    retry = time.time() + 1
     while time.time() < end:
+        if cmd and time.time() >= retry:
+            s.write((cmd + "\n").encode()); s.flush(); retry = time.time() + 1
         raw = s.readline()
         if raw:
             lines.append(raw.decode("utf-8", "replace").rstrip())
 s.close()
-keep = [l for l in lines if "batlog:" in l or "director:" in l]
-with open(path, "w") as f:
+keep = lines if a.foreign_firmware else [l for l in lines if "batlog:" in l or "director:" in l]
+if not a.foreign_firmware and (not any("director:" in l for l in keep) or not any("batlog:" in l for l in keep)):
+    sys.exit("preflight: incomplete device response; refusing to flash")
+with open(path, "x") as f:
     f.write(f"# pocket-tank preflight {stamp} on {port}\n")
+    if a.foreign_firmware:
+        f.write("# Authorized replacement of foreign firmware; Pocket Tank batlog/state unavailable. Full flash backup required unless explicitly waived by the owner.\n")
     f.write("\n".join(keep) + "\n")
 n_samples = next((l for l in keep if "samples (h:mm" in l), "no samples")
 print(f"preflight: {len(keep)} lines -> {os.path.relpath(path, os.getcwd())} | {n_samples.split('batlog: ')[-1]}")

@@ -21,6 +21,7 @@
 #include "display_port.h"
 #include "advisor_llm_esp.h"
 #include "touch_port.h"
+#include "friends.h"
 #include "battery_port.h"
 #include "imu_port.h"
 #include "director.h"
@@ -171,6 +172,7 @@ static void enter_sleep_for(int wake_after_s) {
     ESP_LOGI(TAG, "sleep: save, panel off, %d s grace then %s | battery %d%% %d mV",
              (int)(grace_us / 1000000),
              wake_after_s > 0 ? "deep sleep with the timer" : s_pmic ? "PMIC power-off (the PWR key boots it)" : "deep sleep (BOOT wakes)", pct0, mv0);
+    friends_close();
     touch_port_confirm_answer(-1);              /* an open reset prompt is a NO */
     progression_save(&tank);
     snapshot_fish();
@@ -248,6 +250,7 @@ void device_sleep(int wake_after_s) { enter_sleep_for(wake_after_s); }   /* dire
  * grace ends in). No PMIC: deep sleep. */
 static void enter_poweroff(void) {
     ESP_LOGI(TAG, "power-off now: saving tank, PMIC soft cut (the PWR key boots)");
+    friends_close();
     touch_port_confirm_answer(-1);
     progression_save(&tank);
     audio_port_sleep();
@@ -288,7 +291,12 @@ static void sleep_button_poll(int64_t now) {
         s_btn_armed = true; s_btn_low_since = 0; s_btn_used = false;
     } else if (s_btn_armed) {
         if (!s_btn_low_since) s_btn_low_since = now;
-        else if (!s_btn_used && touch_port_pressed_since(s_btn_low_since) && !touch_port_confirm_up()) {
+        else if (!s_btn_used && now - s_btn_low_since >= 2000000 && !touch_port_confirm_up()) {
+            s_btn_used = true;
+            if (friends_active()) friends_close();
+            friends_open(&tank);
+        }
+        else if (!friends_active() && !s_btn_used && touch_port_pressed_since(s_btn_low_since) && !touch_port_confirm_up()) {
             s_btn_used = true;
             ESP_LOGI(TAG, "BOOT + tap: reset prompt");
             touch_port_confirm_open();
@@ -388,6 +396,7 @@ static void tank_task(void *arg) {
         touch_port_set_inverted(inv);
         touch_port_poll(&tank);
         director_poll(&tank);
+        friends_tick(&tank, now);
         int ans = touch_port_confirm_take();
         if (ans > 0) reset_tank();
         else if (ans < 0) ESP_LOGI(TAG, "reset prompt: tank kept");
@@ -416,7 +425,7 @@ static void tank_task(void *arg) {
         brightness_apply(tank.night);
         { static int64_t last_bat; if (now - last_bat > 5LL * 60 * 1000000) {   /* battery log: awake sample every 5 min */
             batlog_add(battery_pct(), battery_port_vbat_mv(), display_port_brightness(), false, last_bat ? "" : "boot"); last_bat = now; } }
-        tank.hold_light = setup_active() || touch_port_confirm_up();   /* no lights-out mid-name */
+        tank.hold_light = setup_active() || touch_port_confirm_up() || friends_active();   /* no lights-out mid-name */
         tank.ui_cover = tank.hold_light || touch_port_milestones() || touch_port_settings() || touch_port_shop();   /* a fry's spawning waits */
         tank_tick(&tank, dt, llm_ok ? advisor_llm_esp : advisor_rules);
         progression_tick(&tank, dt);
@@ -431,7 +440,7 @@ static void tank_task(void *arg) {
           if (s >= 0 && prev_sel < 0) audio_port_play(SND_CARD_OPEN, AUDIO_PITCH_ONE);
           if (s < 0 && prev_sel >= 0) audio_port_play(SND_CARD_CLOSE, AUDIO_PITCH_ONE);
           prev_sel = s; }
-        if (!touch_port_confirm_up()) {           /* an arrival owed its welcome: the birth flow (setup.c) */
+        if (!touch_port_confirm_up() && !friends_active()) {           /* an arrival owed its welcome: the birth flow (setup.c) */
             int nb = setup_poll_birth(&tank);
             if (nb >= 0) { touch_port_dismiss(); audio_port_play(SND_ARRIVAL, AUDIO_PITCH_ONE);
                            ESP_LOGI(TAG, "a new fry, %s: birth flow up (announce, name, family; director `setup off` drops it)", tank.fish[nb].name); }
@@ -473,6 +482,7 @@ static void tank_task(void *arg) {
                 render_setup(&tank, fb[cur], TANK_W, tank.clock);
             if (touch_port_confirm_up())         /* reset prompt: over everything, fish still swim */
                 render_confirm_reset(fb[cur], TANK_W, touch_port_confirm_frac());
+            if (friends_active()) friends_render(&tank, fb[cur], TANK_W);
             int64_t t1 = esp_timer_get_time();
             if (sel >= 0) { card_us += t1 - tc; card_frames++; }
             display_port_flush(fb[cur]);
@@ -553,19 +563,15 @@ void app_main(void) {
     if (scene) render_set_scene_cache(scene); else ESP_LOGW(TAG, "no scene cache RAM: full redraw per frame");
     uint8_t *vig = heap_caps_malloc(TANK_W * TANK_H, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
     if (vig) render_set_vignette_cache(vig);
-    /* dirty mask (20 KB): internal SRAM if it fits - it is cleared and read
-       every frame, and in PSRAM that was ~1.5 ms; PSRAM fallback */
+    /* Render caches use PSRAM to reserve internal SRAM for display DMA and BLE. */
     { void *ds = heap_caps_malloc(render_decor_scratch_size(), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);   /* the coral / cluster tables: PSRAM, never .bss */
       if (ds) render_set_decor_scratch(ds); else ESP_LOGW(TAG, "decor scratch: no PSRAM (%u B) - falling back to internal", (unsigned)render_decor_scratch_size()); }
-    uint32_t *dirty = heap_caps_malloc(RENDER_DIRTY_WORDS * 4, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
-    if (!dirty) dirty = heap_caps_malloc(RENDER_DIRTY_WORDS * 4, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+    uint32_t *dirty = heap_caps_malloc(RENDER_DIRTY_WORDS * 4, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
     if (dirty) render_set_dirty_mask(dirty); else ESP_LOGW(TAG, "no dirty mask RAM: full redraw per frame");
     ESP_LOGI(TAG, "dirty mask %s", !dirty ? "none" : esp_ptr_external_ram(dirty) ? "PSRAM" : "internal SRAM");
-    /* stats card cache: redrawn 4x/s, blitted otherwise. Internal SRAM if it
-       fits (a PSRAM->PSRAM copy of the 56 KB sprite cost 3.3 ms per frame,
-       more than the draw it replaced) */
-    uint16_t *card = heap_caps_malloc(RENDER_CARD_W * RENDER_CARD_H * 2, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
-    if (!card) card = heap_caps_malloc(RENDER_CARD_W * RENDER_CARD_H * 2, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+    /* Stats card cache (56 KB), redrawn 4x/s and blitted otherwise. */
+    /* Reserve internal SRAM for display DMA and the on-demand BLE controller. */
+    uint16_t *card = heap_caps_malloc(RENDER_CARD_W * RENDER_CARD_H * 2, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
     if (card) render_set_card_cache(card);
     ESP_LOGI(TAG, "card cache %s", !card ? "none" : esp_ptr_external_ram(card) ? "PSRAM" : "internal SRAM");
     /* model: mmap the raw partition; weights are read through the flash cache */

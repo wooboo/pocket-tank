@@ -67,3 +67,43 @@ reset the chip before anyone read the log.
   docs/batlog/2026-09-24_1104.txt).
 - Model partition: v4m (model_q4_v4m.bin, flashed 2026-09-15 ~06:00).
 - Save: lori, mira, bolt (elders), sol (adult), kelp (fry) - the tank at the 2026-09-24 flash (was navi + pebble after Strato's reset of 2026-09-15 night).
+
+## BLE gifting development — 2026-09-28
+
+Device `/dev/cu.usbmodem311401` received the BOOT-triggered Friends build from
+this worktree (ESP-IDF 5.5). Preflight archives are the dated per-port files
+under `docs/batlog/`; NVS backups are under
+`~/.cache/pocket-tank/backups/`. All five fish (dolt, zori, chip, gira, help)
+and the 802-dollar balance survived the update. The model was not flashed.
+
+On this board, discovery and repeated full Bluetooth shutdown/restart work.
+Internal free heap was 42,687 bytes during discovery and 76,579 after close,
+identical over the two measured cycles. A five-fish tank continued rendering
+at about 20 fps with discovery/menu open, with model decisions around 3.7 s.
+These are USB bench observations, not battery-life measurements.
+
+The initial build ran out of display DMA memory because caches and the newly
+linked Bluetooth code exhausted internal SRAM. Render caches now use PSRAM;
+NimBLE host allocations use PSRAM too, and display flush checks initialization.
+The corrected build boots and runs without that assertion.
+
+The owner confirmed `/dev/cu.usbmodem311101` is the same board and authorized
+installing Pocket Tank. They subsequently requested skipping the backup; the
+in-progress full read was cancelled and the incomplete file removed. The new
+board received the model and app with `--install-new --no-backup`. Later app
+updates on both devices also used `--no-backup`; preflight logs were retained.
+
+Two-device testing passed: matching-code Secure Connections, requiring both
+confirmations, cancellation, gifts in both directions, decline/refund, and
+resuming a pending offer after disconnect and re-pairing. The first run
+returned balances to 802/0. Before the final run they were 682/120; that run
+returned them to exactly 682/120, with no pending journals and radios off.
+Both first-run setup flows were already complete by the final test.
+
+The initial hardware test exposed a duplicate termination: calling
+`ble_gap_terminate` just before `nimble_port_stop` caused NimBLE's shutdown
+counter to underflow and report 255 connections. Shutdown now lets
+`nimble_port_stop` own termination; error paths use the same shutdown. The
+final hardware harness rejects that log signature and passed without it.
+Evidence: `docs/ble/2026-09-28-hardware.txt`. No new battery measurement is in
+flight.
