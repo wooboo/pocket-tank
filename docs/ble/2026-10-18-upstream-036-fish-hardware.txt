@@ -1,0 +1,984 @@
+COMMAND 0: friends close
+COMMAND 1: friends close
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (41160) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (41160) director: friends active=0 page=3 code=524850 peer=0000000000000000 balance=728 out=0 in=0 GIFT RECEIVED. THANK YOU
+0: I (41166) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (95253) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (95253) director: friends active=0 page=3 code=524850 peer=0000000000000000 balance=902 out=0 in=0 GIFT DELIVERED
+1: I (95258) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (95263) director: friends active=0 page=3 code=524850 peer=0000000000000000 balance=902 out=0 in=0 GIFT DELIVERED
+COMMAND 0: friends open
+COMMAND 1: friends open
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (41171) director: friends active=0 page=3 code=524850 peer=0000000000000000 balance=728 out=0 in=0 GIFT RECEIVED. THANK YOU
+0: I (41183) BLE_INIT: BT controller compile version [1bb2f50]
+0: I (41187) BLE_INIT: Using main XTAL as clock source
+0: I (41192) BLE_INIT: Feature Config, ADV:1, BLE_50:1, DTM:1, SCAN:1, CCA:0, SMP:1, CONNECT:1
+0: I (41201) BLE_INIT: Bluetooth MAC: 90:70:69:fe:4e:c6
+0: I (41213) NimBLE: GAP procedure initiated: stop advertising.
+0: 
+0: I (41215) friends: pair window open; free internal heap 10323
+0: I (41216) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (95316) BLE_INIT: BT controller compile version [1bb2f50]
+1: I (95317) BLE_INIT: Using main XTAL as clock source
+1: I (95318) BLE_INIT: Feature Config, ADV:1, BLE_50:1, DTM:1, SCAN:1, CCA:0, SMP:1, CONNECT:1
+1: I (95324) BLE_INIT: Bluetooth MAC: 90:70:69:fe:4c:fa
+0: I (41221) director: friends active=1 page=0 code=524850 peer=0000000000000000 balance=728 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+0: I (41232) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (41238) director: friends active=1 page=0 code=524850 peer=0000000000000000 balance=728 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+0: I (41250) NimBLE: GAP procedure initiated: advertise;
+0: I (41254) NimBLE: disc_mode=2
+0: I (41256) NimBLE:  adv_channel_map=0 own_addr_type=0 adv_filter_policy=0 adv_itvl_min=0 adv_itvl_max=0
+0: I (41266) NimBLE:
+0: 
+1: I (95337) NimBLE: GAP procedure initiated: stop advertising.
+1: 
+1: I (95339) friends: pair window open; free internal heap 10371
+1: I (95340) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (95345) director: friends active=1 page=0 code=524850 peer=0000000000000000 balance=902 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+1: I (95356) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (95362) director: friends active=1 page=0 code=524850 peer=0000000000000000 balance=902 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+1: I (95374) NimBLE: GAP procedure initiated: advertise;
+1: I (95378) NimBLE: disc_mode=2
+0: I (41268) NimBLE: GAP procedure initiated: discovery;
+0: I (41272) NimBLE: own_addr_type=0 filter_policy=0 passive=1 limited=0 filter_duplicates=1
+0: I (41280) NimBLE: duration=forever
+0: I (41283) NimBLE:
+0: 
+0: I (41295) codec: ES8311 up (SYS0D 03 DAC 00)
+1: I (95380) NimBLE:  adv_channel_map=0 own_addr_type=0 adv_filter_policy=0 adv_itvl_min=0 adv_itvl_max=0
+1: I (95390) NimBLE:
+1: 
+1: I (95392) NimBLE: GAP procedure initiated: discovery;
+1: I (95396) NimBLE: own_addr_type=0 filter_policy=0 passive=1 limited=0 filter_duplicates=1
+1: I (95404) NimBLE: duration=forever
+1: I (95407) NimBLE:
+1: 
+1: I (95419) codec: ES8311 up (SYS0D 03 DAC 00)
+0: I (41542) audio: up in 255 ms
+0: I (41546) NimBLE: GAP procedure initiated: stop advertising.
+0: 
+0: I (41548) NimBLE: GAP procedure initiated: connect;
+0: I (41548) NimBLE: peer_addr_type=0 peer_addr=
+0: I (41550) NimBLE: 90:70:69:fe:4c:fa
+0: I (41553) NimBLE:  scan_itvl=16 scan_window=16 itvl_min=24 itvl_max=40 latency=0 supervision_timeout=256 min_ce_len=0 max_ce_len=0 own_addr_type=0
+0: I (41566) NimBLE:
+0: 
+1: I (95666) audio: up in 255 ms
+1: I (95690) advisor: zone 2 hunger 1 energy 9 stress 1 curiosity 0 bold 9 social 0 stage elder trust 9 bored 3 food near 8 friend near 1 bubble mid 1 reef far 12 wall mid 7 last visit_bubbles time night -> seek_food urgency 8 p=0.13  [3827 ms, 11.5 tok/s]
+1: I (95701) advisor: prof ms: matmul 2036 attn 542 norm/quant 116 rope 30 swiglu 309 decode 780
+0: I (41715) advisor: zone 1 hunger 2 energy 9 stress 1 curiosity 0 bold 9 social 2 stage elder trust 9 bored 1 food none friend near 3 bubble mid 2 reef far 1 wall mid 8 last visit_bubbles time night -> dart_play urgency 2 p=0.04  [3792 ms, 11.3 tok/s]
+0: I (41726) advisor: prof ms: matmul 2054 attn 533 norm/quant 111 rope 31 swiglu 312 decode 738
+1: I (95821) NimBLE: GAP procedure initiated: stop advertising.
+1: 
+0: I (41763) NimBLE: GAP procedure initiated: stop advertising.
+0: 
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (42197) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (42198) director: friends active=1 page=2 code=524850 peer=0000000000000000 balance=728 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (96350) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (96350) director: friends active=1 page=2 code=524850 peer=0000000000000000 balance=902 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (96509) friends: compare code 439374
+0: I (42474) friends: compare code 439374
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (43223) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (43224) director: friends active=1 page=1 code=439374 peer=0000000000000000 balance=728 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (97369) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (97370) director: friends active=1 page=1 code=439374 peer=0000000000000000 balance=902 out=0 in=0 CONNECTING TO NEARBY TANK
+COMMAND 0: friends confirm
+COMMAND 1: friends confirm
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (43315) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (43315) director: friends active=1 page=2 code=439374 peer=0000000000000000 balance=728 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (43320) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (43326) director: friends active=1 page=2 code=439374 peer=0000000000000000 balance=728 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (97454) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (97454) director: friends active=1 page=2 code=439374 peer=0000000000000000 balance=902 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (97460) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (97465) director: friends active=1 page=2 code=439374 peer=0000000000000000 balance=902 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (43666) NimBLE: GATT procedure initiated: discover characteristics by uuid;
+0: I (43667) NimBLE: start_handle=1 end_handle=65535 uuid=
+0: I (43668) NimBLE: 02000000-0000-5354-4649-474b4e415451
+0: I (43672) NimBLE:
+0: 
+1: I (97788) NimBLE: GATT procedure initiated: discover characteristics by uuid;
+1: I (97788) NimBLE: start_handle=1 end_handle=65535 uuid=
+1: I (97789) NimBLE: 02000000-0000-5354-4649-474b4e415451
+1: I (97794) NimBLE:
+1: 
+0: I (44009) NimBLE: GATT procedure initiated: write;
+0: I (44010) NimBLE: att_handle=16 len=20
+0: 
+1: I (98112) NimBLE: GATT procedure initiated: write;
+1: I (98112) NimBLE: att_handle=16 len=20
+1: 
+0: I (44089) friends: paired with 2c59b054d853a61f
+1: I (98272) friends: paired with cadb9a72f3f25d16
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (98428) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (98429) director: friends active=1 page=3 code=439374 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (44341) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (44342) director: friends active=1 page=3 code=439374 peer=2c59b054d853a61f balance=728 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+COMMAND 0: friends roster
+0: I (44430) director: roster 0 name=zori id=cadb9a72f3f25d16:2 age=708466.2 body=78d67d accent=ffbd59 paid=15 parents=,
+0: I (44430) director: roster 1 name=chip id=cadb9a72f3f25d16:3 age=706305.9 body=f48fb1 accent=ffbd59 paid=15 parents=dolt,zori
+0: I (44440) director: roster 2 name=dolt id=cadb9a72f3f25d16:1 age=709022.7 body=f48fb1 accent=ffe08a paid=15 parents=,
+0: I (44451) director: roster 3 name=nori id=2c59b054d853a61f:1 age=451864.8 body=a799ff accent=78d67d paid=7 parents=,
+0: I (44461) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (44466) director: friends active=1 page=3 code=439374 peer=2c59b054d853a61f balance=728 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (99133) NimBLE: GATT procedure initiated: write;
+1: I (99133) NimBLE: att_handle=16 len=20
+1: 
+0: I (45123) NimBLE: GATT procedure initiated: write;
+0: I (45123) NimBLE: att_handle=16 len=20
+0: 
+1: I (99707) advisor: zone 2 hunger 7 energy 9 stress 0 curiosity 0 bold 9 social 2 stage elder trust 8 bored 0 food none friend mid 6 bubble near 8 reef far 9 wall mid 4 last rest time day -> visit_bubbles urgency 4 p=0.82  [3964 ms, 10.8 tok/s]
+1: I (99717) advisor: prof ms: matmul 2175 attn 491 norm/quant 113 rope 29 swiglu 339 decode 804
+0: I (45688) advisor: zone 1 hunger 4 energy 9 stress 1 curiosity 0 bold 9 social 9 stage elder trust 9 bored 1 food none friend near 10 bubble near 2 reef far 2 wall mid 6 last visit_bubbles time day -> dart_play urgency 3 p=0.42  [3922 ms, 11.0 tok/s]
+0: I (45700) advisor: prof ms: matmul 2159 attn 496 norm/quant 96 rope 27 swiglu 338 decode 794
+1: I (100211) NimBLE: GATT procedure initiated: write;
+1: I (100212) NimBLE: att_handle=16 len=20
+1: 
+0: I (46170) NimBLE: GATT procedure initiated: write;
+0: I (46170) NimBLE: att_handle=16 len=20
+0: 
+COMMAND 1: friends roster
+1: I (100526) display: fb mid 0x0125 corner 0x0000 | scene mid 0x0125 ep 9 | night 0 prefetch 1
+1: I (100527) display: 17.7 fps | render 29.2 ms flush 18.7 ms | scene 1.5 shafts 0.0 veg 1.1 fd/bub 0.5 fish 6.3 vig 1.9 algae 0.1 | card 0.0 ms x0 | veg 0.03 0.03 0.03
+1: I (100538) display: frame 56.6 ms = polls 1.9 + tick 2.2 + prefetch wait 0.0 + render 29.2 + flush 18.7 + tail 0.3 + sleep 4.6 | flush: fill 16.8, wire wait 0.0, send calls 1.8
+1: I (100554) pocket-tank: t=122s 4 fish goals: visit_bubbles seek_food visit_bubbles dart_play | asks 45 decisions 21 last 3964 ms 10.8 tok/s | starve-ignored 0 | heap int 10 KB psram 4576 KB | battery 8% 3634 mV bright 153
+1: I (100575) director: roster 0 name=sol id=2c59b054d853a61f:2 age=471184.3 body=f48fb1 accent=ffe08a paid=7 parents=,
+1: I (100584) director: roster 1 name=gira id=cadb9a72f3f25d16:4 age=699872.7 body=f48fb1 accent=ffbd59 paid=15 parents=dolt,zori
+1: I (100595) director: roster 2 name=help id=cadb9a72f3f25d16:5 age=681351.7 body=f48fb1 accent=ffbd59 paid=7 parents=dolt,zori
+1: I (100606) director: roster 3 name=misa id=cadb9a72f3f25d16:6 age=489159.1 body=f48fb1 accent=ffbd59 paid=7 parents=chip,zori
+1: I (100617) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (100622) director: friends active=1 page=3 code=439374 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (46614) codec: ES8311 down (SYS0D f8)
+0: I (46615) audio: down (idle)
+1: I (100738) codec: ES8311 down (SYS0D f8)
+1: I (100739) audio: down (idle)
+1: I (101267) NimBLE: GATT procedure initiated: write;
+1: I (101268) NimBLE: att_handle=16 len=20
+1: 
+0: I (47184) NimBLE: GATT procedure initiated: write;
+0: I (47184) NimBLE: att_handle=16 len=20
+0: 
+0: I (48195) NimBLE: GATT procedure initiated: write;
+0: I (48195) NimBLE: att_handle=16 len=20
+0: 
+1: I (102307) NimBLE: GATT procedure initiated: write;
+1: I (102307) NimBLE: att_handle=16 len=20
+1: 
+COMMAND 0: friends fish 3
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (102627) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (102627) director: friends active=1 page=3 code=439374 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (48565) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (48566) director: friends active=1 page=3 code=439374 peer=2c59b054d853a61f balance=728 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (48571) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (48576) director: friends active=1 page=3 code=439374 peer=2c59b054d853a61f balance=728 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (48588) NimBLE: GATT procedure initiated: write;
+0: I (48592) NimBLE: att_handle=16 len=20
+0: 
+0: I (48683) NimBLE: GATT procedure initiated: write;
+0: I (48683) NimBLE: att_handle=16 len=20
+0: 
+0: I (48851) NimBLE: GATT procedure initiated: write;
+0: I (48851) NimBLE: att_handle=16 len=20
+0: 
+0: I (49028) NimBLE: GATT procedure initiated: write;
+0: I (49028) NimBLE: att_handle=16 len=20
+0: 
+0: I (49140) NimBLE: GATT procedure initiated: write;
+0: I (49140) NimBLE: att_handle=16 len=20
+0: 
+0: I (49249) NimBLE: GATT procedure initiated: write;
+0: I (49249) NimBLE: att_handle=16 len=20
+0: 
+0: I (49251) NimBLE: GATT procedure initiated: write;
+0: I (49251) NimBLE: att_handle=16 len=20
+0: 
+1: I (103383) NimBLE: GATT procedure initiated: write;
+1: I (103383) NimBLE: att_handle=16 len=20
+1: 
+0: I (49364) NimBLE: GATT procedure initiated: write;
+0: I (49365) NimBLE: att_handle=16 len=20
+0: 
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (49475) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (49475) director: friends active=1 page=3 code=439374 peer=2c59b054d853a61f balance=728 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (49481) NimBLE: GATT procedure initiated: write;
+0: I (49485) NimBLE: att_handle=16 len=20
+0: 
+1: I (103599) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (103599) director: friends active=1 page=3 code=439374 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (49600) NimBLE: GATT procedure initiated: write;
+0: I (49600) NimBLE: att_handle=16 len=20
+0: 
+1: I (103733) advisor: zone 5 hunger 0 energy 9 stress 1 curiosity 0 bold 9 social 0 stage elder trust 4 bored 0 food none friend near 11 bubble near 12 reef far 1 wall mid 6 last dart_play time day -> visit_bubbles urgency 2 p=0.82  [3992 ms, 10.8 tok/s]
+1: I (103745) advisor: prof ms: matmul 2194 attn 495 norm/quant 124 rope 30 swiglu 336 decode 800
+0: I (49709) NimBLE: GATT procedure initiated: write;
+0: I (49709) NimBLE: att_handle=16 len=20
+0: 
+0: I (49758) advisor: zone 2 hunger 7 energy 9 stress 1 curiosity 0 bold 9 social 2 stage elder trust 6 bored 1 food none friend near 9 bubble near 5 reef far 1 wall mid 6 last visit_bubbles time day -> visit_bubbles urgency 4 p=0.78  [4005 ms, 10.7 tok/s]
+0: I (49769) advisor: prof ms: matmul 2202 attn 523 norm/quant 113 rope 29 swiglu 342 decode 785
+0: I (49859) NimBLE: GATT procedure initiated: write;
+0: I (49860) NimBLE: att_handle=16 len=20
+0: 
+0: I (49986) NimBLE: GATT procedure initiated: write;
+0: I (49987) NimBLE: att_handle=16 len=20
+0: 
+0: I (50113) NimBLE: GATT procedure initiated: write;
+0: I (50114) NimBLE: att_handle=16 len=20
+0: 
+0: I (50176) display: fb mid 0x0125 corner 0x0000 | scene mid 0x0125 ep 3 | night 0 prefetch 1
+0: I (50176) display: 12.0 fps | render 57.1 ms flush 19.1 ms | scene 3.6 shafts 0.0 veg 1.6 fd/bub 0.5 fish 8.8 vig 2.4 algae 0.1 | card 0.0 ms x0 | veg 0.04 0.04 0.04
+0: I (50187) display: frame 83.0 ms = polls 3.9 + tick 1.6 + prefetch wait 0.0 + render 57.1 + flush 19.1 + tail 0.4 + sleep 1.1 | flush: fill 17.3, wire wait 0.0, send calls 1.8
+0: I (50203) pocket-tank: t=110s 3 fish goals: rest dart_play dart_play | asks 13 decisions 8 last 4005 ms 10.7 tok/s | starve-ignored 0 | heap int 10 KB psram 4576 KB | battery 100% 4197 mV bright 153
+0: I (50222) NimBLE: GATT procedure initiated: write;
+0: I (50225) NimBLE: att_handle=16 len=20
+0: 
+0: I (50291) NimBLE: GATT procedure initiated: write;
+0: I (50292) NimBLE: att_handle=16 len=20
+0: 
+1: I (104429) NimBLE: GATT procedure initiated: write;
+1: I (104430) NimBLE: att_handle=16 len=20
+1: 
+0: I (50356) NimBLE: GATT procedure initiated: write;
+0: I (50357) NimBLE: att_handle=16 len=20
+0: 
+0: I (50483) NimBLE: GATT procedure initiated: write;
+0: I (50484) NimBLE: att_handle=16 len=20
+0: 
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (50547) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (50548) director: friends active=1 page=3 code=439374 peer=2c59b054d853a61f balance=728 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (104667) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (104668) director: friends active=1 page=3 code=439374 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (50615) NimBLE: GATT procedure initiated: write;
+0: I (50616) NimBLE: att_handle=16 len=20
+0: 
+1: I (104768) codec: ES8311 up (SYS0D 03 DAC 00)
+0: I (50742) NimBLE: GATT procedure initiated: write;
+0: I (50743) NimBLE: att_handle=16 len=20
+0: 
+1: I (104916) friends: fish op 1 seq 8 reply 1 count 4
+0: I (50870) NimBLE: GATT procedure initiated: write;
+0: I (50871) NimBLE: att_handle=16 len=20
+0: 
+1: I (105014) audio: up in 255 ms
+0: I (50997) NimBLE: GATT procedure initiated: write;
+0: I (50998) NimBLE: att_handle=16 len=20
+0: 
+0: I (51124) NimBLE: GATT procedure initiated: write;
+0: I (51125) NimBLE: att_handle=16 len=20
+0: 
+0: I (51251) NimBLE: GATT procedure initiated: write;
+0: I (51252) NimBLE: att_handle=16 len=20
+0: 
+0: I (51315) NimBLE: GATT procedure initiated: write;
+0: I (51316) NimBLE: att_handle=16 len=20
+0: 
+1: I (105479) NimBLE: GATT procedure initiated: write;
+1: I (105479) NimBLE: att_handle=16 len=20
+1: 
+0: I (51379) NimBLE: GATT procedure initiated: write;
+0: I (51380) NimBLE: att_handle=16 len=20
+0: 
+0: I (51506) NimBLE: GATT procedure initiated: write;
+0: I (51507) NimBLE: att_handle=16 len=20
+0: 
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (105647) director: fish count=4 out=0 in=0 offered=8 name=nori
+1: I (105648) director: friends active=1 page=3 code=439374 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 A FISH FOR YOUR AQUARIUM
+COMMAND 1: friends decline
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (51569) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (51570) director: friends active=1 page=3 code=439374 peer=2c59b054d853a61f balance=728 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (51575) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (51580) director: friends active=1 page=3 code=439374 peer=2c59b054d853a61f balance=728 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (105735) NimBLE: GATT procedure initiated: write;
+1: I (105736) NimBLE: att_handle=16 len=20
+1: 
+1: I (105737) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (105739) director: friends active=1 page=3 code=439374 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 A FISH FOR YOUR AQUARIUM
+0: I (51663) friends: fish op 5 seq 8 reply 0 count 4
+1: I (105750) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (105755) director: friends active=1 page=3 code=439374 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 A FISH FOR YOUR AQUARIUM
+0: I (52350) NimBLE: GATT procedure initiated: write;
+0: I (52350) NimBLE: att_handle=16 len=20
+0: 
+1: I (106480) NimBLE: GATT procedure initiated: write;
+1: I (106480) NimBLE: att_handle=16 len=20
+1: 
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (52605) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (52606) director: friends active=1 page=3 code=439374 peer=2c59b054d853a61f balance=728 out=0 in=0 FISH RETURNED TO YOUR TANK
+1: I (106719) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (106720) director: friends active=1 page=3 code=439374 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 A FISH FOR YOUR AQUARIUM
+COMMAND 0: friends fish 3
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (52724) director: fish count=3 out=1 in=0 offered=0 name=-
+1: I (106810) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (106810) director: friends active=1 page=3 code=439374 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 A FISH FOR YOUR AQUARIUM
+0: I (52725) director: friends active=1 page=3 code=439374 peer=2c59b054d853a61f balance=728 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (52730) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (52735) director: friends active=1 page=3 code=439374 peer=2c59b054d853a61f balance=728 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (52746) NimBLE: GATT procedure initiated: write;
+0: I (52751) NimBLE: att_handle=16 len=20
+0: 
+0: I (52834) NimBLE: GATT procedure initiated: write;
+0: I (52834) NimBLE: att_handle=16 len=20
+0: 
+0: I (53004) NimBLE: GATT procedure initiated: write;
+0: I (53004) NimBLE: att_handle=16 len=20
+0: 
+0: I (53169) NimBLE: GATT procedure initiated: write;
+0: I (53169) NimBLE: att_handle=16 len=20
+0: 
+0: I (53330) NimBLE: GATT procedure initiated: write;
+0: I (53330) NimBLE: att_handle=16 len=20
+0: 
+0: I (53415) NimBLE: GATT procedure initiated: write;
+0: I (53416) NimBLE: att_handle=16 len=20
+0: 
+1: I (107579) NimBLE: GATT procedure initiated: write;
+1: I (107579) NimBLE: att_handle=16 len=20
+1: 
+0: I (53500) NimBLE: GATT procedure initiated: write;
+0: I (53500) NimBLE: att_handle=16 len=20
+0: 
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (53662) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (53663) director: friends active=1 page=3 code=439374 peer=2c59b054d853a61f balance=728 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (53668) NimBLE: GATT procedure initiated: write;
+0: I (53673) NimBLE: att_handle=16 len=20
+0: 
+1: I (107796) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (107796) director: friends active=1 page=3 code=439374 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 A FISH FOR YOUR AQUARIUM
+1: I (107914) advisor: zone 2 hunger 8 energy 9 stress 0 curiosity 0 bold 9 social 2 stage elder trust 8 bored 1 food mid 12 friend near 9 bubble near 5 reef far 4 wall mid 10 last visit_bubbles time day -> seek_food urgency 6 p=0.99  [4125 ms, 10.7 tok/s]
+1: I (107926) advisor: prof ms: matmul 2230 attn 574 norm/quant 112 rope 29 swiglu 355 decode 812
+0: I (53843) NimBLE: GATT procedure initiated: write;
+0: I (53843) NimBLE: att_handle=16 len=20
+0: 
+0: I (54007) NimBLE: GATT procedure initiated: write;
+0: I (54007) NimBLE: att_handle=16 len=20
+0: 
+0: I (54179) NimBLE: GATT procedure initiated: write;
+0: I (54179) NimBLE: att_handle=16 len=20
+0: 
+0: I (54345) NimBLE: GATT procedure initiated: write;
+0: I (54345) NimBLE: att_handle=16 len=20
+0: 
+0: I (54423) NimBLE: GATT procedure initiated: write;
+0: I (54424) NimBLE: att_handle=16 len=20
+0: 
+0: I (54507) NimBLE: GATT procedure initiated: write;
+0: I (54507) NimBLE: att_handle=16 len=20
+0: 
+1: I (108614) NimBLE: GATT procedure initiated: write;
+1: I (108615) NimBLE: att_handle=16 len=20
+1: 
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (54675) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (54676) director: friends active=1 page=3 code=439374 peer=2c59b054d853a61f balance=728 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (54681) NimBLE: GATT procedure initiated: write;
+0: I (54686) NimBLE: att_handle=16 len=20
+0: 
+1: I (108773) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (108774) director: friends active=1 page=3 code=439374 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 A FISH FOR YOUR AQUARIUM
+0: I (54852) NimBLE: GATT procedure initiated: write;
+0: I (54852) NimBLE: att_handle=16 len=20
+0: 
+0: I (54959) NimBLE: GATT procedure initiated: write;
+0: I (54959) NimBLE: att_handle=16 len=20
+0: 
+0: I (55071) NimBLE: GATT procedure initiated: write;
+0: I (55071) NimBLE: att_handle=16 len=20
+0: 
+0: I (55180) NimBLE: GATT procedure initiated: write;
+0: I (55180) NimBLE: att_handle=16 len=20
+0: 
+0: I (55291) NimBLE: GATT procedure initiated: write;
+0: I (55292) NimBLE: att_handle=16 len=20
+0: 
+1: I (109500) friends: fish op 1 seq 9 reply 1 count 4
+0: I (55401) NimBLE: GATT procedure initiated: write;
+0: I (55401) NimBLE: att_handle=16 len=20
+0: 
+0: I (55513) NimBLE: GATT procedure initiated: write;
+0: I (55513) NimBLE: att_handle=16 len=20
+0: 
+0: I (55515) NimBLE: GATT procedure initiated: write;
+0: I (55515) NimBLE: att_handle=16 len=20
+0: 
+1: I (109665) NimBLE: GATT procedure initiated: write;
+1: I (109665) NimBLE: att_handle=16 len=20
+1: 
+0: I (55628) NimBLE: GATT procedure initiated: write;
+0: I (55629) NimBLE: att_handle=16 len=20
+0: 
+0: I (55650) advisor: zone 2 hunger 7 energy 9 stress 1 curiosity 0 bold 9 social 2 stage elder trust 6 bored 0 food none friend near 9 bubble mid 10 reef far 8 wall mid 3 last explore time day -> visit_bubbles urgency 4 p=0.61  [3985 ms, 10.8 tok/s]
+0: I (55661) advisor: prof ms: matmul 2186 attn 523 norm/quant 107 rope 28 swiglu 341 decode 786
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (55705) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (55706) director: friends active=1 page=3 code=439374 peer=2c59b054d853a61f balance=728 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (109827) director: fish count=4 out=0 in=0 offered=9 name=nori
+1: I (109827) director: friends active=1 page=3 code=439374 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 A FISH FOR YOUR AQUARIUM
+COMMAND 0: friends close
+COMMAND 1: friends close
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (55774) NimBLE: GAP procedure initiated: stop advertising.
+0: 
+0: I (55774) NimBLE: GAP procedure initiated: terminate connection; conn_handle=1 hci_reason=19
+0: 
+0: I (55795) friends: Bluetooth stopped; free internal heap 48639
+0: I (55795) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (55796) director: friends active=0 page=3 code=439374 peer=0000000000000000 balance=728 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (55806) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (55811) director: friends active=0 page=3 code=439374 peer=0000000000000000 balance=728 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (55831) codec: ES8311 up (SYS0D 03 DAC 00)
+1: I (109911) NimBLE: GAP procedure initiated: stop advertising.
+1: 
+1: I (109913) friends: Bluetooth stopped; free internal heap 44291
+1: I (109914) director: fish count=4 out=0 in=0 offered=0 name=nori
+1: I (109917) director: friends active=0 page=3 code=439374 peer=0000000000000000 balance=902 out=0 in=0 A FISH FOR YOUR AQUARIUM
+1: I (109928) director: fish count=4 out=0 in=0 offered=0 name=nori
+1: I (109934) director: friends active=0 page=3 code=439374 peer=0000000000000000 balance=902 out=0 in=0 A FISH FOR YOUR AQUARIUM
+COMMAND 0: friends open
+COMMAND 1: friends open
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (55983) BLE_INIT: BT controller compile version [1bb2f50]
+0: I (55983) BLE_INIT: Using main XTAL as clock source
+0: I (55984) BLE_INIT: Feature Config, ADV:1, BLE_50:1, DTM:1, SCAN:1, CCA:0, SMP:1, CONNECT:1
+0: I (55991) BLE_INIT: Bluetooth MAC: 90:70:69:fe:4e:c6
+0: I (56001) NimBLE: GAP procedure initiated: stop advertising.
+0: 
+0: I (56002) friends: pair window open; free internal heap 10279
+1: I (110104) BLE_INIT: BT controller compile version [1bb2f50]
+1: I (110104) BLE_INIT: Using main XTAL as clock source
+1: I (110105) BLE_INIT: Feature Config, ADV:1, BLE_50:1, DTM:1, SCAN:1, CCA:0, SMP:1, CONNECT:1
+1: I (110112) BLE_INIT: Bluetooth MAC: 90:70:69:fe:4c:fa
+1: I (110122) NimBLE: GAP procedure initiated: stop advertising.
+1: 
+0: I (56006) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (56011) director: friends active=1 page=0 code=439374 peer=0000000000000000 balance=728 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+0: I (56022) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (56028) director: friends active=1 page=0 code=439374 peer=0000000000000000 balance=728 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+0: I (56040) NimBLE: GAP procedure initiated: advertise;
+0: I (56044) NimBLE: disc_mode=2
+1: I (110123) friends: pair window open; free internal heap 10371
+1: I (110127) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (110133) director: friends active=1 page=0 code=439374 peer=0000000000000000 balance=902 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+1: I (110144) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (110150) director: friends active=1 page=0 code=439374 peer=0000000000000000 balance=902 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+1: I (110162) NimBLE: GAP procedure initiated: advertise;
+0: I (56047) NimBLE:  adv_channel_map=0 own_addr_type=0 adv_filter_policy=0 adv_itvl_min=0 adv_itvl_max=0
+0: I (56056) NimBLE:
+0: 
+0: I (56058) NimBLE: GAP procedure initiated: discovery;
+0: I (56062) NimBLE: own_addr_type=0 filter_policy=0 passive=1 limited=0 filter_duplicates=1
+0: I (56070) NimBLE: duration=forever
+0: I (56073) NimBLE:
+0: 
+0: I (56078) audio: up in 255 ms
+1: I (110166) NimBLE: disc_mode=2
+1: I (110169) NimBLE:  adv_channel_map=0 own_addr_type=0 adv_filter_policy=0 adv_itvl_min=0 adv_itvl_max=0
+1: I (110178) NimBLE:
+1: 
+1: I (110181) NimBLE: GAP procedure initiated: discovery;
+1: I (110185) NimBLE: own_addr_type=0 filter_policy=0 passive=1 limited=0 filter_duplicates=1
+1: I (110193) NimBLE: duration=forever
+1: I (110196) NimBLE:
+1: 
+0: I (56280) NimBLE: GAP procedure initiated: stop advertising.
+0: 
+0: I (56281) NimBLE: GAP procedure initiated: connect;
+0: I (56281) NimBLE: peer_addr_type=0 peer_addr=
+0: I (56284) NimBLE: 90:70:69:fe:4c:fa
+0: I (56287) NimBLE:  scan_itvl=16 scan_window=16 itvl_min=24 itvl_max=40 latency=0 supervision_timeout=256 min_ce_len=0 max_ce_len=0 own_addr_type=0
+0: I (56300) NimBLE:
+0: 
+0: I (56389) NimBLE: GAP procedure initiated: stop advertising.
+0: 
+1: I (110560) display: fb mid 0x0125 corner 0x0000 | scene mid 0x0125 ep 11 | night 0 prefetch 1
+1: I (110561) display: 11.4 fps | render 62.8 ms flush 18.6 ms | scene 2.8 shafts 0.0 veg 1.1 fd/bub 0.5 fish 6.0 vig 2.1 algae 0.1 | card 0.0 ms x0 | veg 0.03 0.03 0.03
+1: I (110572) display: frame 88.0 ms = polls 3.5 + tick 2.1 + prefetch wait 0.0 + render 62.8 + flush 18.6 + tail 0.4 + sleep 0.5 | flush: fill 16.7, wire wait 0.0, send calls 1.9
+1: I (110588) pocket-tank: t=132s 4 fish goals: visit_bubbles visit_bubbles seek_food visit_bubbles | asks 54 decisions 23 last 4125 ms 10.7 tok/s | starve-ignored 0 | heap int 10 KB psram 4576 KB | battery 8% 3635 mV bright 153
+1: I (110610) NimBLE: GAP procedure initiated: stop advertising.
+1: 
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (110981) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (110982) director: friends active=1 page=2 code=439374 peer=0000000000000000 balance=902 out=0 in=0 CONNECTING TO NEARBY TANK
+0: I (57015) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (57016) director: friends active=1 page=2 code=439374 peer=0000000000000000 balance=728 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (111156) friends: compare code 702028
+0: I (57106) friends: compare code 702028
+1: I (111911) advisor: zone 2 hunger 8 energy 9 stress 0 curiosity 0 bold 9 social 2 stage elder trust 8 bored 2 food none friend near 2 bubble near 8 reef far 7 wall mid 2 last visit_bubbles time day -> visit_bubbles urgency 4 p=0.48  [3933 ms, 10.9 tok/s]
+1: I (111922) advisor: prof ms: matmul 2158 attn 488 norm/quant 102 rope 29 swiglu 338 decode 806
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (57939) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (57940) director: friends active=1 page=1 code=702028 peer=0000000000000000 balance=728 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (112036) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (112037) director: friends active=1 page=1 code=702028 peer=0000000000000000 balance=902 out=0 in=0 CONNECTING TO NEARBY TANK
+COMMAND 0: friends confirm
+COMMAND 1: friends confirm
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (58030) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (58030) director: friends active=1 page=2 code=702028 peer=0000000000000000 balance=728 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (58036) director: fish count=3 out=1 in=0 offered=0 name=-
+1: I (112122) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (112122) director: friends active=1 page=2 code=702028 peer=0000000000000000 balance=902 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (112128) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (112133) director: friends active=1 page=2 code=702028 peer=0000000000000000 balance=902 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (58041) director: friends active=1 page=2 code=702028 peer=0000000000000000 balance=728 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (112456) NimBLE: GATT procedure initiated: discover characteristics by uuid;
+1: I (112457) NimBLE: start_handle=1 end_handle=65535 uuid=
+1: I (112458) NimBLE: 02000000-0000-5354-4649-474b4e415451
+1: I (112462) NimBLE:
+1: 
+0: I (58376) NimBLE: GATT procedure initiated: discover characteristics by uuid;
+0: I (58377) NimBLE: start_handle=1 end_handle=65535 uuid=
+0: I (58378) NimBLE: 02000000-0000-5354-4649-474b4e415451
+0: I (58382) NimBLE:
+0: 
+1: I (112777) NimBLE: GATT procedure initiated: write;
+1: I (112778) NimBLE: att_handle=16 len=20
+1: 
+0: I (58715) NimBLE: GATT procedure initiated: write;
+0: I (58716) NimBLE: att_handle=16 len=20
+0: 
+0: I (58798) friends: paired with 2c59b054d853a61f
+0: I (58799) NimBLE: GATT procedure initiated: write;
+0: I (58799) NimBLE: att_handle=16 len=20
+0: 
+1: I (113012) friends: paired with cadb9a72f3f25d16
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (58975) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (58975) director: friends active=1 page=3 code=702028 peer=2c59b054d853a61f balance=728 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (58981) NimBLE: GATT procedure initiated: write;
+0: I (58986) NimBLE: att_handle=16 len=20
+0: 
+1: I (113089) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (113090) director: friends active=1 page=3 code=702028 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (113179) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (113179) director: friends active=1 page=3 code=702028 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (59100) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (59100) director: friends active=1 page=3 code=702028 peer=2c59b054d853a61f balance=728 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (59106) NimBLE: GATT procedure initiated: write;
+0: I (59111) NimBLE: att_handle=16 len=20
+0: 
+0: I (59225) NimBLE: GATT procedure initiated: write;
+0: I (59225) NimBLE: att_handle=16 len=20
+0: 
+0: I (59334) NimBLE: GATT procedure initiated: write;
+0: I (59335) NimBLE: att_handle=16 len=20
+0: 
+0: I (59445) NimBLE: GATT procedure initiated: write;
+0: I (59445) NimBLE: att_handle=16 len=20
+0: 
+0: I (59554) NimBLE: GATT procedure initiated: write;
+0: I (59554) NimBLE: att_handle=16 len=20
+0: 
+0: I (59665) NimBLE: GATT procedure initiated: write;
+0: I (59665) NimBLE: att_handle=16 len=20
+0: 
+0: I (59726) advisor: zone 1 hunger 6 energy 9 stress 0 curiosity 0 bold 9 social 0 stage elder trust 9 bored 2 food none friend near 6 bubble near 12 reef far 10 wall mid 3 last rest time night -> rest urgency 0 p=0.89  [3902 ms, 11.0 tok/s]
+0: I (59736) advisor: prof ms: matmul 2158 attn 481 norm/quant 109 rope 29 swiglu 327 decode 784
+0: I (59754) NimBLE: GATT procedure initiated: write;
+0: I (59755) NimBLE: att_handle=16 len=20
+0: 
+1: I (113833) NimBLE: GATT procedure initiated: write;
+1: I (113833) NimBLE: att_handle=16 len=20
+1: 
+0: I (59837) NimBLE: GATT procedure initiated: write;
+0: I (59837) NimBLE: att_handle=16 len=20
+0: 
+0: I (60001) NimBLE: GATT procedure initiated: write;
+0: I (60001) NimBLE: att_handle=16 len=20
+0: 
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (114157) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (114157) director: friends active=1 page=3 code=702028 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (60081) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (60082) director: friends active=1 page=3 code=702028 peer=2c59b054d853a61f balance=728 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (60172) NimBLE: GATT procedure initiated: write;
+0: I (60172) NimBLE: att_handle=16 len=20
+0: 
+0: I (60259) display: fb mid 0x0125 corner 0x0000 | scene mid 0x0125 ep 5 | night 0 prefetch 1
+0: I (60259) display: 11.1 fps | render 64.8 ms flush 17.6 ms | scene 4.4 shafts 0.0 veg 1.5 fd/bub 0.5 fish 9.0 vig 2.1 algae 0.1 | card 0.0 ms x0 | veg 0.04 0.04 0.04
+0: I (60270) display: frame 89.8 ms = polls 5.0 + tick 1.5 + prefetch wait 0.0 + render 64.8 + flush 17.6 + tail 0.4 + sleep 0.6 | flush: fill 15.8, wire wait 0.0, send calls 1.8
+0: I (60286) pocket-tank: t=120s 3 fish goals: rest dart_play dart_play | asks 18 decisions 10 last 3902 ms 11.0 tok/s | starve-ignored 0 | heap int 10 KB psram 4576 KB | battery 100% 4198 mV bright 153
+0: I (60305) NimBLE: GATT procedure initiated: write;
+0: I (60308) NimBLE: att_handle=16 len=20
+0: 
+0: I (60475) NimBLE: GATT procedure initiated: write;
+0: I (60475) NimBLE: att_handle=16 len=20
+0: 
+0: I (60644) NimBLE: GATT procedure initiated: write;
+0: I (60644) NimBLE: att_handle=16 len=20
+0: 
+1: I (114885) NimBLE: GATT procedure initiated: write;
+1: I (114886) NimBLE: att_handle=16 len=20
+1: 
+0: I (60811) NimBLE: GATT procedure initiated: write;
+0: I (60811) NimBLE: att_handle=16 len=20
+0: 
+0: I (60812) NimBLE: GATT procedure initiated: write;
+0: I (60813) NimBLE: att_handle=16 len=20
+0: 
+0: I (60980) NimBLE: GATT procedure initiated: write;
+0: I (60980) NimBLE: att_handle=16 len=20
+0: 
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (61067) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (61068) director: friends active=1 page=3 code=702028 peer=2c59b054d853a61f balance=728 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (115211) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (115212) director: friends active=1 page=3 code=702028 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (61156) NimBLE: GATT procedure initiated: write;
+0: I (61156) NimBLE: att_handle=16 len=20
+0: 
+1: I (115276) codec: ES8311 down (SYS0D f8)
+1: I (115277) audio: down (idle)
+0: I (61319) NimBLE: GATT procedure initiated: write;
+0: I (61319) NimBLE: att_handle=16 len=20
+0: 
+0: I (61390) codec: ES8311 down (SYS0D f8)
+0: I (61391) audio: down (idle)
+1: I (115535) friends: fish op 1 seq 9 reply 1 count 4
+0: I (61487) NimBLE: GATT procedure initiated: write;
+0: I (61487) NimBLE: att_handle=16 len=20
+0: 
+0: I (61651) NimBLE: GATT procedure initiated: write;
+0: I (61652) NimBLE: att_handle=16 len=20
+0: 
+0: I (61814) NimBLE: GATT procedure initiated: write;
+0: I (61814) NimBLE: att_handle=16 len=20
+0: 
+0: I (61815) NimBLE: GATT procedure initiated: write;
+0: I (61816) NimBLE: att_handle=16 len=20
+0: 
+1: I (115963) NimBLE: GATT procedure initiated: write;
+1: I (115964) NimBLE: att_handle=16 len=20
+1: 
+1: I (115994) advisor: zone 2 hunger 0 energy 9 stress 1 curiosity 0 bold 9 social 0 stage elder trust 4 bored 2 food none friend near 1 bubble near 6 reef far 6 wall mid 2 last visit_bubbles time day -> visit_bubbles urgency 2 p=0.59  [4033 ms, 10.7 tok/s]
+1: I (116005) advisor: prof ms: matmul 2224 attn 496 norm/quant 133 rope 32 swiglu 337 decode 800
+0: I (61984) NimBLE: GATT procedure initiated: write;
+0: I (61984) NimBLE: att_handle=16 len=20
+0: 
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (116202) director: fish count=4 out=0 in=0 offered=9 name=nori
+1: I (116203) director: friends active=1 page=3 code=702028 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 A FISH FOR YOUR AQUARIUM
+COMMAND 1: friends accept
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (62148) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (62149) director: friends active=1 page=3 code=702028 peer=2c59b054d853a61f balance=728 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (62154) director: fish count=3 out=1 in=0 offered=0 name=-
+0: I (62160) director: friends active=1 page=3 code=702028 peer=2c59b054d853a61f balance=728 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (62171) NimBLE: GATT procedure initiated: write;
+0: I (62176) NimBLE: att_handle=16 len=20
+0: 
+1: I (116316) NimBLE: GATT procedure initiated: write;
+1: I (116316) NimBLE: att_handle=16 len=20
+1: 
+1: I (116317) director: fish count=4 out=0 in=9 offered=0 name=-
+1: I (116319) director: friends active=1 page=3 code=702028 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 RECEIVING YOUR NEW FISH
+1: I (116330) director: fish count=4 out=0 in=9 offered=0 name=-
+1: I (116335) director: friends active=1 page=3 code=702028 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 RECEIVING YOUR NEW FISH
+0: I (62300) NimBLE: GATT procedure initiated: write;
+0: I (62301) NimBLE: att_handle=16 len=20
+0: 
+0: I (62302) friends: fish op 2 seq 9 reply 3 count 3
+1: I (116525) NimBLE: GATT procedure initiated: write;
+1: I (116526) NimBLE: att_handle=16 len=20
+1: 
+1: I (116526) friends: fish op 3 seq 9 reply 4 count 5
+0: I (62498) friends: fish op 4 seq 9 reply 0 count 3
+0: I (62829) NimBLE: GATT procedure initiated: write;
+0: I (62830) NimBLE: att_handle=16 len=20
+0: 
+1: I (117009) NimBLE: GATT procedure initiated: write;
+1: I (117010) NimBLE: att_handle=16 len=20
+1: 
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (117247) director: fish count=5 out=0 in=0 offered=0 name=-
+1: I (117247) director: friends active=1 page=3 code=702028 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 FISH RECEIVED. WELCOME HOME
+0: I (63225) director: fish count=3 out=0 in=0 offered=0 name=-
+0: I (63225) director: friends active=1 page=3 code=702028 peer=2c59b054d853a61f balance=728 out=0 in=0 FISH DELIVERED
+COMMAND 1: friends roster
+1: I (117415) director: roster 0 name=sol id=2c59b054d853a61f:2 age=471201.1 body=f48fb1 accent=ffe08a paid=7 parents=,
+1: I (117416) director: roster 1 name=gira id=cadb9a72f3f25d16:4 age=699889.5 body=f48fb1 accent=ffbd59 paid=15 parents=dolt,zori
+1: I (117426) director: roster 2 name=help id=cadb9a72f3f25d16:5 age=681368.5 body=f48fb1 accent=ffbd59 paid=7 parents=dolt,zori
+1: I (117437) director: roster 3 name=misa id=cadb9a72f3f25d16:6 age=489175.9 body=f48fb1 accent=ffbd59 paid=7 parents=chip,zori
+1: I (117448) director: roster 4 name=nori id=2c59b054d853a61f:1 age=451870.8 body=a799ff accent=78d67d paid=7 parents=,
+1: I (117458) director: fish count=5 out=0 in=0 offered=0 name=-
+1: I (117463) director: friends active=1 page=3 code=702028 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 FISH RECEIVED. WELCOME HOME
+0: I (63772) advisor: zone 2 hunger 5 energy 9 stress 1 curiosity 0 bold 9 social 9 stage elder trust 9 bored 1 food none friend near 8 bubble near 5 reef far 2 wall mid 9 last dart_play time day -> visit_bubbles urgency 3 p=0.75  [4015 ms, 10.7 tok/s]
+0: I (63783) advisor: prof ms: matmul 2184 attn 521 norm/quant 109 rope 29 swiglu 364 decode 795
+0: I (63842) NimBLE: GATT procedure initiated: write;
+0: I (63843) NimBLE: att_handle=16 len=20
+0: 
+1: I (118033) NimBLE: GATT procedure initiated: write;
+1: I (118033) NimBLE: att_handle=16 len=20
+1: 
+0: I (64851) NimBLE: GATT procedure initiated: write;
+0: I (64852) NimBLE: att_handle=16 len=20
+0: 
+1: I (119085) NimBLE: GATT procedure initiated: write;
+1: I (119086) NimBLE: att_handle=16 len=20
+1: 
+COMMAND 1: friends fish 4
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (65352) director: fish count=3 out=0 in=0 offered=0 name=-
+0: I (65353) director: friends active=1 page=3 code=702028 peer=2c59b054d853a61f balance=728 out=0 in=0 FISH DELIVERED
+1: I (119470) director: fish count=4 out=1 in=0 offered=0 name=-
+1: I (119470) director: friends active=1 page=3 code=702028 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (119476) director: fish count=4 out=1 in=0 offered=0 name=-
+1: I (119481) director: friends active=1 page=3 code=702028 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (119492) NimBLE: GATT procedure initiated: write;
+1: I (119497) NimBLE: att_handle=16 len=20
+1: 
+1: I (119604) NimBLE: GATT procedure initiated: write;
+1: I (119604) NimBLE: att_handle=16 len=20
+1: 
+1: I (119707) NimBLE: GATT procedure initiated: write;
+1: I (119707) NimBLE: att_handle=16 len=20
+1: 
+1: I (119811) NimBLE: GATT procedure initiated: write;
+1: I (119811) NimBLE: att_handle=16 len=20
+1: 
+1: I (119915) NimBLE: GATT procedure initiated: write;
+1: I (119915) NimBLE: att_handle=16 len=20
+1: 
+0: I (65868) NimBLE: GATT procedure initiated: write;
+0: I (65869) NimBLE: att_handle=16 len=20
+0: 
+1: I (120023) NimBLE: GATT procedure initiated: write;
+1: I (120024) NimBLE: att_handle=16 len=20
+1: 
+1: I (120113) advisor: zone 2 hunger 1 energy 9 stress 1 curiosity 0 bold 8 social 9 stage elder trust 6 bored 3 food none friend near 6 bubble mid 12 reef far 12 wall mid 7 last visit_bubbles time day -> visit_bubbles urgency 4 p=0.75  [4070 ms, 10.6 tok/s]
+1: I (120123) NimBLE: GATT procedure initiated: write;
+1: I (120125) advisor: prof ms: matmul 2201 attn 546 norm/quant 117 rope 29 swiglu 349 decode 815
+1: I (120129) NimBLE: att_handle=16 len=20
+1: 
+1: I (120142) NimBLE: GATT procedure initiated: write;
+1: I (120146) NimBLE: att_handle=16 len=20
+1: 
+1: I (120227) NimBLE: GATT procedure initiated: write;
+1: I (120227) NimBLE: att_handle=16 len=20
+1: 
+1: I (120384) NimBLE: GATT procedure initiated: write;
+1: I (120384) NimBLE: att_handle=16 len=20
+1: 
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (66379) director: fish count=3 out=0 in=0 offered=0 name=-
+0: I (66380) director: friends active=1 page=3 code=702028 peer=2c59b054d853a61f balance=728 out=0 in=0 FISH DELIVERED
+1: I (120463) director: fish count=4 out=1 in=0 offered=0 name=-
+1: I (120464) director: friends active=1 page=3 code=702028 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (120544) NimBLE: GATT procedure initiated: write;
+1: I (120544) NimBLE: att_handle=16 len=20
+1: 
+1: I (120621) display: fb mid 0x0125 corner 0x0000 | scene mid 0x0125 ep 11 | night 0 prefetch 1
+1: I (120622) display: 11.1 fps | render 61.4 ms flush 21.1 ms | scene 0.6 shafts 0.0 veg 1.1 fd/bub 0.5 fish 6.3 vig 1.8 algae 0.1 | card 0.0 ms x0 | veg 0.03 0.03 0.03
+1: I (120633) display: frame 89.8 ms = polls 4.1 + tick 2.2 + prefetch wait 0.0 + render 61.4 + flush 21.1 + tail 0.4 + sleep 0.5 | flush: fill 19.2, wire wait 0.0, send calls 1.9
+1: I (120649) pocket-tank: t=142s 4 fish goals: visit_bubbles visit_bubbles visit_bubbles visit_bubbles | asks 65 decisions 26 last 4070 ms 10.6 tok/s | starve-ignored 0 | heap int 10 KB psram 4576 KB | battery 8% 3636 mV bright 153
+1: I (120671) NimBLE: GATT procedure initiated: write;
+1: I (120673) NimBLE: att_handle=16 len=20
+1: 
+1: I (120833) NimBLE: GATT procedure initiated: write;
+1: I (120833) NimBLE: att_handle=16 len=20
+1: 
+0: I (66894) NimBLE: GATT procedure initiated: write;
+0: I (66895) NimBLE: att_handle=16 len=20
+0: 
+1: I (120987) NimBLE: GATT procedure initiated: write;
+1: I (120987) NimBLE: att_handle=16 len=20
+1: 
+1: I (121151) NimBLE: GATT procedure initiated: write;
+1: I (121152) NimBLE: att_handle=16 len=20
+1: 
+1: I (121153) NimBLE: GATT procedure initiated: write;
+1: I (121154) NimBLE: att_handle=16 len=20
+1: 
+1: I (121312) NimBLE: GATT procedure initiated: write;
+1: I (121312) NimBLE: att_handle=16 len=20
+1: 
+0: I (67313) codec: ES8311 up (SYS0D 03 DAC 00)
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (121473) director: fish count=4 out=1 in=0 offered=0 name=-
+1: I (121474) director: friends active=1 page=3 code=702028 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (121479) NimBLE: GATT procedure initiated: write;
+1: I (121484) NimBLE: att_handle=16 len=20
+1: 
+0: I (67416) director: fish count=3 out=0 in=0 offered=0 name=-
+0: I (67416) director: friends active=1 page=3 code=702028 peer=2c59b054d853a61f balance=728 out=0 in=0 FISH DELIVERED
+0: I (67559) audio: up in 255 ms
+1: I (121646) NimBLE: GATT procedure initiated: write;
+1: I (121646) NimBLE: att_handle=16 len=20
+1: 
+1: I (121803) NimBLE: GATT procedure initiated: write;
+1: I (121803) NimBLE: att_handle=16 len=20
+1: 
+0: I (67753) friends: fish op 1 seq 4 reply 1 count 3
+0: I (67824) advisor: zone 2 hunger 6 energy 9 stress 0 curiosity 0 bold 9 social 0 stage elder trust 9 bored 1 food none friend near 11 bubble mid 12 reef far 9 wall mid 4 last rest time day -> visit_bubbles urgency 4 p=0.59  [3980 ms, 10.8 tok/s]
+0: I (67836) advisor: prof ms: matmul 2181 attn 511 norm/quant 110 rope 29 swiglu 340 decode 796
+1: I (121964) NimBLE: GATT procedure initiated: write;
+1: I (121964) NimBLE: att_handle=16 len=20
+1: 
+0: I (67913) NimBLE: GATT procedure initiated: write;
+0: I (67914) NimBLE: att_handle=16 len=20
+0: 
+1: I (122120) NimBLE: GATT procedure initiated: write;
+1: I (122120) NimBLE: att_handle=16 len=20
+1: 
+1: I (122199) NimBLE: GATT procedure initiated: write;
+1: I (122200) NimBLE: att_handle=16 len=20
+1: 
+1: I (122280) NimBLE: GATT procedure initiated: write;
+1: I (122280) NimBLE: att_handle=16 len=20
+1: 
+1: I (122437) NimBLE: GATT procedure initiated: write;
+1: I (122437) NimBLE: att_handle=16 len=20
+1: 
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (68368) director: fish count=3 out=0 in=0 offered=4 name=nori
+0: I (68369) director: friends active=1 page=3 code=702028 peer=2c59b054d853a61f balance=728 out=0 in=0 A FISH FOR YOUR AQUARIUM
+1: I (122515) director: fish count=4 out=1 in=0 offered=0 name=-
+COMMAND 0: friends accept
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (122516) director: friends active=1 page=3 code=702028 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (122521) director: fish count=4 out=1 in=0 offered=0 name=-
+1: I (122526) director: friends active=1 page=3 code=702028 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (68472) NimBLE: GATT procedure initiated: write;
+0: I (68472) NimBLE: att_handle=16 len=20
+0: 
+0: I (68473) director: fish count=3 out=0 in=4 offered=0 name=-
+0: I (68475) director: friends active=1 page=3 code=702028 peer=2c59b054d853a61f balance=728 out=0 in=0 RECEIVING YOUR NEW FISH
+0: I (68486) director: fish count=3 out=0 in=4 offered=0 name=-
+0: I (68491) director: friends active=1 page=3 code=702028 peer=2c59b054d853a61f balance=728 out=0 in=0 RECEIVING YOUR NEW FISH
+1: I (122645) NimBLE: GATT procedure initiated: write;
+1: I (122645) NimBLE: att_handle=16 len=20
+1: 
+0: I (68576) NimBLE: GATT procedure initiated: write;
+0: I (68576) NimBLE: att_handle=16 len=20
+0: 
+1: I (122646) friends: fish op 2 seq 4 reply 3 count 4
+0: I (68577) friends: fish op 3 seq 4 reply 4 count 4
+1: I (122759) friends: fish op 4 seq 4 reply 0 count 4
+0: I (68914) NimBLE: GATT procedure initiated: write;
+0: I (68915) NimBLE: att_handle=16 len=20
+0: 
+1: I (123245) NimBLE: GATT procedure initiated: write;
+1: I (123246) NimBLE: att_handle=16 len=20
+1: 
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (69430) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (69431) director: friends active=1 page=3 code=702028 peer=2c59b054d853a61f balance=728 out=0 in=0 FISH RECEIVED. WELCOME HOME
+1: I (123594) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (123594) director: friends active=1 page=3 code=702028 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 FISH DELIVERED
+COMMAND 0: friends roster
+0: I (69523) director: roster 0 name=zori id=cadb9a72f3f25d16:2 age=708491.3 body=78d67d accent=ffbd59 paid=15 parents=,
+0: I (69524) director: roster 1 name=chip id=cadb9a72f3f25d16:3 age=706330.9 body=f48fb1 accent=ffbd59 paid=15 parents=dolt,zori
+0: I (69534) director: roster 2 name=dolt id=cadb9a72f3f25d16:1 age=709047.8 body=f48fb1 accent=ffe08a paid=15 parents=,
+0: I (69545) director: roster 3 name=nori id=2c59b054d853a61f:1 age=451873.8 body=a799ff accent=78d67d paid=7 parents=,
+0: I (69555) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (69560) director: friends active=1 page=3 code=702028 peer=2c59b054d853a61f balance=728 out=0 in=0 FISH RECEIVED. WELCOME HOME
+0: I (69997) NimBLE: GATT procedure initiated: write;
+0: I (69997) NimBLE: att_handle=16 len=20
+0: 
+1: I (124275) advisor: zone 2 hunger 8 energy 9 stress 1 curiosity 0 bold 9 social 2 stage elder trust 8 bored 1 food mid 12 friend near 3 bubble mid 3 reef far 3 wall mid 9 last visit_bubbles time day -> dart_play urgency 4 p=0.00  [4123 ms, 10.7 tok/s]
+1: I (124286) advisor: prof ms: matmul 2270 attn 545 norm/quant 126 rope 30 swiglu 343 decode 796
+1: I (124316) NimBLE: GATT procedure initiated: write;
+1: I (124317) NimBLE: att_handle=16 len=20
+1: 
+0: I (70334) display: fb mid 0x0125 corner 0x0000 | scene mid 0x0125 ep 5 | night 0 prefetch 1
+0: I (70334) display: 11.3 fps | render 64.2 ms flush 18.1 ms | scene 2.3 shafts 0.0 veg 1.6 fd/bub 0.5 fish 8.5 vig 2.2 algae 0.1 | card 0.0 ms x0 | veg 0.04 0.04 0.04
+0: I (70345) display: frame 88.4 ms = polls 3.6 + tick 1.6 + prefetch wait 0.0 + render 64.2 + flush 18.1 + tail 0.4 + sleep 0.5 | flush: fill 16.2, wire wait 0.0, send calls 1.9
+0: I (70361) pocket-tank: t=130s 4 fish goals: visit_bubbles dart_play visit_bubbles explore | asks 19 decisions 12 last 3980 ms 10.8 tok/s | starve-ignored 0 | heap int 10 KB psram 4576 KB | battery 100% 4198 mV bright 153
+0: I (71062) NimBLE: GATT procedure initiated: write;
+0: I (71062) NimBLE: att_handle=16 len=20
+0: 
+1: I (125357) NimBLE: GATT procedure initiated: write;
+1: I (125357) NimBLE: att_handle=16 len=20
+1: 
+COMMAND 1: friends roster
+1: I (125679) director: roster 0 name=sol id=2c59b054d853a61f:2 age=471209.4 body=f48fb1 accent=ffe08a paid=7 parents=,
+1: I (125679) director: roster 1 name=gira id=cadb9a72f3f25d16:4 age=699897.8 body=f48fb1 accent=ffbd59 paid=15 parents=dolt,zori
+1: I (125690) director: roster 2 name=help id=cadb9a72f3f25d16:5 age=681376.7 body=f48fb1 accent=ffbd59 paid=7 parents=dolt,zori
+1: I (125701) director: roster 3 name=misa id=cadb9a72f3f25d16:6 age=489184.2 body=f48fb1 accent=ffbd59 paid=7 parents=chip,zori
+1: I (125712) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (125717) director: friends active=1 page=3 code=702028 peer=cadb9a72f3f25d16 balance=902 out=0 in=0 FISH DELIVERED
+0: I (72070) NimBLE: GATT procedure initiated: write;
+0: I (72070) NimBLE: att_handle=16 len=20
+0: 
+1: I (126363) NimBLE: GATT procedure initiated: write;
+1: I (126364) NimBLE: att_handle=16 len=20
+1: 
+0: I (72548) advisor: zone 5 hunger 7 energy 9 stress 1 curiosity 0 bold 9 social 2 stage elder trust 6 bored 0 food none friend near 8 bubble mid 7 reef mid 12 wall mid 2 last explore time day -> visit_bubbles urgency 4 p=0.75  [3970 ms, 10.8 tok/s]
+0: I (72559) advisor: prof ms: matmul 2173 attn 516 norm/quant 103 rope 27 swiglu 343 decode 794
+0: I (73121) NimBLE: GATT procedure initiated: write;
+0: I (73122) NimBLE: att_handle=16 len=20
+0: 
+0: I (73271) codec: ES8311 down (SYS0D f8)
+0: I (73272) audio: down (idle)
+1: I (127404) NimBLE: GATT procedure initiated: write;
+1: I (127404) NimBLE: att_handle=16 len=20
+1: 
+COMMAND 0: friends close
+COMMAND 1: friends close
+0: I (73571) NimBLE: GAP procedure initiated: stop advertising.
+0: 
+0: I (73571) NimBLE: GAP procedure initiated: terminate connection; conn_handle=1 hci_reason=19
+0: 
+0: I (73587) friends: Bluetooth stopped; free internal heap 44183
+0: I (73587) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (127664) NimBLE: GAP procedure initiated: stop advertising.
+1: 
+1: I (127665) NimBLE: GAP procedure initiated: terminate connection; conn_handle=1 hci_reason=19
+1: 
+0: I (73588) director: friends active=0 page=3 code=702028 peer=0000000000000000 balance=728 out=0 in=0 FISH RECEIVED. WELCOME HOME
+0: I (73607) codec: ES8311 up (SYS0D 03 DAC 00)
+1: I (127702) friends: Bluetooth stopped; free internal heap 44159
+1: I (127702) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (127703) director: friends active=0 page=3 code=702028 peer=0000000000000000 balance=902 out=0 in=0 FISH DELIVERED
+1: I (127722) codec: ES8311 up (SYS0D 03 DAC 00)
+0: I (73854) audio: up in 255 ms
+1: I (127969) audio: up in 255 ms
+1: I (128404) advisor: zone 2 hunger 8 energy 9 stress 1 curiosity 0 bold 9 social 2 stage elder trust 8 bored 1 food mid 12 friend near 5 bubble mid 5 reef far 3 wall mid 10 last visit_bubbles time day -> seek_food urgency 6 p=0.99  [4085 ms, 10.8 tok/s]
+1: I (128415) advisor: prof ms: matmul 2227 attn 547 norm/quant 105 rope 29 swiglu 345 decode 820

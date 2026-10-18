@@ -1,0 +1,85 @@
+All 48 simulator selftests passed on amoled18, round175c, watch206 and square216.
+
+RUN fishsim --selftest
+RUN fishsim --selftest-hunger
+RUN fishsim --selftest-shop
+RUN fishsim --selftest-battery
+RUN fishsim --selftest-pop
+RUN fishsim --selftest-card
+RUN fishsim --selftest-fry
+RUN fishsim --selftest-sleep
+RUN fishsim --selftest-tend
+RUN fishsim --selftest-llm
+RUN fishsim --selftest-saves
+selftest-saves ok (10 fixtures, 136 loads; a 447-byte save and a foreign magic start fresh; NVS tank/save)
+RUN fishsim --selftest-update
+selftest-update: OK
+RUN fishsim-round --selftest
+RUN fishsim-round --selftest-hunger
+RUN fishsim-round --selftest-shop
+RUN fishsim-round --selftest-battery
+RUN fishsim-round --selftest-pop
+RUN fishsim-round --selftest-card
+RUN fishsim-round --selftest-fry
+RUN fishsim-round --selftest-sleep
+RUN fishsim-round --selftest-tend
+RUN fishsim-round --selftest-llm
+RUN fishsim-round --selftest-saves
+selftest-saves ok (10 fixtures, 136 loads; a 447-byte save and a foreign magic start fresh; NVS tank/save)
+RUN fishsim-round --selftest-update
+selftest-update: OK
+RUN fishsim-watch --selftest
+RUN fishsim-watch --selftest-hunger
+RUN fishsim-watch --selftest-shop
+RUN fishsim-watch --selftest-battery
+RUN fishsim-watch --selftest-pop
+RUN fishsim-watch --selftest-card
+RUN fishsim-watch --selftest-fry
+RUN fishsim-watch --selftest-sleep
+RUN fishsim-watch --selftest-tend
+RUN fishsim-watch --selftest-llm
+RUN fishsim-watch --selftest-saves
+selftest-saves ok (10 fixtures, 136 loads; a 447-byte save and a foreign magic start fresh; NVS tank/save)
+RUN fishsim-watch --selftest-update
+selftest-update: OK
+RUN fishsim-square --selftest
+RUN fishsim-square --selftest-hunger
+RUN fishsim-square --selftest-shop
+RUN fishsim-square --selftest-battery
+RUN fishsim-square --selftest-pop
+RUN fishsim-square --selftest-card
+RUN fishsim-square --selftest-fry
+RUN fishsim-square --selftest-sleep
+RUN fishsim-square --selftest-tend
+RUN fishsim-square --selftest-llm
+RUN fishsim-square --selftest-saves
+selftest-saves ok (10 fixtures, 136 loads; a 447-byte save and a foreign magic start fresh; NVS tank/save)
+RUN fishsim-square --selftest-update
+selftest-update: OK
+
+occlusion grass plain: 203 fish pixels covered
+occlusion coral plain: 735 fish pixels covered
+occlusion grass cached: 203 fish pixels covered
+occlusion coral cached: 735 fish pixels covered
+PASS: shelter targets, descent, holding cover, empty-garden fallback, release, startle/setup exceptions, grass/coral occlusion with and without scene cache
+
+Money hardware test:
+Matching code: 251836
+PASS: both confirmations required; cancelled pairing closes cleanly
+Matching code: 502839
+PASS: gifts in both directions, original balances restored
+PASS: declined gift refunded
+Matching code: 524850
+PASS: pending gift resumes after disconnect/re-pair; balances restored
+{"result": "passed", "balances": [728, 902], "devices": ["/dev/cu.usbmodem311101", "/dev/cu.usbmodem31201"]}
+
+Fish hardware test:
+Matching code: 439374
+PASS: decline restores fish; two-fish minimum enforced
+Matching code: 702028
+PASS: disconnected gift resumes; name, colours, age and paid history preserved
+PASS: fish returned with stable identity and family; both original rosters and balances restored
+
+Deployed build: 899fe45
+Firmware SHA-256: 04d8e3d7629be503927c140ec79e0435933515087645046e8cb492ce6880225f
+Both devices report v0.3.6 alpha, build 899fe45, ota_0. Four original fish each; identities, families, colours, ages and paid history preserved; radios off; no pending gifts; saves committed. Final balances 728 / 902 (same as before hardware transfer tests).

@@ -178,3 +178,23 @@ and a signed ESP-IDF 5.5 firmware build. Real-device save fixtures in
 `tests/fixtures/` verify all eight fish, identities, family, balances and a
 second load after saving in the merged format. Upstream fixtures still load.
 Hardware deployment and BLE verification are recorded below after flashing.
+
+### Deployment and hardware verification
+
+Both USB devices now report **v0.3.6 alpha, build `899fe45`**, running and
+booting `ota_0`. All flash writes passed esptool hash verification; NVS and
+model partitions were not written. The first board received a second app
+flash after fixing stale build metadata in linked worktrees; its first
+merged save loaded successfully again on that second boot.
+
+Both physical BLE harnesses passed: matching-code confirmation on both
+screens, cancellation, money gifts in both directions, decline/refund and
+reconnect recovery; fish decline, interrupted offer/reconnect/accept and a
+return trip with stable identity, family, name, colours, age and paid history.
+Final checks matched all eight original fish against the pre-update rosters.
+Both radios are off, both money and fish journals have no pending transfers,
+and both devices acknowledged `save`. Final balances are 728 / 902, exactly
+the transfer tests' baselines (keeper activity before flashing changed the
+balances from the initial backup). Evidence is under
+`docs/ble/2026-10-18-upstream-036-*`; the validation file contains the checks
+and deployed firmware SHA-256. No battery experiment was started.
