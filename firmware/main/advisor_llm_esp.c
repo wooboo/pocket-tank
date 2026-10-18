@@ -21,7 +21,7 @@ static goal_t g_resp_goal; static int g_resp_fish = -1; static bool g_busy;
 static bool g_pending[N_FISH_MAX]; static int g_next;
 /* the roster a request was made against (tank_t.roster_gen): a fish sold
  * shifts the slots, and a decision asked for the old ones is dropped */
-static uint8_t g_gen, g_req_gen, g_resp_gen;
+static uint32_t g_gen, g_req_gen, g_resp_gen;
 static uint32_t g_decisions, g_last_ms; static float g_tok_s;
 
 static void *psram_alloc(size_t n) {
@@ -41,7 +41,7 @@ static void worker(void *arg) {
     for (;;) {
         xSemaphoreTake(g_req_sem, portMAX_DELAY);
         xSemaphoreTake(g_mx, portMAX_DELAY);
-        int fish = g_req_fish; uint8_t gen = g_req_gen; char st[400]; strcpy(st, g_req_state); g_req_fish = -1; g_busy = true;
+        int fish = g_req_fish; uint32_t gen = g_req_gen; char st[400]; strcpy(st, g_req_state); g_req_fish = -1; g_busy = true;
         xSemaphoreGive(g_mx);
         int ntok = 0; int64_t t0 = esp_timer_get_time();
         memset(q4_prof_us, 0, sizeof q4_prof_us);

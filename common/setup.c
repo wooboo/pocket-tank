@@ -824,9 +824,11 @@ void render_setup(const tank_t *t, uint16_t *fb, int stride, float clock) {
         const fish_t *f = &t->fish[page_fish()];
         const fish_t *pa = f->parent_a >= 0 && f->parent_a < t->n_fish ? &t->fish[f->parent_a] : NULL;
         const fish_t *pb = f->parent_b >= 0 && f->parent_b < t->n_fish ? &t->fish[f->parent_b] : NULL;
-        bool shop = f->parent_a < 0 && f->parent_b < 0;              /* bought (0.3.5): its look is the shop's */
-        const char *na = shop ? "THE SHOP" : fish_name(t, f->parent_a), *nb = shop ? "THE SHOP" : fish_name(t, f->parent_b);
-        uint32_t ca = pa ? pa->color : shop ? C_CAPT : C_DIM, cb = pb ? pb->color : shop ? C_CAPT : C_DIM;
+        bool shop = f->parent_a < 0 && f->parent_b < 0 && !f->family.parent_names[0][0] && !f->family.parent_names[1][0];
+        const char *na = pa ? pa->name : f->family.parent_names[0][0] ? f->family.parent_names[0] : shop ? "THE SHOP" : "?";
+        const char *nb = pb ? pb->name : f->family.parent_names[1][0] ? f->family.parent_names[1] : shop ? "THE SHOP" : "?";
+        uint32_t ca = pa ? pa->color : f->family.parent_body[0] ? f->family.parent_body[0] : shop ? C_CAPT : C_DIM;
+        uint32_t cb = pb ? pb->color : f->family.parent_body[1] ? f->family.parent_body[1] : shop ? C_CAPT : C_DIM;
         panel(fb, stride);
         text_c(fb, stride, CX, SETUP_Y + 20, 3, C_TEXT, f->name);
         float ps = f->size * 2.0f;                                   /* a portrait, twice life size (a fry) ... */

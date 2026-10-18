@@ -372,7 +372,11 @@ bool display_port_init(void) {
 
     for (int i = 0; i < 2; i++) {
         s_stripe[i] = heap_caps_malloc(STRIPE_BYTES, MALLOC_CAP_DMA);
-        if (!s_stripe[i]) return false;
+        if (!s_stripe[i]) {
+            ESP_LOGE(TAG, "display DMA allocation failed (%u bytes)", STRIPE_BYTES);
+            for (int j=0;j<i;j++) { free(s_stripe[j]); s_stripe[j]=NULL; }
+            return false;
+        }
     }
     s_stripe_free = xSemaphoreCreateCounting(2, 2);
     const spi_bus_config_t spi = SH8601_PANEL_BUS_QSPI_CONFIG(s_round ? R_PIN_LCD_PCLK : s_square ? S_PIN_LCD_PCLK : PIN_LCD_PCLK, PIN_LCD_DATA0, PIN_LCD_DATA1,
@@ -602,7 +606,7 @@ static void native_flush(const uint16_t *fb) {
 }
 #endif
 void display_port_flush(const uint16_t *fb) {
-    if (!s_panel) return;
+    if (!s_panel || !s_stripe_free) return;
     if (s_round) { round_flush(fb); return; }
 #if defined(TANK_WATCH) || defined(TANK_SQUARE)
     native_flush(fb); return;

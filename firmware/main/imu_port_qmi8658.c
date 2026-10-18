@@ -1,11 +1,13 @@
 /* imu_port_qmi8658.c — QMI8658 6-axis IMU (I2C 0x6B, alt 0x6A) as an
- * orientation sensor: accel only at 31.25 Hz, gyro off. Polled ~4x/s from the
- * tank task; the inverted flag flips only after the gravity component along
- * the panel's landscape-vertical axis has clearly (>0.5 g) pointed the other
+ * orientation sensor: accel only at 31.25 Hz, gyro off. Polled up to 31x/s from the
+ * tank task; motion/flip detection stays at 4 Hz. The inverted flag flips
+ * only after the gravity component along the landscape vertical axis
+ * has clearly (>0.21 g) pointed the other
  * way for 3 consecutive polls, and holds its last state while the device lies
  * flat (no axis dominant), so the screen never flaps on a table. */
 #include "imu_port.h"
 #include "display_port.h"      /* board_is_round */
+#include "imu_gravity.h"
 #include "esp_log.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
@@ -29,7 +31,8 @@ static int s_up_sign = -1;   /* the round 1.75C, 2026-10-01 (Strato holding it u
 #define REG_AX_L           0x35
 #define WHO_AM_I_VAL       0x05
 
-#define POLL_INTERVAL_US   250000
+#define POLL_INTERVAL_US   32000
+#define DETECTOR_INTERVAL_US 250000
 /* 2026-08-31: was 8192 (0.5 g) - that only fired within ~60 deg of vertical,
  * so a device reclined on its back (bench pose: up-axis carries ~0.25 g)
  * never flipped. Now ~0.21 g, but the up-axis must also DOMINATE the other
@@ -46,7 +49,11 @@ static const char *TAG = "imu";
 static i2c_master_dev_handle_t s_dev;
 static bool s_inverted;
 static int s_streak;              /* consecutive polls voting for a flip */
-static int64_t s_next_us;
+static int64_t s_next_us, s_detector_next_us, s_sample_us;
+static imu_gravity_t s_gravity = {0, -1};
+static imu_water_t s_water;
+static imu_shake_t s_shake;
+static bool s_shake_pending;
 static int16_t s_prev[3]; static bool s_have_prev;
 static int64_t s_moved_us; static int s_motion; static int16_t s_last[3];
 static int64_t s_handled_us; static bool s_prev_moved;   /* two polls in a row over the threshold */
@@ -122,6 +129,18 @@ void imu_port_poll(int64_t now_us) {
     int16_t a[3] = { (int16_t)(raw[0] | raw[1] << 8),
                      (int16_t)(raw[2] | raw[3] << 8),
                      (int16_t)(raw[4] | raw[5] << 8) };
+    float sample_dt = s_sample_us ? (now_us - s_sample_us) / 1e6f : 0.032f;
+    if (sample_dt > 0.1f) sample_dt = 0.032f;
+    s_sample_us = now_us;
+    imu_water_sample(&s_water, a[0] / 16384.0f, sample_dt);
+    float gravity[3] = {a[0]/16384.0f, a[1]/16384.0f, a[2]/16384.0f};
+    if (imu_shake_sample(&s_shake, gravity, sample_dt)) s_shake_pending = true;
+    imu_gravity_sample(&s_gravity, a[0] / 16384.0f, a[1] / 16384.0f,
+                       a[2] / 16384.0f, sample_dt);
+    for (int i = 0; i < 3; i++) s_last[i] = a[i];
+    /* Preserve the existing motion thresholds and 750 ms flip debounce. */
+    if (now_us < s_detector_next_us) return;
+    s_detector_next_us = now_us + DETECTOR_INTERVAL_US;
     static int logged;
     if (logged < 3) { logged++; ESP_LOGI(TAG, "g=[%d %d %d] inverted=%d", a[0], a[1], a[2], (int)s_inverted); }
     /* handling: movement since the last poll, railed channels ignored */
@@ -176,6 +195,22 @@ void imu_port_poll(int64_t now_us) {
     }
 }
 
+void imu_port_bubble_up(float *x, float *y) {
+    if (!s_dev || !s_sample_us || esp_timer_get_time() - s_sample_us > 500000) {
+        *x = 0; *y = -1; return;
+    }
+    imu_gravity_screen(&s_gravity, s_inverted, x, y);
+}
+
+float imu_port_water_push(void) {
+    if (!s_dev || !s_sample_us || esp_timer_get_time()-s_sample_us > 500000) return 0;
+    return s_inverted ? -s_water.push : s_water.push;
+}
+
+bool imu_port_take_shake(void) {
+    bool pending = s_shake_pending; s_shake_pending = false; return pending;
+}
+
 bool imu_port_inverted(void) { return s_inverted; }
 void imu_port_last(int16_t out[3], int *motion) { for (int i = 0; i < 3; i++) out[i] = s_last[i]; if (motion) *motion = s_motion; }
 bool imu_port_handled(void) { return s_handled_us && esp_timer_get_time() - s_handled_us < IMU_MOTION_HOLD_US; }
@@ -195,5 +230,9 @@ void imu_port_power_down(void) {
 }
 void imu_port_wake(void) {
     if (!s_dev) return;
+    s_sample_us = s_next_us = s_detector_next_us = 0;
+    s_water = (imu_water_t){0};
+    s_shake = (imu_shake_t){0}; s_shake_pending = false;
+    s_have_prev = false; s_prev_moved = false; s_streak = 0;
     if (!imu_reset_config()) ESP_LOGW(TAG, "wake reconfig failed");
 }

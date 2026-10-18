@@ -23,6 +23,7 @@
 #include "touch_port.h"
 #include "display_port.h"
 #include "update.h"
+#include "friends.h"
 #include "board_pins.h"
 #include "tank.h"
 #include "render.h"
@@ -508,6 +509,11 @@ void touch_port_poll(tank_t *t) {
         /* snapshot the school: the user aims at where a fish WAS - by release
            a darting fish has moved and the finger hid it the whole time */
         for (int i = 0; i < t->n_fish && i < N_FISH_MAX; i++) { s_fx[i] = t->fish[i].x; s_fy[i] = t->fish[i].y; }
+    }
+    if (friends_active()) {
+        friends_touch(t, tx, ty, touched);
+        if (touched) { s_lx = tx; s_ly = ty; }
+        s_down = touched; return;
     }
     bool su = setup_active();                                /* before the touch: BEGIN's release is not a tank tap */
     if (s_set && !s_cf && !su) {                             /* the settings page owns the glass: segments, LIGHTS OUT's arrows, CLOSE */

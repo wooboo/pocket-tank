@@ -36,7 +36,7 @@ static bool   g_pending[N_FISH_MAX];
 static int    g_next = 0;             /* rotation pointer over pending fish */
 /* the roster a request was made against (tank_t.roster_gen): a fish sold
  * shifts the slots, and a decision asked for the old ones is dropped */
-static uint8_t g_gen, g_req_gen, g_resp_gen;
+static uint32_t g_gen, g_req_gen, g_resp_gen;
 bool advisor_llm_narrate = false;     /* --narrate: stream states + decisions */
 
 static void *worker(void *arg) {
@@ -44,7 +44,7 @@ static void *worker(void *arg) {
     for (;;) {
         pthread_mutex_lock(&g_mx);
         while (g_req_fish < 0) pthread_cond_wait(&g_cv, &g_mx);
-        int fish = g_req_fish; uint8_t gen = g_req_gen;
+        int fish = g_req_fish; uint32_t gen = g_req_gen;
         char state[400];
         strcpy(state, g_req_state);
         g_req_fish = -1;

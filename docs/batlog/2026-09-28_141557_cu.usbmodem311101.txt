@@ -1,0 +1,32 @@
+# pocket-tank preflight 2026-09-28_141557 on /dev/cu.usbmodem311101
+I (131750) batlog: no samples yet
+I (132827) batlog: no samples yet
+I (133902) batlog: no samples yet
+I (134971) batlog: no samples yet
+I (135858) director: 0 nori   fry   age 0.0h size 0.55 hunger 1.6 energy 6.3 stress 0.0 curiosity 0.0 trust 5.0 ms 111  visit_bubbles at 356,101
+I (135861) director: 1 sol    fry   age 0.0h size 0.57 hunger 6.5 energy 5.7 stress 0.0 curiosity 2.8 trust 5.0 ms 111  follow_friend at 305,112
+I (135873) director: pellets 0 | trickle on | ravenous 0 | day idle 0s | veg 0.36 0.35 0.34 | algae cells 0/644 | courting no | arrival -
+I (135885) director: sand dollars 120 (earned 0) | shop: - | colonies 0 | 0.0 in trimmed
+I (135894) director: bed 0 fronds (x from 37, pitch 12): 0.35 0.39 0.34 0.38 0.34 0.38 0.34 0.37 0.33 0.37 0.33 0.37
+I (135904) director: bed 1 fronds (x from 376, pitch 12): 0.36 0.31 0.35 0.39 0.35
+I (135911) director: bed 2 fronds (x from 278, pitch 12): 0.36 0.32 0.36 0.32 0.35 0.31 0.35 0.39
+I (135919) director: nursery bed 0 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (135928) director: battery 100% charging, VBAT 4176 mV | brightness 255/255 (level 100%)
+I (136905) director: 0 nori   fry   age 0.0h size 0.55 hunger 1.6 energy 6.3 stress 0.0 curiosity 0.0 trust 5.0 ms 111  visit_bubbles at 371,94
+I (136908) director: 1 sol    fry   age 0.0h size 0.57 hunger 6.5 energy 5.7 stress 0.0 curiosity 2.8 trust 5.0 ms 111  follow_friend at 311,98
+I (136921) director: pellets 0 | trickle on | ravenous 0 | day idle 0s | veg 0.36 0.35 0.34 | algae cells 0/644 | courting no | arrival -
+I (136933) director: sand dollars 120 (earned 0) | shop: - | colonies 0 | 0.0 in trimmed
+I (136941) director: bed 0 fronds (x from 37, pitch 12): 0.35 0.39 0.34 0.38 0.34 0.38 0.34 0.37 0.33 0.37 0.33 0.37
+I (136951) director: bed 1 fronds (x from 376, pitch 12): 0.36 0.31 0.35 0.39 0.35
+I (136958) director: bed 2 fronds (x from 278, pitch 12): 0.36 0.32 0.36 0.32 0.35 0.31 0.35 0.39
+I (136967) director: nursery bed 0 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (136975) director: battery 100% charging, VBAT 4177 mV | brightness 255/255 (level 100%)
+I (137949) director: 0 nori   fry   age 0.0h size 0.55 hunger 1.6 energy 6.3 stress 0.0 curiosity 0.0 trust 5.0 ms 111  visit_bubbles at 370,112
+I (137952) director: 1 sol    fry   age 0.0h size 0.57 hunger 6.5 energy 5.7 stress 0.0 curiosity 2.7 trust 5.0 ms 111  follow_friend at 320,112
+I (137964) director: pellets 0 | trickle on | ravenous 0 | day idle 0s | veg 0.36 0.35 0.34 | algae cells 0/644 | courting no | arrival -
+I (137976) director: sand dollars 120 (earned 0) | shop: - | colonies 0 | 0.0 in trimmed
+I (137985) director: bed 0 fronds (x from 37, pitch 12): 0.35 0.39 0.34 0.38 0.34 0.38 0.34 0.37 0.33 0.37 0.33 0.37
+I (137995) director: bed 1 fronds (x from 376, pitch 12): 0.36 0.31 0.35 0.39 0.35
+I (138002) director: bed 2 fronds (x from 278, pitch 12): 0.36 0.32 0.36 0.32 0.35 0.31 0.35 0.39
+I (138011) director: nursery bed 0 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (138019) director: battery 100% charging, VBAT 4177 mV | brightness 255/255 (level 100%)

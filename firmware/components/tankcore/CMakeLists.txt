@@ -4,7 +4,7 @@
 # the static-archive link order resolves (tankcore -> nvs_flash).
 set(COMMON ${CMAKE_CURRENT_LIST_DIR}/../../../common)
 idf_component_register(
-    SRCS "${COMMON}/tank.c" "${COMMON}/advisor.c" "${COMMON}/render.c" "${COMMON}/icons.c" "${COMMON}/progression.c" "${COMMON}/setup.c"
+    SRCS "${COMMON}/fish_gift.c" "${COMMON}/friends_ui.c" "${COMMON}/gift.c" "${COMMON}/tank.c" "${COMMON}/advisor.c" "${COMMON}/render.c" "${COMMON}/icons.c" "${COMMON}/progression.c" "${COMMON}/setup.c"
          "${COMMON}/audio.c" "${COMMON}/notice.c" "${COMMON}/sounds.c" "${COMMON}/battery.c" "${COMMON}/update.c"
          "persist_port_esp.c" "rtc_port_pcf85063.c"
     INCLUDE_DIRS "${COMMON}" "."

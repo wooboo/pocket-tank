@@ -2,6 +2,7 @@
  * updateFish/targetForGoal/wall handling, with prototype px values scaled by
  * ~0.55 for the 448-wide tank. */
 #include "tank.h"
+#include <string.h>
 #include "tank_events.h"
 #include <math.h>
 #include <stddef.h>
@@ -197,7 +198,7 @@ void tank_set_name(tank_t *t, int slot, const char *name) {
         f->name[n] = c >= 'A' && c <= 'Z' ? (char)(c - 'A' + 'a') : c;
         n++;
     }
-    f->name[n] = 0;
+    while (n <= FISH_NAME_MAX) f->name[n++] = 0;
 }
 static uint32_t fin_for(uint32_t body) {
     for (int i = 0; i < ROSTER_N; i++) if (ROSTER[i].color == body) return ROSTER[i].fin;
@@ -248,6 +249,7 @@ void tank_make_fish(tank_t *t, int slot, int preset, float sociable, float bold,
     f->sig = 0xffffffffu; f->ms_bits = 0; f->ms_seen = 0;
     f->color = p->color; f->fin = p->fin; f->accent = p->accent;
     f->parent_a = f->parent_b = -1;
+    f->age_s = 0; f->starve_s = 0; f->family = (fish_family_t){0};
 }
 
 void tank_set_bubble_x(tank_t *t, float x) {
@@ -284,7 +286,7 @@ void tank_new_population(tank_t *t) {
 }
 
 int tank_add_fish(tank_t *t, int parent_a, int parent_b) {
-    if (t->n_fish >= N_FISH_MAX || t->n_fish >= ROSTER_N) return -1;
+    if (t->fish_gift.journal.out_phase || t->fish_gift.journal.in_seq || t->n_fish >= N_FISH_MAX || t->n_fish >= ROSTER_N) return -1;
     int used[ROSTER_N] = {0};
     for (int i = 0; i < t->n_fish; i++) used[t->fish[i].preset] = 1;
     int free_n = 0, free_idx[ROSTER_N];
@@ -304,6 +306,13 @@ int tank_add_fish(tank_t *t, int parent_a, int parent_b) {
     if (tank_randf(t, 0, 1) < 0.5f) { int x = ia; ia = ib; ib = x; pa = &t->fish[ia]; pb = &t->fish[ib]; }
     tank_set_look(t, slot, pa->color, pb->accent);
     t->fish[slot].parent_a = (int8_t)ia; t->fish[slot].parent_b = (int8_t)ib;
+    int parents[2]={ia,ib};
+    for (int j=0;j<2;j++) {
+        const fish_t *p=&t->fish[parents[j]];
+        t->fish[slot].family.parents[j]=p->family.id;
+        memcpy(t->fish[slot].family.parent_names[j],p->name,8);
+        t->fish[slot].family.parent_body[j]=p->color; t->fish[slot].family.parent_accent[j]=p->accent;
+    }
     place_near_reef(t, &t->fish[slot]);
     t->fish[slot].hunger = 4; t->fish[slot].trust = 4;
     t->n_fish++;
@@ -314,7 +323,7 @@ int tank_add_fish(tank_t *t, int parent_a, int parent_b) {
  * was offered in, a temperament of its own (nobody's to inherit), and in at
  * the surface under the middle of the glass, as if poured from the bag */
 int tank_add_bought_fry(tank_t *t, uint32_t body, uint32_t accent) {
-    if (t->n_fish >= N_FISH_MAX || t->n_fish >= ROSTER_N) return -1;
+    if (t->fish_gift.journal.out_phase || t->fish_gift.journal.in_seq || t->n_fish >= N_FISH_MAX || t->n_fish >= ROSTER_N) return -1;
     int used[ROSTER_N] = {0};
     for (int i = 0; i < t->n_fish; i++) used[t->fish[i].preset] = 1;
     int free_n = 0, free_idx[ROSTER_N];
@@ -357,7 +366,12 @@ bool tank_remove_fish(tank_t *t, int idx) {
 }
 
 void tank_init(tank_t *t, uint32_t seed) {
+    t->gift = (gift_save_t){0};
+    t->fish_gift = (fish_gift_save_t){0}; t->roster_gen = 0;
     t->rng = seed ? seed : 0xC0FFEE;
+    t->bubble_up_x = 0; t->bubble_up_y = -1;
+    t->water_push = 0; t->motion_inverted = false; t->low_battery = false; t->battery_recovery_s = 0;
+    for (int b = 0; b < VEG_BEDS_MAX; b++) t->veg_bend[b] = t->veg_velocity[b] = 0;
     t->n_fish = 0;                 /* progression_boot restores or calls tank_new_population */
     for (int i = 0; i < MAX_FOOD; i++) t->food[i].alive = false;
     t->bubble_x = BUBBLE_X_DEFAULT; t->bubble_y = TANK_BOT * 0.5f;   /* matches gen_traces.py; setup may move x */
@@ -377,7 +391,7 @@ void tank_init(tank_t *t, uint32_t seed) {
     t->light_override = false; t->light_on = true;
     t->hold_active = false; t->hold_time = 0; t->hold_approached = false;
     t->tap_count = 0; t->tap_burst_t = 99; t->startled = false;
-    t->startle_cooldown = 0;
+    t->startle_cooldown = 0; t->shake_startled = false;
     t->feed_spot_x = -1; t->player_feedings = 0; t->feed_open = false; t->hold_approaches = 0; t->greet_timer = 0;
     t->courting = false; t->court_a = t->court_b = -1;
     t->court_cool = 30; t->court_active = 0;
@@ -599,6 +613,71 @@ int tank_nursery_bed(const tank_t *t) {
         if (t->veg_growth[b] >= VEG_NURSERY && (best < 0 || t->veg_growth[b] > t->veg_growth[best])) best = b;
     return best;
 }
+/* Transient spring motion: each bed has a slightly different period. */
+void tank_set_water_motion(tank_t *t, float ux, float uy, float push, bool inverted) {
+    if (inverted != t->motion_inverted) {
+        for (int b = 0; b < VEG_BEDS_MAX; b++) {
+            t->veg_bend[b] = -t->veg_bend[b];
+            t->veg_velocity[b] = -t->veg_velocity[b];
+        }
+    }
+    t->motion_inverted = inverted;
+    t->bubble_up_x = ux; t->bubble_up_y = uy;
+    t->water_push = clampf(push, -1.5f, 1.5f);
+}
+static void veg_motion_tick(tank_t *t, float dt) {
+    /* Substeps keep the spring stable during a slow frame or console command. */
+    float left = clampf(dt, 0, .25f);
+    while (left > 0) {
+        float h = fminf(left, .01f); left -= h;
+        for (int b = 0; b < VEG_BEDS_MAX; b++) {
+            float spring = b == 3 ? 20 : 13 + b * 2;
+            float target = t->bubble_up_x * (b == 3 ? .45f : .8f);
+            float accel = spring * (target - t->veg_bend[b])
+                        - (b == 3 ? 5 : 3.6f) * t->veg_velocity[b]
+                        - t->water_push * (b == 3 ? 8 : 14);
+            t->veg_velocity[b] = clampf(t->veg_velocity[b] + accel*h, -5, 5);
+            t->veg_bend[b] += t->veg_velocity[b]*h;
+            if (fabsf(t->veg_bend[b]) > 1.2f) {
+                t->veg_bend[b] = clampf(t->veg_bend[b], -1.2f, 1.2f);
+                t->veg_velocity[b] = 0;
+            }
+        }
+    }
+}
+static float veg_sin(float x) {
+    static float lut[256]; static bool filled;
+    if (!filled) { for (int i = 0; i < 256; i++) lut[i] = sinf(i * (TAU / 256)); filled = true; }
+    return lut[(int)(x * (256.0f / TAU)) & 255];
+}
+void tank_veg_shape_at(const tank_t *t, int b, int i, veg_shape_t *s, float clock) {
+    static const int seeds[VEG_BEDS_MAX] = {0, 7, 3, 5};
+    float bx;
+    s->segs = tank_veg_frond(t, b, i, &bx);
+    if (s->segs < 1) s->segs = 1;
+    if (s->segs > VEG_MAX_SEGS) s->segs = VEG_MAX_SEGS;
+    s->sword = tank_veg_kind(t, b) == VEG_KIND_SWORD;
+    s->bottom = (int)(TANK_BOT - 16 + VEG_SEG_RY);
+    s->top = (int)(TANK_BOT - 16 - (s->segs - 1)*VEG_SEG_DY - VEG_SEG_RY);
+    if (s->top < 0) s->top = 0;
+    float phase = i + seeds[b];
+    float sway = veg_sin(clock * (s->sword ? .6f : .9f) + phase*1.7f);
+    for (int k = 0; k <= s->segs; k++) {
+        float height = k * VEG_SEG_DY;
+        float u = height / ((VEG_SEGS_FULL - 1)*VEG_SEG_DY);
+        /* Absolute height, not fraction of current blade length: cutting a
+         * tip does not suddenly move the remaining stem sideways. */
+        float bend = t->veg_bend[b] * height * (.12f + .20f*u);
+        float wave = sway * (s->sword ? 5 : 8) * u
+                   * veg_sin(k*.4f + clock*.6f + phase);
+        s->x[k] = bx + bend + wave;
+    }
+}
+
+void tank_veg_shape(const tank_t *t, int b, int i, veg_shape_t *s) {
+    tank_veg_shape_at(t, b, i, s, t->clock);
+}
+
 /* where the pair circles: low inside the nursery bed, a flat loop that weaves
  * the fronds (body centre ~14 px off the floor line) */
 static void court_site(const tank_t *t, float *cx, float *cy, float *rx) {
@@ -705,13 +784,13 @@ void tank_veg_set(tank_t *t, int b, float g) {
 /* is (x,y) within `side` px of some frond of bed b sideways, and no more than
  * `up` px above its tip? The slash arms only from here. */
 static bool veg_near_frond(const tank_t *t, int b, float x, float y, float side, float up) {
-    float x0, x1; int n;
-    tank_veg_bed(t, b, &x0, &x1, NULL, &n);
-    if (x < x0 - side || x > x1 + side) return false;
+    int n; tank_veg_bed(t, b, NULL, NULL, NULL, &n);
     for (int i = 0; i < n; i++) {
-        float fx; int segs = tank_veg_frond(t, b, i, &fx);
-        float tip = TANK_BOT - 16 - segs * VEG_SEG_PX;
-        if (fabsf(x - fx) <= side && y >= tip - up) return true;
+        veg_shape_t shape; tank_veg_shape(t, b, i, &shape);
+        if (y < shape.top - up || y > shape.bottom + side) continue;
+        int row = (int)clampf(y, shape.top, shape.bottom);
+        float cx, half; tank_veg_span(&shape, row, &cx, &half);
+        if (x >= (int)(cx-half)-side && x <= (int)(cx+half)+side) return true;
     }
     return false;
 }
@@ -746,37 +825,61 @@ void tank_reef_spot(const tank_t *t, float *x, float *y) {
     } else { *x = t->reef_x; *y = t->reef_y; }
 }
 
-/* the scissors: cut every frond whose spine the stroke segment (x0,y0)-(x1,y1)
- * crosses, to the height where it crosses (only ever DOWN, never below nubs).
- * The segment reaches SLASH_REACH_PX past its far end - the finger is a pad,
- * not a point, and the frond just ahead of the reported point at lift is
- * under it (mid-stroke the next segment crosses that frond anyway, at the
- * same height); `landing` (the retroactive first segment of a stroke) reaches
- * the same distance back past its start, for the frond under the finger as
- * it touched down. A frond in the reach is cut at the height of that end.
- * Returns the number of fronds cut. */
+/* Clip a stroke to the visible pixel row and test its horizontal span.
+ * This includes the blade's width, not just an imaginary centre line. */
+static bool veg_stroke_row(float x0, float y0, float x1, float y1,
+                           int row, int lo, int hi, float *hit_x) {
+    float dy = y1-y0, a = 0, z = 1;
+    if (fabsf(dy) < .0001f) {
+        if (y0 < row-.5f || y0 > row+.5f) return false;
+    } else {
+        float p = (row-.5f-y0)/dy, q = (row+.5f-y0)/dy;
+        a = fmaxf(0, fminf(p,q)); z = fminf(1, fmaxf(p,q));
+        if (a > z) return false;
+    }
+    float xa = x0+(x1-x0)*a, xb = x0+(x1-x0)*z;
+    if (fmaxf(xa,xb) < lo || fminf(xa,xb) > hi) return false;
+    *hit_x = clampf((xa+xb)*.5f, lo, hi);
+    return true;
+}
 static int veg_cut(tank_t *t, float x0, float y0, float x1, float y1, bool landing, int wall) {
     int cuts = 0;
-    float lo = x0 < x1 ? x0 : x1, hi = x0 < x1 ? x1 : x0;
-    if (x1 >= x0) hi += SLASH_REACH_PX; else lo -= SLASH_REACH_PX;
-    if (landing) { if (x1 >= x0) lo -= SLASH_REACH_PX; else hi += SLASH_REACH_PX; }
-    if (wall < 0 && x1 < x0 && x1 <= TANK_FX0 + SLASH_WALL_PX) lo = TANK_FX0;                  /* aimed at a wall frond (SLASH_WALL_SIDE_PX) */
-    if (wall > 0 && x1 > x0 && x1 >= TANK_FX1 - SLASH_WALL_PX) hi = TANK_FX1;
-    float dx = x1 - x0;
+    /* The fingertip can sweep the sand just below the visible roots. Keep
+     * the established floor-mowing gesture, snapping that pad to the root. */
+    float root_row = (int)(TANK_BOT-16+VEG_SEG_RY);
+    if (y0 > root_row && y0 <= TANK_BOT) y0 = root_row;
+    if (y1 > root_row && y1 <= TANK_BOT) y1 = root_row;
+    float sign = x1 >= x0 ? 1 : -1;
+    float reach = SLASH_REACH_PX;
+    if (wall < 0 && x1 < x0 && x1 <= TANK_FX0 + SLASH_WALL_PX) reach = x1 - TANK_FX0;
+    if (wall > 0 && x1 > x0 && x1 >= TANK_FX1 - SLASH_WALL_PX) reach = TANK_FX1 - x1;
     for (int b = 0; b < tank_veg_beds(t); b++) {
-        float bx0; int n; veg_bed_base(t, b, &bx0, &n);
+        int n; tank_veg_bed(t, b, NULL, NULL, NULL, &n);
         for (int i = 0; i < n; i++) {
-            float fx = bx0 + i * veg_pitch(b);
-            if (fx < lo || fx > hi) continue;
-            float u = fabsf(dx) > 0.001f ? clampf((fx - x0) / dx, 0, 1) : 0;
-            float cy = y0 + (y1 - y0) * u;
-            float hf = (TANK_BOT - 16 - cy) / ((VEG_SEGS_FULL - 1) * VEG_SEG_PX);
-            if (hf < VEG_NUB) hf = VEG_NUB;
-            if (hf >= t->veg_h[b][i]) continue;    /* the stroke passed above the tip */
-            t->trim_px += (t->veg_h[b][i] - hf) * (VEG_SEGS_FULL - 1) * VEG_PAY_PX;   /* the inches (sand dollars) */
+            veg_shape_t shape; tank_veg_shape(t, b, i, &shape);
+            float fx = 0, cy = 0; bool hit = false;
+            int bottom = (int)ceilf(fmaxf(y0,y1)+.5f);
+            int top = (int)floorf(fminf(y0,y1)-.5f);
+            if (bottom > shape.bottom) bottom = shape.bottom;
+            if (top < shape.top) top = shape.top;
+            for (int y = bottom; y >= top; y--) {
+                float cx, half; tank_veg_span(&shape, y, &cx, &half);
+                int lo = (int)(cx-half), hi = (int)(cx+half);
+                hit = veg_stroke_row(x0,y0,x1,y1,y,lo,hi,&fx)
+                   || veg_stroke_row(x1,y1,x1+sign*reach,y1,y,lo,hi,&fx)
+                   || (landing && veg_stroke_row(x0-sign*SLASH_REACH_PX,y0,x0,y0,y,lo,hi,&fx));
+                if (hit) { cy = (float)y; break; } /* lowest crossing wins */
+            }
+            if (!hit) continue;
+            /* Whole segments: the new visible tip is at/below the cut row,
+             * within one 3.2 px segment. Nubs are always protected. */
+            int segs = 1 + (int)floorf((TANK_BOT-16-VEG_SEG_RY-cy)/VEG_SEG_DY);
+            float hf = fmaxf(VEG_NUB, (segs-2+.001f)/(VEG_SEGS_FULL-2));
+            if (hf >= t->veg_h[b][i]) continue;
+            t->trim_px += (t->veg_h[b][i]-hf)*(VEG_SEGS_FULL-1)*VEG_PAY_PX;
             t->veg_h[b][i] = hf;
             cuts++;
-            int puffs = 2;                         /* cut leaves drift up */
+            int puffs = 2;
             for (int k = 0; k < MAX_BUBBLE && puffs > 0; k++) {
                 if (t->bubble[k].column) continue;
                 t->bubble[k].x = fx + tank_randf(t, -4, 4);
@@ -1957,6 +2060,61 @@ int tank_shrimp_tap(tank_t *t, float x, float y) {
     if (t->shrimp_taps == 3) tank_startle(t, x, y);
     return t->shrimp_taps;
 }
+void tank_update_battery(tank_t *t, float fraction, bool charging, float dt) {
+    if (fraction < 0 || fraction > 1) return; /* unavailable gauge */
+    if (charging) { t->low_battery=false; t->battery_recovery_s=0; }
+    else if (fraction <= .15f) { t->low_battery=true; t->battery_recovery_s=0; }
+    else if (t->low_battery) {
+        t->battery_recovery_s += fmaxf(0,dt);
+        if (t->battery_recovery_s >= 30) { t->low_battery=false; t->battery_recovery_s=0; }
+    }
+}
+
+bool tank_fish_sheltering(const tank_t *t, int fish) {
+    return t->low_battery && !t->startled && fish != t->stage_fish;
+}
+void tank_shelter_target(const tank_t *t, int fish, float *x, float *y) {
+    float xs[VEG_BEDS_MAX+2], ys[VEG_BEDS_MAX+2]; int count=0;
+    /* Coral refuges first so even a small school uses purchased cover. */
+    if (t->sd_unlocks & SD_ITEM_CORAL) {
+        xs[count]=tank_decor_x(t,3); ys[count++]=TANK_BOT-38;
+    }
+    if (t->sd_unlocks & SD_ITEM_CLUSTER) {
+        xs[count]=tank_decor_x(t,4)-12; ys[count++]=TANK_BOT-55;
+    }
+    for (int b=0;b<tank_veg_beds(t);b++) {
+        int n; tank_veg_bed(t,b,NULL,NULL,NULL,&n);
+        int best=-1;
+        for(int j=0;j<n;j++) {
+            int i=(j+fish*3)%n;
+            if(t->veg_h[b][i]>=VEG_BARE && (best<0 || t->veg_h[b][i]>t->veg_h[b][best])) best=i;
+        }
+        if(best<0) continue;
+        veg_shape_t shape; tank_veg_shape(t,b,best,&shape);
+        float cy=clampf(shape.top+24,TANK_BOT*.60f,TANK_BOT-28);
+        float cx,half; tank_veg_span(&shape,(int)cy,&cx,&half);
+        xs[count]=cx; ys[count++]=cy;
+    }
+    if(count) { int slot=fish%count; *x=xs[slot]; *y=ys[slot]; }
+    else { *x=t->reef_x+fish*28; *y=TANK_BOT-40; } /* trimmed / empty garden */
+    *x=clampf(*x,30,TANK_W-30);
+    *y=clampf(*y,TANK_BOT*.60f,TANK_BOT-28);
+}
+
+void tank_shake(tank_t *t) {
+    tank_handled(t);
+    t->shake_startled = t->startled = true;
+    t->startle_x = TANK_W*.5f; t->startle_y = TANK_H*.5f;
+    t->startle_cooldown = 2.5f; /* stress outlasts the scatter reflex */
+    /* Cancel an unfinished double tap rather than toggling lights later. */
+    t->tap_count = 0;
+    for (int i=0;i<t->n_fish;i++) {
+        fish_t *f = &t->fish[i];
+        f->stress = fminf(10, f->stress + 4.0f);
+    }
+    tank_emit(TEV_SPOOK, -1);
+}
+
 void tank_touch_tap(tank_t *t, float x, float y) {
     tank_handled(t);
     if (t->tool != TOOL_HAND) return;            /* a tool in hand: no feed, no light, no startle - DONE first (2026-10-04) */
@@ -1988,7 +2146,7 @@ static void touch_tick(tank_t *t, float dt) {
     if (t->tap_count >= 3 && t->tap_burst_t > TAP_WINDOW) t->tap_count = 0;
     if (t->startled) {
         t->startle_cooldown -= dt;
-        if (t->startle_cooldown <= 0) { t->startled = false; t->tap_count = 0; }
+        if (t->startle_cooldown <= 0) { t->startled = false; t->shake_startled = false; t->tap_count = 0; }
     }
     if (t->hold_active) {                           /* calm presence earns trust */
         float was = t->hold_time;
@@ -2457,10 +2615,10 @@ static void update_fish(tank_t *t, int idx, float dt) {
     float touch_speed = -1;
     if (t->startled && f->goal.id != GOAL_FLEE_SHADOW) {
         float d = tank_dist(f->x, f->y, t->startle_x, t->startle_y);
-        if (d < STARTLE_RADIUS * 1.6f) {
+        if (t->shake_startled || d < STARTLE_RADIUS * 1.6f) {
             float away = atan2f(f->y - t->startle_y, f->x - t->startle_x);
-            desired = norm_ang(desired + norm_ang(away - desired) * 0.85f);
-            touch_speed = lerpf(55, 90, f->bold);
+            desired = norm_ang(desired + norm_ang(away - desired) * (t->shake_startled ? .35f : .85f));
+            touch_speed = t->shake_startled ? lerpf(28, 42, f->bold) : lerpf(55, 90, f->bold);
         }
     } else if (idx == t->stage_fish) {
         /* on stage (setup): a lazy figure-of-eight round the page's clear
@@ -2472,6 +2630,13 @@ static void update_fish(tank_t *t, int idx, float dt) {
         float to = atan2f(wy - f->y, wx - f->x);
         desired = norm_ang(desired + norm_ang(to - desired) * 0.85f);
         touch_speed = tank_dist(f->x, f->y, t->stage_x, t->stage_y) > 80 ? 44 : 20;
+    } else if (tank_fish_sheltering(t,idx)) {
+        float sx,sy; tank_shelter_target(t,idx,&sx,&sy);
+        sx += sinf(t->clock*.35f+idx*1.7f)*4;
+        sy += sinf(t->clock*.28f+idx)*2;
+        float d=tank_dist(f->x,f->y,sx,sy);
+        desired=atan2f(sy-f->y,sx-f->x);
+        touch_speed=d>40 ? 28 : d>10 ? 12 : 2;
     } else if (t->spawning && (idx == t->court_a || idx == t->court_b) &&
                f->goal.id != GOAL_FLEE_SHADOW && !(t->ravenous && f->hunger > 6.5f)) {
         /* the spawning (2026-09-24): the courtship that ends in a fry. It
@@ -2545,7 +2710,8 @@ static void update_fish(tank_t *t, int idx, float dt) {
             float d = tank_dist(f->x, f->y, t->fish[i].x, t->fish[i].y), r = 36 * f->size;
             if (d < r) {
                 float away = atan2f(f->y - t->fish[i].y, f->x - t->fish[i].x);
-                desired = norm_ang(desired + norm_ang(away - desired) * (0.35f + 0.5f * (1 - d / r)));
+                desired = norm_ang(desired + norm_ang(away - desired) * (0.35f + 0.5f * (1 - d / r))
+                                   * (tank_fish_sheltering(t,idx) ? .2f : 1));
             }
         }
 
@@ -2682,6 +2848,7 @@ static uint32_t state_signature(const tank_t *t, int idx) {
 
 void tank_tick(tank_t *t, float dt, advisor_fn advise) {
     t->clock += dt;
+    veg_motion_tick(t, dt);
     /* the light: on while the device is handled, off LIGHT_IDLE_S after the
      * last touch or movement (tank_handled) - a tank left on the desk goes
      * dark and the fish sleep. A setup page or a prompt holds it on; the
@@ -2703,10 +2870,17 @@ void tank_tick(tank_t *t, float dt, advisor_fn advise) {
         if (!p->alive) continue;
         live_food++;
         p->age += dt;
-        if (p->y < FOOD_FLOOR_Y) {
-            p->y += 8 * dt;
-            p->x += sinf(p->age * 1.5f) * dt * 2;
-        } else p->floor_s += dt;                        /* resting on the floor (FOOD_FLOOR_S) */
+        /* Gravity follows the sensor; floor lifetime stays upstream's so
+         * the shrimp school can eat settled pellets. */
+        float gx = -t->bubble_up_x, gy = -t->bubble_up_y;
+        float nx = clampf(p->x + gx * 8 * dt, 4, TANK_W - 4);
+        float ny = clampf(p->y + gy * 8 * dt, 4, FOOD_FLOOR_Y);
+        if (fabsf(nx - p->x) + fabsf(ny - p->y) > .00001f) {
+            float drift = sinf(p->age * 1.5f) * dt * 2;
+            p->x = clampf(nx + gy * drift, 4, TANK_W - 4);
+            p->y = clampf(ny - gx * drift, 4, FOOD_FLOOR_Y);
+        }
+        if (p->y >= FOOD_FLOOR_Y && gy > 0) p->floor_s += dt;
         if (p->floor_s > 0 ? p->floor_s > FOOD_FLOOR_S : p->age > FOOD_LIFE_S) p->alive = false;
     }
     /* the tank's own trickle keeps fish alive when nobody is home (never
@@ -2743,16 +2917,31 @@ void tank_tick(tank_t *t, float dt, advisor_fn advise) {
     seahorse_tick(t, dt);
     shrimp_tick(t, dt);
 
-    /* bubbles rise */
+    /* Buoyancy follows screen-space up. Wobble is perpendicular to it.
+     * The aerator stays attached to the tank floor, even upside down. */
     for (int i = 0; i < MAX_BUBBLE; i++) {
         bubble_t *b = &t->bubble[i];
         b->wobble += dt * 2.5f;
-        b->y -= b->vy * dt;
-        b->x += sinf(b->wobble) * dt * (b->column ? 9 : 4);
-        if (b->y < -6) {
-            b->y = TANK_BOT + tank_randf(t, 4, 24);
-            b->x = b->column ? t->bubble_x + tank_randf(t, -10, 10)
-                             : tank_randf(t, TANK_FX0 + 12, TANK_FX1 - 12);
+        float drift = sinf(b->wobble) * (b->column ? 9 : 4);
+        b->x += (t->bubble_up_x * b->vy - t->bubble_up_y * drift) * dt;
+        b->y += (t->bubble_up_y * b->vy + t->bubble_up_x * drift) * dt;
+        if (b->x < -6 || b->x > TANK_W + 6 || b->y < -6 || b->y > TANK_H + 6) {
+            if (b->column) {
+                b->x = t->bubble_x + tank_randf(t, -10, 10);
+                b->y = TANK_H - 17;  /* the visible aerator */
+            } else {
+                /* Enter from the downstream edge; choose edges in proportion
+                 * to their incoming flux so diagonals populate the whole tank. */
+                float horizontal = fabsf(t->bubble_up_x) * TANK_H;
+                float vertical = fabsf(t->bubble_up_y) * TANK_W;
+                if (tank_randf(t, 0, horizontal + vertical) < horizontal) {
+                    b->x = t->bubble_up_x > 0 ? 0 : TANK_W;
+                    b->y = tank_randf(t, 12, TANK_H - 12);
+                } else {
+                    b->x = tank_randf(t, 12, TANK_W - 12);
+                    b->y = t->bubble_up_y < 0 ? TANK_H : 0;
+                }
+            }
         }
     }
 

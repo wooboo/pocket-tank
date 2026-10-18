@@ -1,0 +1,322 @@
+Firmware: 889d2eb
+A: /dev/cu.usbmodem311401; B: /dev/cu.usbmodem311101
+PASS: declined gift returned; minimum two fish; interrupted offer resumed; accepted and returned help; original rosters 5/2 and balances 156/81 restored. No debug staging or save rollback.
+
+COMMAND 0: friends close
+COMMAND 1: friends close
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (10863) director: fish count=5 out=0 in=0 offered=0 name=-
+0: I (10863) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=156 out=0 in=0
+1: I (10999) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (11000) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=81 out=0 in=0
+1: I (11003) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (11008) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=81 out=0 in=0
+COMMAND 0: friends open
+COMMAND 1: friends open
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (10867) director: fish count=5 out=0 in=0 offered=0 name=-
+0: I (10872) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=156 out=0 in=0
+0: I (10947) director: fish count=5 out=0 in=0 offered=0 name=-
+1: I (11115) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (11119) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=81 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+0: I (10951) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=156 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+0: I (10962) director: fish count=5 out=0 in=0 offered=0 name=-
+0: I (10968) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=156 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+1: I (11130) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (11136) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=81 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (11904) director: fish count=5 out=0 in=0 offered=0 name=-
+0: I (11905) director: friends active=1 page=2 code=000000 peer=0000000000000000 balance=156 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (12120) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (12121) director: friends active=1 page=2 code=000000 peer=0000000000000000 balance=81 out=0 in=0 CONNECTING TO NEARBY TANK
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (12923) director: fish count=5 out=0 in=0 offered=0 name=-
+0: I (12924) director: friends active=1 page=1 code=010763 peer=0000000000000000 balance=156 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (13156) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (13156) director: friends active=1 page=1 code=010763 peer=0000000000000000 balance=81 out=0 in=0 CONNECTING TO NEARBY TANK
+COMMAND 0: friends confirm
+COMMAND 1: friends confirm
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (13084) director: fish count=5 out=0 in=0 offered=0 name=-
+0: I (13084) director: friends active=1 page=2 code=010763 peer=0000000000000000 balance=156 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (13089) director: fish count=5 out=0 in=0 offered=0 name=-
+1: I (13232) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (13233) director: friends active=1 page=2 code=010763 peer=0000000000000000 balance=81 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (13238) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (13243) director: friends active=1 page=2 code=010763 peer=0000000000000000 balance=81 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (13095) director: friends active=1 page=2 code=010763 peer=0000000000000000 balance=156 out=0 in=0 WAITING FOR YOUR FRIEND
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (14230) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (14231) director: friends active=1 page=3 code=010763 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (14112) director: fish count=5 out=0 in=0 offered=0 name=-
+0: I (14112) director: friends active=1 page=3 code=010763 peer=2c59b054d853a61f balance=156 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+COMMAND 0: friends roster
+0: I (14190) director: roster 0 name=dolt id=0000000000000000:0 age=237081.1 body=f48fb1 accent=ffe08a paid=15 parents=,
+0: I (14191) director: roster 1 name=zori id=0000000000000000:0 age=237081.1 body=78d67d accent=ffbd59 paid=15 parents=,
+0: I (14200) director: roster 2 name=chip id=0000000000000000:0 age=235293.6 body=f48fb1 accent=ffbd59 paid=15 parents=,
+0: I (14210) director: roster 3 name=gira id=0000000000000000:0 age=231208.0 body=f48fb1 accent=ffbd59 paid=15 parents=,
+0: I (14221) director: roster 4 name=help id=0000000000000000:0 age=213152.4 body=f48fb1 accent=ffbd59 paid=7 parents=,
+0: I (14231) director: fish count=5 out=0 in=0 offered=0 name=-
+0: I (14236) director: friends active=1 page=3 code=010763 peer=2c59b054d853a61f balance=156 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+COMMAND 1: friends roster
+1: I (16382) director: roster 0 name=nori id=0000000000000000:0 age=3090.5 body=a799ff accent=78d67d paid=1 parents=,
+1: I (16383) director: roster 1 name=sol id=0000000000000000:0 age=3090.5 body=f48fb1 accent=ffe08a paid=1 parents=,
+1: I (16392) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (16397) director: friends active=1 page=3 code=010763 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+COMMAND 1: friends fish 0
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (18420) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (18420) director: friends active=1 page=3 code=010763 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 TWO FISH MUST STAY HERE
+0: I (18289) director: fish count=5 out=0 in=0 offered=0 name=-
+0: I (18289) director: friends active=1 page=3 code=010763 peer=2c59b054d853a61f balance=156 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (18425) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (18430) director: friends active=1 page=3 code=010763 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 TWO FISH MUST STAY HERE
+COMMAND 0: friends fish 4
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (18503) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (18503) director: friends active=1 page=3 code=010763 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 TWO FISH MUST STAY HERE
+0: I (18398) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (18398) director: friends active=1 page=3 code=010763 peer=2c59b054d853a61f balance=156 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (18404) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (18409) director: friends active=1 page=3 code=010763 peer=2c59b054d853a61f balance=156 out=0 in=0 WAITING FOR YOUR FRIEND
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (19362) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (19363) director: friends active=1 page=3 code=010763 peer=2c59b054d853a61f balance=156 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (19532) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (19533) director: friends active=1 page=3 code=010763 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 TWO FISH MUST STAY HERE
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (20417) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (20418) director: friends active=1 page=3 code=010763 peer=2c59b054d853a61f balance=156 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (20565) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (20565) director: friends active=1 page=3 code=010763 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 TWO FISH MUST STAY HERE
+1: I (20839) friends: fish op 1 seq 1 reply 1 count 2
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (21466) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (21467) director: friends active=1 page=3 code=010763 peer=2c59b054d853a61f balance=156 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (21683) director: fish count=2 out=0 in=0 offered=1 name=help
+1: I (21688) director: friends active=1 page=3 code=010763 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 A FISH FOR YOUR AQUARIUM
+COMMAND 1: friends decline
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (21599) director: fish count=4 out=1 in=0 offered=0 name=-
+1: I (21761) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (21762) director: friends active=1 page=3 code=010763 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 A FISH FOR YOUR AQUARIUM
+0: I (21600) director: friends active=1 page=3 code=010763 peer=2c59b054d853a61f balance=156 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (21614) friends: fish op 5 seq 1 reply 0 count 5
+1: I (21774) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (21779) director: friends active=1 page=3 code=010763 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 A FISH FOR YOUR AQUARIUM
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (22595) director: fish count=5 out=0 in=0 offered=0 name=-
+1: I (22739) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (22740) director: friends active=1 page=3 code=010763 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 A FISH FOR YOUR AQUARIUM
+COMMAND 0: friends fish 4
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (22596) director: friends active=1 page=3 code=010763 peer=2c59b054d853a61f balance=156 out=0 in=0 FISH RETURNED TO YOUR TANK
+0: I (22632) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (22633) director: friends active=1 page=3 code=010763 peer=2c59b054d853a61f balance=156 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (22638) director: fish count=4 out=1 in=0 offered=0 name=-
+1: I (22808) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (22808) director: friends active=1 page=3 code=010763 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 A FISH FOR YOUR AQUARIUM
+0: I (22643) director: friends active=1 page=3 code=010763 peer=2c59b054d853a61f balance=156 out=0 in=0 WAITING FOR YOUR FRIEND
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (23668) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (23668) director: friends active=1 page=3 code=010763 peer=2c59b054d853a61f balance=156 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (23837) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (23838) director: friends active=1 page=3 code=010763 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 A FISH FOR YOUR AQUARIUM
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (24868) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (24868) director: friends active=1 page=3 code=010763 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 A FISH FOR YOUR AQUARIUM
+0: I (24748) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (24749) director: friends active=1 page=3 code=010763 peer=2c59b054d853a61f balance=156 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (25281) friends: fish op 1 seq 2 reply 1 count 2
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (25890) director: fish count=2 out=0 in=0 offered=2 name=help
+1: I (25891) director: friends active=1 page=3 code=010763 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 A FISH FOR YOUR AQUARIUM
+COMMAND 0: friends close
+COMMAND 1: friends close
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (25780) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (25781) director: friends active=1 page=3 code=010763 peer=2c59b054d853a61f balance=156 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (25844) friends: Bluetooth stopped; free internal heap 77255
+0: I (25844) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (25844) director: friends active=0 page=3 code=010763 peer=0000000000000000 balance=156 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (25855) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (25860) director: friends active=0 page=3 code=010763 peer=0000000000000000 balance=156 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (26016) director: friends active=0 page=3 code=010763 peer=0000000000000000 balance=81 out=0 in=0 A FISH FOR YOUR AQUARIUM
+1: I (26027) director: fish count=2 out=0 in=0 offered=0 name=help
+1: I (26032) director: friends active=0 page=3 code=010763 peer=0000000000000000 balance=81 out=0 in=0 A FISH FOR YOUR AQUARIUM
+COMMAND 0: friends open
+COMMAND 1: friends open
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (26125) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (26130) director: friends active=1 page=0 code=010763 peer=0000000000000000 balance=81 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+1: I (26142) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (26147) director: friends active=1 page=0 code=010763 peer=0000000000000000 balance=81 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+0: I (26040) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (26046) director: friends active=1 page=0 code=010763 peer=0000000000000000 balance=156 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+0: I (26057) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (26062) director: friends active=1 page=0 code=010763 peer=0000000000000000 balance=156 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (27110) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (27110) director: friends active=1 page=2 code=010763 peer=0000000000000000 balance=81 out=0 in=0 CONNECTING TO NEARBY TANK
+0: I (26999) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (26999) director: friends active=1 page=2 code=010763 peer=0000000000000000 balance=156 out=0 in=0 CONNECTING TO NEARBY TANK
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (27940) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (27940) director: friends active=1 page=1 code=210223 peer=0000000000000000 balance=156 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (28174) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (28175) director: friends active=1 page=1 code=210223 peer=0000000000000000 balance=81 out=0 in=0 CONNECTING TO NEARBY TANK
+COMMAND 0: friends confirm
+COMMAND 1: friends confirm
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (28242) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (28243) director: friends active=1 page=2 code=210223 peer=0000000000000000 balance=81 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (28248) director: fish count=2 out=0 in=0 offered=0 name=-
+0: I (28095) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (28095) director: friends active=1 page=2 code=210223 peer=0000000000000000 balance=156 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (28100) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (28106) director: friends active=1 page=2 code=210223 peer=0000000000000000 balance=156 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (28253) director: friends active=1 page=2 code=210223 peer=0000000000000000 balance=81 out=0 in=0 WAITING FOR YOUR FRIEND
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (29135) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (29136) director: friends active=1 page=3 code=210223 peer=2c59b054d853a61f balance=156 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (29317) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (29317) director: friends active=1 page=3 code=210223 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (29383) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (29384) director: friends active=1 page=3 code=210223 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (29246) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (29247) director: friends active=1 page=3 code=210223 peer=2c59b054d853a61f balance=156 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (30400) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (30400) director: friends active=1 page=3 code=210223 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (30282) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (30283) director: friends active=1 page=3 code=210223 peer=2c59b054d853a61f balance=156 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (31413) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (31414) director: friends active=1 page=3 code=210223 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (31296) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (31296) director: friends active=1 page=3 code=210223 peer=2c59b054d853a61f balance=156 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (31548) friends: fish op 1 seq 2 reply 1 count 2
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (32272) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (32272) director: friends active=1 page=3 code=210223 peer=2c59b054d853a61f balance=156 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (32470) director: fish count=2 out=0 in=0 offered=2 name=help
+1: I (32471) director: friends active=1 page=3 code=210223 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 A FISH FOR YOUR AQUARIUM
+COMMAND 1: friends accept
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (32350) director: fish count=4 out=1 in=0 offered=0 name=-
+0: I (32350) director: friends active=1 page=3 code=210223 peer=2c59b054d853a61f balance=156 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (32566) director: fish count=2 out=0 in=2 offered=0 name=-
+1: I (32567) director: friends active=1 page=3 code=210223 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 RECEIVING YOUR NEW FISH
+1: I (32578) director: fish count=2 out=0 in=2 offered=0 name=-
+1: I (32584) director: friends active=1 page=3 code=210223 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 RECEIVING YOUR NEW FISH
+0: I (32462) friends: fish op 2 seq 2 reply 3 count 4
+1: I (32682) friends: fish op 3 seq 2 reply 4 count 3
+0: I (32562) friends: fish op 4 seq 2 reply 0 count 4
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (33406) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (33407) director: friends active=1 page=3 code=210223 peer=2c59b054d853a61f balance=156 out=0 in=0 FISH DELIVERED
+1: I (33589) director: fish count=3 out=0 in=0 offered=0 name=-
+1: I (33589) director: friends active=1 page=3 code=210223 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 FISH RECEIVED. WELCOME HOME
+COMMAND 1: friends roster
+1: I (33670) director: roster 0 name=nori id=2c59b054d853a61f:1 age=3107.8 body=a799ff accent=78d67d paid=1 parents=,
+1: I (33671) director: roster 1 name=sol id=2c59b054d853a61f:2 age=3107.8 body=f48fb1 accent=ffe08a paid=1 parents=,
+1: I (33680) director: roster 2 name=help id=cadb9a72f3f25d16:5 age=213158.5 body=f48fb1 accent=ffbd59 paid=7 parents=dolt,zori
+1: I (33691) director: fish count=3 out=0 in=0 offered=0 name=-
+1: I (33696) director: friends active=1 page=3 code=210223 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 FISH RECEIVED. WELCOME HOME
+COMMAND 1: friends fish 2
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (35537) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (35537) director: friends active=1 page=3 code=210223 peer=2c59b054d853a61f balance=156 out=0 in=0 FISH DELIVERED
+1: I (35784) director: fish count=2 out=1 in=0 offered=0 name=-
+1: I (35784) director: friends active=1 page=3 code=210223 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (35790) director: fish count=2 out=1 in=0 offered=0 name=-
+1: I (35795) director: friends active=1 page=3 code=210223 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 WAITING FOR YOUR FRIEND
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (36695) director: fish count=2 out=1 in=0 offered=0 name=-
+1: I (36696) director: friends active=1 page=3 code=210223 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (36580) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (36581) director: friends active=1 page=3 code=210223 peer=2c59b054d853a61f balance=156 out=0 in=0 FISH DELIVERED
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (37734) director: fish count=2 out=1 in=0 offered=0 name=-
+1: I (37734) director: friends active=1 page=3 code=210223 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (37606) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (37606) director: friends active=1 page=3 code=210223 peer=2c59b054d853a61f balance=156 out=0 in=0 FISH DELIVERED
+0: I (38001) friends: fish op 1 seq 1 reply 1 count 4
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (38561) director: fish count=4 out=0 in=0 offered=1 name=help
+0: I (38561) director: friends active=1 page=3 code=210223 peer=2c59b054d853a61f balance=156 out=0 in=0 A FISH FOR YOUR AQUARIUM
+1: I (38763) director: fish count=2 out=1 in=0 offered=0 name=-
+1: I (38763) director: friends active=1 page=3 code=210223 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 WAITING FOR YOUR FRIEND
+COMMAND 0: friends accept
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (38650) director: fish count=4 out=0 in=1 offered=0 name=-
+0: I (38651) director: friends active=1 page=3 code=210223 peer=2c59b054d853a61f balance=156 out=0 in=0 RECEIVING YOUR NEW FISH
+0: I (38663) director: fish count=4 out=0 in=1 offered=0 name=-
+0: I (38668) director: friends active=1 page=3 code=210223 peer=2c59b054d853a61f balance=156 out=0 in=0 RECEIVING YOUR NEW FISH
+1: I (38845) director: fish count=2 out=1 in=0 offered=0 name=-
+1: I (38846) director: friends active=1 page=3 code=210223 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (38877) friends: fish op 2 seq 1 reply 3 count 2
+0: I (38780) friends: fish op 3 seq 1 reply 4 count 5
+1: I (39059) friends: fish op 4 seq 1 reply 0 count 2
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (39644) director: fish count=5 out=0 in=0 offered=0 name=-
+0: I (39644) director: friends active=1 page=3 code=210223 peer=2c59b054d853a61f balance=156 out=0 in=0 FISH RECEIVED. WELCOME HOME
+1: I (39867) director: fish count=2 out=0 in=0 offered=0 name=-
+COMMAND 0: friends roster
+0: I (39722) director: roster 0 name=dolt id=cadb9a72f3f25d16:1 age=237106.2 body=f48fb1 accent=ffe08a paid=15 parents=,
+0: I (39723) director: roster 1 name=zori id=cadb9a72f3f25d16:2 age=237106.2 body=78d67d accent=ffbd59 paid=15 parents=,
+0: I (39732) director: roster 2 name=chip id=cadb9a72f3f25d16:3 age=235318.7 body=f48fb1 accent=ffbd59 paid=15 parents=dolt,zori
+1: I (39867) director: friends active=1 page=3 code=210223 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 FISH DELIVERED
+0: I (39743) director: roster 3 name=gira id=cadb9a72f3f25d16:4 age=231233.1 body=f48fb1 accent=ffbd59 paid=15 parents=dolt,zori
+0: I (39754) director: roster 4 name=help id=cadb9a72f3f25d16:5 age=213161.5 body=f48fb1 accent=ffbd59 paid=7 parents=dolt,zori
+0: I (39765) director: fish count=5 out=0 in=0 offered=0 name=-
+0: I (39770) director: friends active=1 page=3 code=210223 peer=2c59b054d853a61f balance=156 out=0 in=0 FISH RECEIVED. WELCOME HOME
+COMMAND 1: friends roster
+1: I (41940) director: roster 0 name=nori id=2c59b054d853a61f:1 age=3116.1 body=a799ff accent=78d67d paid=1 parents=,
+1: I (41941) director: roster 1 name=sol id=2c59b054d853a61f:2 age=3116.1 body=f48fb1 accent=ffe08a paid=1 parents=,
+1: I (41950) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (41955) director: friends active=1 page=3 code=210223 peer=cadb9a72f3f25d16 balance=81 out=0 in=0 FISH DELIVERED
+COMMAND 0: friends close
+COMMAND 1: friends close
+0: I (43773) friends: Bluetooth stopped; free internal heap 72671
+0: I (43773) director: fish count=5 out=0 in=0 offered=0 name=-
+0: I (43773) director: friends active=0 page=3 code=210223 peer=0000000000000000 balance=156 out=0 in=0 FISH RECEIVED. WELCOME HOME
+1: I (43969) friends: Bluetooth stopped; free internal heap 72683
+1: I (43970) director: fish count=2 out=0 in=0 offered=0 name=-
+1: I (43971) director: friends active=0 page=3 code=210223 peer=0000000000000000 balance=81 out=0 in=0 FISH DELIVERED

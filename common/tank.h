@@ -18,6 +18,8 @@
 #define POCKET_TANK_TANK_H
 
 #include <stdbool.h>
+#include "gift.h"
+#include "fish_gift.h"
 #include <stdint.h>
 
 #ifdef TANK_ROUND               /* the round 466 px glass (Waveshare 1.75C, 2026-10-01): the frame is the square around a bowl */
@@ -323,6 +325,9 @@ typedef struct {
      * parent_b's, bold / sociable the pair's average with a nudge. -1 = one
      * of the founding pair (or an older save). Saved per fish. */
     int8_t parent_a, parent_b;
+    double age_s;
+    float starve_s; /* transient hunger clock follows its fish when slots shift */
+    fish_family_t family;
 } fish_t;
 
 /* a pellet: it sinks ~43 s from the surface to the floor, then RESTS there
@@ -365,11 +370,19 @@ typedef struct {
 typedef struct { float x, y, vy, wobble; bool column; } bubble_t;
 
 typedef struct tank {
+    gift_save_t gift;
+    fish_gift_save_t fish_gift;
     fish_t   fish[N_FISH_MAX];
     int      n_fish;               /* live fish = fish[0..n_fish-1] */
     food_t   food[MAX_FOOD];
     bubble_t bubble[MAX_BUBBLE];
     float    bubble_x, bubble_y;   /* bubble column anchor */
+    float    bubble_up_x, bubble_up_y; /* transient screen-space unit vector; never saved */
+    float    water_push, veg_bend[VEG_BEDS_MAX], veg_velocity[VEG_BEDS_MAX];
+    float    battery_recovery_s; /* time continuously above shelter threshold */
+    bool     low_battery; /* transient: shelter until charging / gauge recovery */
+    bool     shake_startled; /* whole-school startle, unlike a local glass tap */
+    bool     motion_inverted; /* transient motion only; save format unchanged */
     float    reef_x, reef_y;
     float    clock;                /* seconds since start */
     bool     night;                /* the tank light is off: fish rest, the palette dims */
@@ -636,7 +649,7 @@ typedef struct tank {
                                     * milestones, settings, the shop) - a fry's spawning
                                     * waits, so the keeper never misses it (2026-09-24).
                                     * Set every frame; not saved. */
-    uint8_t  roster_gen;           /* ticks when a fish leaves and the slots shift (tank_remove_fish):
+    uint32_t roster_gen;           /* ticks when a fish leaves and the slots shift (tank_remove_fish):
                                     * the advisors drop what they were asked about the old slots.
                                     * Not saved. */
     int8_t   stage_fish;          /* setup: this fish is being named / coloured - it swims
@@ -792,6 +805,10 @@ void  tank_orient_lock(tank_t *t, bool lock);
 #endif
 void  tank_touch_hold(tank_t *t, float x, float y);
 void  tank_touch_tap(tank_t *t, float x, float y);
+void  tank_update_battery(tank_t *t, float fraction, bool charging, float dt);
+bool  tank_fish_sheltering(const tank_t *t, int fish);
+void  tank_shelter_target(const tank_t *t, int fish, float *x, float *y);
+void  tank_shake(tank_t *t); /* called only after sustained shaking is recognised */
 /* tank_touch_drag: call EVERY FRAME while a finger is down at x,y (moving or
  * not; tank.c tracks travel). Once a stroke has moved far enough it becomes a
  * WIPE: algae cells along the path are squeegeed clean. A mostly-HORIZONTAL
@@ -904,6 +921,29 @@ enum { SD_PAID_JUV = 1u << 0, SD_PAID_ADULT = 1u << 1, SD_PAID_ELDER = 1u << 2, 
  * every loop over beds runs to this. tank_veg_kind is the species (render). */
 int   tank_veg_beds(const tank_t *t);
 veg_kind_t tank_veg_kind(const tank_t *t, int b);
+#define VEG_SEG_DY VEG_SEG_PX
+#define VEG_SEG_RY 2.2f
+#define VEG_MAX_SEGS (VEG_SEGS_FULL + 5)
+typedef struct {
+    int segs, top, bottom;
+    bool sword;
+    float x[VEG_MAX_SEGS + 1];
+} veg_shape_t;
+/* One spine and pixel-row silhouette for drawing, drag arming and scissors. */
+void tank_veg_shape(const tank_t *t, int bed, int frond, veg_shape_t *shape);
+void tank_veg_shape_at(const tank_t *t, int bed, int frond, veg_shape_t *shape, float clock);
+static inline void tank_veg_span(const veg_shape_t *s, int y, float *cx, float *half) {
+    float sp = (TANK_BOT - 16 - y) / VEG_SEG_DY;
+    if (sp < 0) sp = 0;
+    if (sp > s->segs - 1) sp = (float)(s->segs - 1);
+    int k = (int)sp; float f = sp - k;
+    *cx = s->x[k] + (s->x[k + 1] - s->x[k]) * f;
+    float u = sp / (s->segs > 1 ? s->segs - 1 : 1);
+    *half = s->sword ? 1.2f + 6.0f * (u < .4f ? u/.4f : (1-u)/.6f)
+                     : 2.4f - 2.0f*u;
+    if (*half < .4f) *half = .4f;
+}
+void tank_set_water_motion(tank_t *t, float up_x, float up_y, float push, bool inverted);
 /* the purchases land: the sword plant at VEG_START on the open floor; the
  * snail on the glass, bottom left */
 void  tank_plant_place(tank_t *t);

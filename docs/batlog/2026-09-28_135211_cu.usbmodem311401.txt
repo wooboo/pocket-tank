@@ -1,0 +1,83 @@
+# pocket-tank preflight 2026-09-28_135211 on /dev/cu.usbmodem311401
+I (73642) batlog: 3 samples (h:mm since the first | SoC | VBAT | bright | state | mA since previous)
+I (73642) batlog:     0:00 |  95% | 4082 mV |   0 | asleep | bed
+I (73647) batlog:    34:43 |  94% | 4181 mV |  91 | awake  | boot      0.1 mA
+I (73653) batlog:    34:48 | 100% | 4168 mV |  91 | awake  |        -144.0 mA
+I (73660) batlog:   awake:  0.1 h, -12 mAh -> -144 mA average
+I (73665) batlog:   asleep: 34.7 h, 2.0 mAh -> 0.06 mA average
+I (73671) batlog:   (SoC is 1% = 2 mAh; short awake windows are coarse, a night is not)
+I (74762) batlog: 3 samples (h:mm since the first | SoC | VBAT | bright | state | mA since previous)
+I (74762) batlog:     0:00 |  95% | 4082 mV |   0 | asleep | bed
+I (74766) batlog:    34:43 |  94% | 4181 mV |  91 | awake  | boot      0.1 mA
+I (74773) batlog:    34:48 | 100% | 4168 mV |  91 | awake  |        -144.0 mA
+I (74780) batlog:   awake:  0.1 h, -12 mAh -> -144 mA average
+I (74785) batlog:   asleep: 34.7 h, 2.0 mAh -> 0.06 mA average
+I (74791) batlog:   (SoC is 1% = 2 mAh; short awake windows are coarse, a night is not)
+I (75774) batlog: 3 samples (h:mm since the first | SoC | VBAT | bright | state | mA since previous)
+I (75775) batlog:     0:00 |  95% | 4082 mV |   0 | asleep | bed
+I (75779) batlog:    34:43 |  94% | 4181 mV |  91 | awake  | boot      0.1 mA
+I (75786) batlog:    34:48 | 100% | 4168 mV |  91 | awake  |        -144.0 mA
+I (75792) batlog:   awake:  0.1 h, -12 mAh -> -144 mA average
+I (75798) batlog:   asleep: 34.7 h, 2.0 mAh -> 0.06 mA average
+I (75803) batlog:   (SoC is 1% = 2 mAh; short awake windows are coarse, a night is not)
+I (76863) batlog: 3 samples (h:mm since the first | SoC | VBAT | bright | state | mA since previous)
+I (76864) batlog:     0:00 |  95% | 4082 mV |   0 | asleep | bed
+I (76868) batlog:    34:43 |  94% | 4181 mV |  91 | awake  | boot      0.1 mA
+I (76875) batlog:    34:48 | 100% | 4168 mV |  91 | awake  |        -144.0 mA
+I (76882) batlog:   awake:  0.1 h, -12 mAh -> -144 mA average
+I (76887) batlog:   asleep: 34.7 h, 2.0 mAh -> 0.06 mA average
+I (76892) batlog:   (SoC is 1% = 2 mAh; short awake windows are coarse, a night is not)
+I (77677) director: 0 dolt   elder age 64.6h size 1.36 hunger 3.4 energy 8.6 stress 0.0 curiosity 0.1 trust 8.8 ms f3f  dart_play at 295,194
+I (77679) director: 1 zori   elder age 64.6h size 1.45 hunger 4.3 energy 10.0 stress 0.0 curiosity 0.0 trust 9.1 ms f3f  rest at 126,304
+I (77691) director: 2 chip   elder age 64.1h size 1.31 hunger 5.4 energy 10.0 stress 0.0 curiosity 0.0 trust 9.5 ms f3f  rest at 131,161
+I (77703) director: 3 gira   elder age 63.0h size 1.57 hunger 4.1 energy 10.0 stress 0.0 curiosity 0.0 trust 9.5 ms f3f  rest at 93,200
+I (77715) director: 4 help   elder age 58.0h size 1.25 hunger 3.6 energy 10.0 stress 0.0 curiosity 0.0 trust 8.1 ms f3f  rest at 193,276
+I (77727) director: pellets 0 | trickle on | ravenous 0 | night idle 76s | veg 0.18 0.24 0.16 | algae cells 0/644 | courting no | arrival -
+I (77739) director: sand dollars 802 (earned 1412) | shop: plant snail | colonies 103 | 1909.2 in trimmed
+I (77749) director: snail at 182,344 heading 90 deg | no target, cell -1 at -1,-1 (film 0) | 0 cells on the glass | 861 grazed so far
+I (77761) director: bed 0 fronds (x from 19, pitch 12): 0.21 0.20 0.19 0.18 0.18 0.18 0.17 0.17 0.17 0.17 0.17 0.17 0.17 0.17 0.17
+I (77772) director: bed 1 fronds (x from 376, pitch 12): 0.19 0.19 0.20 0.26 0.37
+I (77779) director: bed 2 fronds (x from 278, pitch 12): 0.13 0.13 0.14 0.14 0.16 0.17 0.19 0.19
+I (77788) director: bed 3 leaves (x from 220, pitch 14): 0.17 0.17 0.13 0.12
+I (77794) director: plant placed: centre x 241 (the keeper's), depth BEHIND the fish
+I (77802) director: castle placed: centre x 122 (the keeper's), BEHIND the grass
+I (77809) director: coral placed: centre x 233 (the keeper's), IN FRONT, colour 8a5be0, growth 0.58 of 1.25 (growing)
+I (77819) director: reef cluster placed: centre x 324 (the keeper's), BEHIND, look REEF, growth 0.27 of 2 (filling out)
+I (77830) director: nursery bed 1 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (77838) director: battery 100% on battery, VBAT 4121 mV | brightness 91/255 (level 60%)
+I (78700) director: 0 dolt   elder age 64.6h size 1.36 hunger 3.5 energy 8.6 stress 0.0 curiosity 0.1 trust 8.8 ms f3f  dart_play at 284,260
+I (78702) director: 1 zori   elder age 64.6h size 1.45 hunger 4.3 energy 10.0 stress 0.0 curiosity 0.0 trust 9.1 ms f3f  rest at 121,306
+I (78714) director: 2 chip   elder age 64.1h size 1.31 hunger 5.5 energy 10.0 stress 0.0 curiosity 0.0 trust 9.5 ms f3f  rest at 132,169
+I (78726) director: 3 gira   elder age 63.0h size 1.57 hunger 4.2 energy 10.0 stress 0.0 curiosity 0.0 trust 9.5 ms f3f  rest at 96,207
+I (78738) director: 4 help   elder age 58.0h size 1.25 hunger 3.6 energy 10.0 stress 0.0 curiosity 0.0 trust 8.1 ms f3f  rest at 196,274
+I (78750) director: pellets 0 | trickle on | ravenous 0 | night idle 77s | veg 0.18 0.24 0.16 | algae cells 0/644 | courting no | arrival -
+I (78762) director: sand dollars 802 (earned 1412) | shop: plant snail | colonies 103 | 1909.2 in trimmed
+I (78772) director: snail at 185,344 heading 90 deg | no target, cell -1 at -1,-1 (film 0) | 0 cells on the glass | 861 grazed so far
+I (78783) director: bed 0 fronds (x from 19, pitch 12): 0.21 0.20 0.19 0.18 0.18 0.18 0.17 0.17 0.17 0.17 0.17 0.17 0.17 0.17 0.17
+I (78795) director: bed 1 fronds (x from 376, pitch 12): 0.19 0.19 0.20 0.26 0.37
+I (78802) director: bed 2 fronds (x from 278, pitch 12): 0.13 0.13 0.14 0.14 0.16 0.17 0.19 0.19
+I (78811) director: bed 3 leaves (x from 220, pitch 14): 0.17 0.17 0.13 0.12
+I (78817) director: plant placed: centre x 241 (the keeper's), depth BEHIND the fish
+I (78825) director: castle placed: centre x 122 (the keeper's), BEHIND the grass
+I (78832) director: coral placed: centre x 233 (the keeper's), IN FRONT, colour 8a5be0, growth 0.58 of 1.25 (growing)
+I (78842) director: reef cluster placed: centre x 324 (the keeper's), BEHIND, look REEF, growth 0.27 of 2 (filling out)
+I (78853) director: nursery bed 1 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (78861) director: battery 100% on battery, VBAT 4123 mV | brightness 91/255 (level 60%)
+I (79775) director: 0 dolt   elder age 64.6h size 1.36 hunger 3.5 energy 8.5 stress 0.0 curiosity 0.1 trust 8.8 ms f3f  dart_play at 266,175
+I (79777) director: 1 zori   elder age 64.6h size 1.45 hunger 4.3 energy 10.0 stress 0.0 curiosity 0.0 trust 9.1 ms f3f  rest at 125,306
+I (79789) director: 2 chip   elder age 64.1h size 1.31 hunger 5.5 energy 10.0 stress 0.0 curiosity 0.0 trust 9.5 ms f3f  rest at 133,178
+I (79801) director: 3 gira   elder age 63.0h size 1.57 hunger 4.2 energy 10.0 stress 0.0 curiosity 0.0 trust 9.5 ms f3f  rest at 98,217
+I (79813) director: 4 help   elder age 58.0h size 1.25 hunger 3.7 energy 10.0 stress 0.0 curiosity 0.0 trust 8.1 ms f3f  rest at 194,276
+I (79825) director: pellets 0 | trickle on | ravenous 0 | night idle 78s | veg 0.18 0.24 0.16 | algae cells 0/644 | courting no | arrival -
+I (79837) director: sand dollars 802 (earned 1412) | shop: plant snail | colonies 103 | 1909.2 in trimmed
+I (79847) director: snail at 189,344 heading 90 deg | no target, cell -1 at -1,-1 (film 0) | 0 cells on the glass | 861 grazed so far
+I (79858) director: bed 0 fronds (x from 19, pitch 12): 0.21 0.20 0.19 0.18 0.18 0.18 0.17 0.17 0.17 0.17 0.17 0.17 0.17 0.17 0.17
+I (79870) director: bed 1 fronds (x from 376, pitch 12): 0.19 0.19 0.20 0.26 0.37
+I (79877) director: bed 2 fronds (x from 278, pitch 12): 0.13 0.13 0.14 0.14 0.16 0.17 0.19 0.19
+I (79885) director: bed 3 leaves (x from 220, pitch 14): 0.17 0.17 0.13 0.12
+I (79892) director: plant placed: centre x 241 (the keeper's), depth BEHIND the fish
+I (79900) director: castle placed: centre x 122 (the keeper's), BEHIND the grass
+I (79907) director: coral placed: centre x 233 (the keeper's), IN FRONT, colour 8a5be0, growth 0.58 of 1.25 (growing)
+I (79917) director: reef cluster placed: centre x 324 (the keeper's), BEHIND, look REEF, growth 0.27 of 2 (filling out)
+I (79928) director: nursery bed 1 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (79936) director: battery 100% on battery, VBAT 4126 mV | brightness 91/255 (level 60%)

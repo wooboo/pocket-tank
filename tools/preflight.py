@@ -1,4 +1,4 @@
-#!/Users/strato/.espressif/python_env/idf5.4_py3.13_env/bin/python
+#!/usr/bin/env python3
 """preflight.py - archive what the tank knows BEFORE anything resets it.
 
 Run before every flash (tools/flash.sh does), and any morning after a night
@@ -42,9 +42,9 @@ for cmd, secs in (("batlog", 4), ("state", 3)):
             lines.append(raw.decode("utf-8", "replace").rstrip())
 s.close()
 keep = [l for l in lines if "batlog:" in l or "director:" in l]
-if not any("director:" in l for l in keep):   # another board on that port, or the tank asleep: nothing to archive, nothing to flash
+if not any("director:" in l for l in keep) or not any("batlog:" in l for l in keep):   # another board on that port, or the tank asleep: nothing to archive, nothing to flash
     sys.exit(f"preflight: no director on {port} - not the tank, or it is asleep; refusing to continue")
-with open(path, "w") as f:
+with open(path, "x") as f:
     f.write(f"# pocket-tank preflight {stamp} on {port}\n")
     f.write("\n".join(keep) + "\n")
 n_samples = next((l for l in keep if "samples (h:mm" in l), "no samples")

@@ -20,8 +20,8 @@ CONFIG_ESPTOOLPY_FLASHFREQ_80M=y
 # radio: Wi-Fi only in update mode, at boot, before the tank exists
 # (docs/OTA.md). No IRAM optimizations (they buy throughput with internal
 # RAM), lwIP + the driver allowed in PSRAM, TLS on external memory, small
-# buffer counts: a download is a trickle. No Bluetooth.
-CONFIG_BT_ENABLED=n
+# buffer counts: a download is a trickle. BLE starts on demand.
+
 CONFIG_ESP_WIFI_IRAM_OPT=n
 CONFIG_ESP_WIFI_RX_IRAM_OPT=n
 CONFIG_ESP_WIFI_SLP_IRAM_OPT=n
@@ -47,6 +47,16 @@ CONFIG_SECURE_SIGNED_APPS_RSA_SCHEME=y
 CONFIG_SECURE_SIGNED_ON_UPDATE_NO_SECURE_BOOT=y
 CONFIG_SECURE_BOOT_BUILD_SIGNED_BINARIES=y
 CONFIG_SECURE_BOOT_SIGNING_KEY="keys/ota_signing_key.pem"
+# BLE is started on demand by the BOOT pairing gesture
+CONFIG_BT_ENABLED=y
+CONFIG_BT_NIMBLE_ENABLED=y
+CONFIG_BT_NIMBLE_MAX_CONNECTIONS=1
+CONFIG_BT_NIMBLE_SM_SC=y
+CONFIG_BT_NIMBLE_SM_LEGACY=n
+CONFIG_BT_NIMBLE_ROLE_CENTRAL=y
+CONFIG_BT_NIMBLE_ROLE_PERIPHERAL=y
+CONFIG_BT_NIMBLE_ROLE_OBSERVER=y
+CONFIG_BT_NIMBLE_ROLE_BROADCASTER=y
 # generous main stack for the tank/render task; inference has its own task
 CONFIG_ESP_MAIN_TASK_STACK_SIZE=16384
 CONFIG_FREERTOS_HZ=1000
@@ -60,3 +70,6 @@ CONFIG_POCKET_TANK_AUDIO_ES8311=y
 CONFIG_ESP_TASK_WDT_CHECK_IDLE_TASK_CPU1=n
 CONFIG_ESP32S3_DATA_CACHE_64KB=y
 CONFIG_ESP32S3_DATA_CACHE_LINE_64B=y
+
+# NimBLE host buffers use PSRAM; controller and DMA retain internal SRAM.
+CONFIG_BT_NIMBLE_MEM_ALLOC_MODE_EXTERNAL=y

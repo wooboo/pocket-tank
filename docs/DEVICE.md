@@ -70,3 +70,111 @@ reset the chip before anyone read the log.
   page's history lives in NVS namespace "bat" (fresh at that flash).
 - Model partition: v4m (model_q4_v4m.bin, flashed 2026-09-15 ~06:00).
 - Save: mem + lira (juveniles, 0.7 h old, 20 sand dollars) at the 2026-09-24 13:15 flash - the morning's lori / mira / bolt / sol / kelp were already gone in that preflight archive (wiped between 11:16 and 13:15).
+
+## BLE gifting development — 2026-09-28
+
+Device `/dev/cu.usbmodem311401` received the BOOT-triggered Friends build from
+this worktree (ESP-IDF 5.5). Preflight archives are the dated per-port files
+under `docs/batlog/`; NVS backups are under
+`~/.cache/pocket-tank/backups/`. All five fish (dolt, zori, chip, gira, help)
+and the 802-dollar balance survived the update. The model was not flashed.
+
+On this board, discovery and repeated full Bluetooth shutdown/restart work.
+Internal free heap was 42,687 bytes during discovery and 76,579 after close,
+identical over the two measured cycles. A five-fish tank continued rendering
+at about 20 fps with discovery/menu open, with model decisions around 3.7 s.
+These are USB bench observations, not battery-life measurements.
+
+The initial build ran out of display DMA memory because caches and the newly
+linked Bluetooth code exhausted internal SRAM. Render caches now use PSRAM;
+NimBLE host allocations use PSRAM too, and display flush checks initialization.
+The corrected build boots and runs without that assertion.
+
+The owner confirmed `/dev/cu.usbmodem311101` is the same board and authorized
+installing Pocket Tank. They subsequently requested skipping the backup; the
+in-progress full read was cancelled and the incomplete file removed. The new
+board received the model and app with `--install-new --no-backup`. Later app
+updates on both devices also used `--no-backup`; preflight logs were retained.
+
+Two-device testing passed: matching-code Secure Connections, requiring both
+confirmations, cancellation, gifts in both directions, decline/refund, and
+resuming a pending offer after disconnect and re-pairing. The first run
+returned balances to 802/0. Before the final run they were 682/120; that run
+returned them to exactly 682/120, with no pending journals and radios off.
+Both first-run setup flows were already complete by the final test.
+
+The initial hardware test exposed a duplicate termination: calling
+`ble_gap_terminate` just before `nimble_port_stop` caused NimBLE's shutdown
+counter to underflow and report 255 connections. Shutdown now lets
+`nimble_port_stop` own termination; error paths use the same shutdown. The
+final hardware harness rejects that log signature and passed without it.
+Evidence: `docs/ble/2026-09-28-hardware.txt`. No new battery measurement is in
+flight.
+
+## Combined tilt + BLE deployment — 2026-09-28
+
+Rebased BLE onto `feat/tilt-bubbles` (including main's portable flashing changes)
+and flashed application commit `996a1dc` to both `/dev/cu.usbmodem311401` and
+`/dev/cu.usbmodem311101`. Used `--no-backup --no-build`, as requested; model
+partitions and NVS were not rewritten. Preflight archives:
+`2026-09-28_144330_cu.usbmodem311401.txt` and
+`2026-09-28_144431_cu.usbmodem311101.txt`. The second device's initial preflight
+received an incomplete response and correctly prevented flashing; the retry
+archived its state successfully before proceeding.
+
+Both flash operations verified successfully. The two-device BLE harness passed
+mutual code confirmation, cancellation, gifts both ways, decline/refund,
+reconnect recovery and clean shutdown. Starting/ending balances were 154/44,
+with no pending transfers and both radios off. Tilt/water-motion diagnostics
+and low-battery shelter status were checked on the deployed devices. Evidence:
+`docs/ble/2026-09-28-rebased-hardware.txt`. Before deployment, all seven host
+regressions (tilt, grass, food, shake, shelter, gifts, persistence) and the
+combined firmware build passed. No new battery measurement is in flight.
+
+## Fish gifting deployment — 2026-09-28
+
+Both boards now run `889d2eb` (fish gifts on top of the combined tilt + BLE
+branch). Flashed through `tools/flash.sh --no-backup --no-build`; archives:
+`docs/batlog/2026-09-28_151242_cu.usbmodem311401.txt` and
+`docs/batlog/2026-09-28_151242_cu.usbmodem311101.txt`. No binary backup, model
+replacement, NVS erase or staging/restore was performed. No battery experiment
+was active.
+
+`tools/test_fish_hardware.py` verified the founding-pair restriction, decline
+and return, interrupted offer/re-pair/accept, preserved name/colours/age/paid
+history, and the return trip with the same identity and parent names. `help`
+returned to the original tank: dolt, zori, chip, gira, help; the second tank
+still has nori and sol. Balances at this test were 156 / 81 and were unchanged.
+Evidence: `docs/ble/2026-09-28-fish-hardware.txt`. The test closes both radios.
+
+The existing two-device money regression also passed on this firmware: both
+confirmations required, cancellation, gifts both ways, decline/refund and
+reconnect recovery; final balances remained 156 / 81 and both radios stopped.
+
+## Upstream 0.3.6 + existing BLE integration — 2026-10-18
+
+Merged public upstream `b407974` with `t3code/plan-ble-multiplayer-trading`
+(`dbcf5df`), preserving money/fish gifts, BOOT pairing, tilt-driven bubbles,
+food and grass, shake response, and the 15% shelter. Upstream Wi-Fi updates,
+new animals, shop and decoration management remain available.
+
+The September BLE saves appended journals at byte 1656; upstream 0.3.6 uses
+that area for its own additions. The merged build keeps upstream's frozen
+prefix, moves BLE journals to byte 1912, and migrates both legacy BLE lengths.
+Merged saves are 3152 bytes, below the 4000-byte NVS budget. Fish ages retain
+upstream's double precision and travel with their fish when slots shift.
+
+Before any device update, archived both tanks under `docs/batlog/2026-10-18_*`.
+Read and hashed each device's first 0x290000 flash bytes (bootloader, table,
+app and NVS); separate NVS copies and the SHA-256 manifest are in
+`~/.cache/pocket-tank/backups/2026-10-18/`, keyed by USB serial
+`90:70:69:FE:4E:C4` and `90:70:69:FE:4C:F8`. The AI model is preserved.
+The local OTA signing key is also copied to `~/.cache/pocket-tank/keys/`.
+
+Validation before flashing: all 12 simulator selftests on all four boards
+(`CPATH=/opt/homebrew/include make -C sim -j8 ARCH= check-all`), protocol and
+persistence tests under ASan/UBSan, tilt/grass/food/shake/shelter host tests,
+and a signed ESP-IDF 5.5 firmware build. Real-device save fixtures in
+`tests/fixtures/` verify all eight fish, identities, family, balances and a
+second load after saving in the merged format. Upstream fixtures still load.
+Hardware deployment and BLE verification are recorded below after flashing.

@@ -196,7 +196,19 @@ typedef struct {
      * (castle, coral, cluster, pumpkin, plant). Older saves read zeros: the
      * old fixed order. */
     uint8_t  decor_rank[DECOR_SLOTS], pad_rank[3];
+    gift_save_t gift; /* BLE transfers: balance and journal in one NVS blob */
+    fish_gift_save_t fish_gift;
 } save_t;
+/* The deployed September BLE build appended its journals at 1656, before
+ * upstream grew the save. Recognize its exact lengths and move only that
+ * tail; all upstream offsets above remain frozen. */
+typedef struct {
+    uint8_t prefix[1656];
+    gift_save_t gift;
+    fish_gift_save_t fish_gift;
+} legacy_ble_save_t;
+_Static_assert(offsetof(legacy_ble_save_t, gift) == 1656, "legacy BLE journal moved");
+_Static_assert(offsetof(save_t, gift) == 1912, "merged BLE journal moved");
 /* the smallest PTK2 save (pre-upkeep, 2026-08-30): anything shorter is not
  * ours. Every later build wrote sizeof(save_t) of its day - 448, 1112, 1304,
  * 1408, 1440, 1456 ... - and load_save takes ANY such length, so a tail only
@@ -308,7 +320,7 @@ float progression_time_scale = 1.0f;
  * at a time rounds every step once it passes ~36 h (its step is 1/64 s
  * there, 1/32 past ~73 h) - with elder at 96 h it came anywhere from 89 h
  * to 105 h depending on the frame rate. The save keeps a float, once. */
-static double s_age[N_FISH_MAX];
+/* Precise age travels with the fish when gifting or selling shifts slots. */
 static uint32_t s_loaded_release;    /* the release that wrote the save this boot loaded (0 = older / none) */
 static int64_t  s_loaded_unix;       /* ... and its wall-clock stamp (0 = none) */
 static float s_since_save, s_dirty_since;
@@ -319,7 +331,6 @@ static int   s_rav_feedings0;        /* player_feedings when the episode began (
 static bool  s_gave_up;              /* AUTO FEED off: they begged, nobody came, nothing fell - no more begging
                                         until the keeper feeds (s_gave_feedings0) or someone is no longer starving */
 static int   s_gave_feedings0;
-static float s_starve_s[N_FISH_MAX]; /* seconds each fish has been starving in a lit tank with AUTO FEED off */
 static bool  s_arrival_pending;
 static float s_spawn_in = -1;        /* seconds until the spawning starts (-1 = not counting) */
 static bool  s_prev_night;
@@ -330,13 +341,13 @@ static int   s_sd_pending;           /* dollars awarded and not yet shown (the t
 static int32_t s_sd_prev_feedings = -1;   /* player_feedings at the last tick (-1 = adopt at the next) */
 static int32_t s_sale_need;               /* player_feedings the next fry waits for since a fish was sold (0 = none sold) */
 static uint16_t s_fry_seed;               /* the fry offer (progression_fry_*): its seed, 0 = none drawn */
-static double   s_fry_age;                /* ... its age in tank seconds (a double, as s_age) */
+static double   s_fry_age;                /* ... its age in tank seconds (a double, as fish.age_s) */
 static uint8_t  s_fry_sold;               /* ... bit k = fry k bought */
 
 static float clampf(float v, float lo, float hi) { return v < lo ? lo : v > hi ? hi : v; }
 static void mark_dirty(void) { if (!s_dirty) { s_dirty = true; s_dirty_since = 0; } }
 
-float progression_age_s(const tank_t *t, int idx) { (void)t; return idx >= 0 && idx < N_FISH_MAX ? (float)s_age[idx] : 0; }
+float progression_age_s(const tank_t *t, int idx) { (void)t; return idx >= 0 && idx < N_FISH_MAX ? (float)t->fish[idx].age_s : 0; }
 bool  progression_arrival_pending(void) { return s_arrival_pending; }
 bool  progression_setup_pending(void)   { return s_setup_pending; }
 void  progression_setup_done(tank_t *t) { s_setup_pending = false; progression_save(t); }
@@ -416,7 +427,8 @@ int progression_fish_value(const tank_t *t, int fish) {
     return fish < 0 || fish >= t->n_fish ? 0 : worth[t->fish[fish].stage & 3];
 }
 bool progression_fish_sellable(const tank_t *t, int fish) {
-    return fish >= 0 && fish < t->n_fish && t->n_fish > FISH_KEEP_MIN && s_newborn < 0;
+    return !t->fish_gift.journal.out_phase && !t->fish_gift.journal.in_seq &&
+        fish >= 0 && fish < t->n_fish && t->n_fish > FISH_KEEP_MIN && s_newborn < 0;
 }
 static void set_tms(tank_t *t, uint32_t bit);   /* (below) */
 static void fry_age(tank_t *t, float seconds);
@@ -424,8 +436,6 @@ bool progression_sell_fish(tank_t *t, int fish) {
     if (!progression_fish_sellable(t, fish)) return false;
     int worth = progression_fish_value(t, fish);
     if (!tank_remove_fish(t, fish)) return false;
-    for (int i = fish; i < t->n_fish; i++) { s_age[i] = s_age[i + 1]; s_starve_s[i] = s_starve_s[i + 1]; }   /* the clocks move down with their fish */
-    s_age[t->n_fish] = 0; s_starve_s[t->n_fish] = 0;
     /* the slot it leaves is earned again by care, not handed back: a fry
        already on its way is called off, and the next one waits for
        SELL_FRY_MEALS more meals (care_gates) - every other gate was met long
@@ -517,6 +527,7 @@ static void pick_parents(const tank_t *t, int *pa, int *pb) {
 /* the arrival itself: a fry in the nursery grass, traits inherited from the
  * parents; the stage clock starts from zero */
 static void do_arrival(tank_t *t) {
+    if (t->fish_gift.journal.out_phase || t->fish_gift.journal.in_seq) return;
     int a, b;
     pick_parents(t, &a, &b);
     int slot = tank_add_fish(t, a, b);
@@ -528,7 +539,7 @@ static void do_arrival(tank_t *t) {
         float x0, x1; tank_veg_bed(t, nb, &x0, &x1, NULL, NULL);
         t->fish[slot].x = (x0 + x1) * 0.5f; t->fish[slot].y = TANK_BOT - 16 - 18;
     }
-    s_age[slot] = 0;
+    t->fish[slot].age_s = 0;
     t->fish[slot].ms_bits = MS_ARRIVED;
     t->sd_paid_fish[slot] = 0;               /* a new ledger for the new fish */
     if (t->n_fish <= N_FISH_MAX) set_tms(t, POP_TMS[t->n_fish]);
@@ -582,7 +593,7 @@ bool progression_buy_fry(tank_t *t, int k) {
     if (slot < 0) return false;
     t->sd_balance -= SD_PRICE_FRY;
     s_fry_sold |= (uint8_t)(1u << k);
-    s_age[slot] = 0; s_starve_s[slot] = 0;
+    t->fish[slot].age_s = 0; t->fish[slot].starve_s = 0;
     t->fish[slot].ms_bits = MS_ARRIVED;
     t->sd_paid_fish[slot] = 0;                     /* its stages pay; no birth dollars - it was bought */
     apply_growth(&t->fish[slot]);
@@ -605,7 +616,7 @@ static int care_gates(const tank_t *t, gate_t g[CARE_GATES_MAX]) {
     for (int i = 0; i < t->n_fish; i++)
         if (t->fish[i].trust < min_trust) min_trust = t->fish[i].trust;
     int last = t->n_fish - 1;
-    float age = last >= 0 ? (float)s_age[last] : 0;
+    float age = last >= 0 ? (float)t->fish[last].age_s : 0;
     int n = 0;
     /* the MEALS gate after a sale: the table's count, or the meals owed since
        the fish was sold, whichever is further off */
@@ -780,12 +791,12 @@ void progression_stage_arrival(tank_t *t) { (void)t; if (!s_arrival_pending) { s
 void progression_fresh(tank_t *t) {
     tank_new_population(t);          /* a new tank: two FRY, contrasting -
                                       * the keeper watches them grow up */
-    for (int i = 0; i < N_FISH_MAX; i++) s_age[i] = 0;
+    for (int i = 0; i < N_FISH_MAX; i++) t->fish[i].age_s = 0;
     t->tank_ms_bits = TMS_PAIR;
     for (int i = 0; i < t->n_fish; i++) { t->fish[i].ms_bits = MS_ARRIVED; apply_growth(&t->fish[i]); }
     s_arrival_pending = false; s_spawn_in = -1; s_prev_night = t->night;
     s_ravenous = false; s_ravenous_t = 0; s_gave_up = false;
-    for (int i = 0; i < N_FISH_MAX; i++) s_starve_s[i] = 0;
+    for (int i = 0; i < N_FISH_MAX; i++) t->fish[i].starve_s = 0;
     s_setup_pending = true;          /* a new tank: welcome, names, colours */
     s_newborn = -1;
     s_sd_prev_feedings = 0; s_sd_pending = 0;   /* a fresh ledger (tank_init zeroed the tank's) */
@@ -804,8 +815,8 @@ void progression_reset(tank_t *t, uint32_t seed) {
 
 void progression_set_age(tank_t *t, int idx, float seconds) {
     if (idx < 0 || idx >= t->n_fish) return;
-    s_age[idx] = seconds < 0 ? 0 : seconds;
-    apply_stage(&t->fish[idx], s_age[idx], true);
+    t->fish[idx].age_s = seconds < 0 ? 0 : seconds;
+    apply_stage(&t->fish[idx], t->fish[idx].age_s, true);
     apply_growth(&t->fish[idx]);
     mark_dirty();
 }
@@ -820,6 +831,16 @@ static bool load_save(tank_t *t, int64_t *saved_unix) {
     size_t got = 0;
     bool loaded = persist_port_load(&sv, sizeof sv, &got) && got >= SAVE_CORE_SIZE && got <= sizeof sv;
     if (!loaded || sv.magic != SAVE_MAGIC || sv.n_fish < 2 || sv.n_fish > N_FISH_MAX) return false;
+    if (got == sizeof(legacy_ble_save_t) || got == offsetof(legacy_ble_save_t, fish_gift)) {
+        gift_save_t gift;
+        fish_gift_save_t fish_gift = {0};
+        memcpy(&gift, (uint8_t *)&sv + offsetof(legacy_ble_save_t, gift), sizeof gift);
+        if (got == sizeof(legacy_ble_save_t))
+            memcpy(&fish_gift, (uint8_t *)&sv + offsetof(legacy_ble_save_t, fish_gift), sizeof fish_gift);
+        memset((uint8_t *)&sv + 1652, 0, sizeof sv - 1652);
+        sv.gift = gift;
+        sv.fish_gift = fish_gift;
+    }
     if (got == SAVE_PRE_BUBBLE_SIZE) {         /* the first public installer's layout: see SAVE_PRE_BUBBLE_SIZE */
         memmove(&sv.ms_seen, &sv.bubble_x, sizeof sv.ms_seen + sizeof sv.tank_ms_seen);
         sv.bubble_x = 0;                       /* = the default column */
@@ -838,7 +859,7 @@ static bool load_save(tank_t *t, int64_t *saved_unix) {
         f->ms_seen = sv.ms_seen[i] & f->ms_bits;
         f->rest_dx = s->rest_dx; f->rest_dy = s->rest_dy;
         f->drift_acc = sv.drift_acc[i];
-        s_age[i] = s->age_s;
+        t->fish[i].age_s = s->age_s;
         t->n_fish = i + 1;
         if (sv.names[i][0]) { sv.names[i][FISH_NAME_MAX] = 0; tank_set_name(t, i, sv.names[i]); }
         tank_set_look(t, i, sv.body[i], sv.accent[i]);        /* zeros keep the preset's */
@@ -871,6 +892,9 @@ static bool load_save(tank_t *t, int64_t *saved_unix) {
     memcpy(t->algae, sv.algae, ALGAE_CELLS);
     t->trims = sv.trims; t->cells_cleaned = sv.cells_cleaned;
     /* the sand dollar tail (zeros for an older save: the ledger back-pays) */
+    t->gift = sv.gift;
+    t->fish_gift = sv.fish_gift;
+    for (int i=0;i<t->n_fish;i++) t->fish[i].family = sv.fish_gift.family[i];
     t->sd_balance = sv.sd_balance; t->sd_earned = sv.sd_earned; t->sd_unlocks = sv.sd_unlocks & ((1u << SD_ITEM_COUNT) - 1);
     for (int i = 0; i < N_FISH_MAX; i++) t->sd_paid_fish[i] = i < t->n_fish ? sv.sd_paid_fish[i] : 0;
     t->sd_colonies_paid = sv.sd_colonies_paid; t->sd_inches_paid = sv.sd_inches_paid;
@@ -945,8 +969,8 @@ void progression_slept(tank_t *t, float seconds) {
     tank_tick_sleep(t, seconds);
     fry_age(t, seconds);                      /* the fry offer ages asleep too, in full */
     for (int i = 0; i < t->n_fish; i++) {     /* and they grew, slowly, in the dark */
-        s_age[i] += seconds * SLEEP_GROWTH_FRAC;
-        apply_stage(&t->fish[i], s_age[i], false); apply_growth(&t->fish[i]);
+        t->fish[i].age_s += seconds * SLEEP_GROWTH_FRAC;
+        apply_stage(&t->fish[i], t->fish[i].age_s, false); apply_growth(&t->fish[i]);
     }
     /* the tank milestone (2026-09-15, was "first quiet night" - every fish
        resting under the old day/night cycle): one unbroken stretch of device
@@ -977,8 +1001,8 @@ void progression_tick(tank_t *t, float dt) {
     int n_dart = 0; bool changed_someone = false, reef_visit = false;
     for (int i = 0; i < t->n_fish; i++) {
         fish_t *f = &t->fish[i];
-        s_age[i] += aged;
-        apply_stage(f, s_age[i], false);
+        t->fish[i].age_s += aged;
+        apply_stage(f, t->fish[i].age_s, false);
         apply_growth(f);
         /* trait drift, slow: calm + fed -> bolder/more social; startled -> shyer */
         float k = tended / (DRIFT_HOURS * 3600.0f);          /* full unit per DRIFT_HOURS of pressure */
@@ -1054,10 +1078,10 @@ void progression_tick(tank_t *t, float dt) {
     /* AUTO FEED off: going hungry costs trust (the constants' note above) */
     for (int i = 0; i < t->n_fish; i++) {
         fish_t *f = &t->fish[i];
-        if (!t->autofeed_off || f->hunger < STARVE_HUNGER) { s_starve_s[i] = 0; continue; }
+        if (!t->autofeed_off || f->hunger < STARVE_HUNGER) { t->fish[i].starve_s = 0; continue; }
         if (t->night) continue;                               /* dark: they rest; the count holds */
-        s_starve_s[i] += dt;
-        if (s_starve_s[i] > STARVE_GRACE_S && f->trust > STARVE_TRUST_FLOOR)
+        t->fish[i].starve_s += dt;
+        if (t->fish[i].starve_s > STARVE_GRACE_S && f->trust > STARVE_TRUST_FLOOR)
             f->trust = fmaxf(STARVE_TRUST_FLOOR, f->trust - STARVE_TRUST_PER_S * dt);
     }
     /* tank.c picks the presentation: empty water = beg at the surface; live
@@ -1112,6 +1136,9 @@ void progression_tick(tank_t *t, float dt) {
 
 bool progression_save(tank_t *t) {
     save_t sv; memset(&sv, 0, sizeof sv);
+    sv.gift = t->gift;
+    sv.fish_gift = t->fish_gift;
+    for (int i=0;i<t->n_fish;i++) sv.fish_gift.family[i] = t->fish[i].family;
     sv.magic = SAVE_MAGIC; sv.saved_unix = clock_port_now_unix(); sv.clock = t->clock;
     sv.saved_release = PT_RELEASE_NUM;
     sv.sale_meals_need = s_sale_need;
@@ -1169,7 +1196,7 @@ bool progression_save(tank_t *t) {
         s->size = f->size; s->trust = f->trust; s->bold = f->bold; s->sociable = f->sociable;
         s->bold0 = f->bold0; s->sociable0 = f->sociable0;
         s->hunger = f->hunger; s->energy = f->energy; s->stress = f->stress; s->curiosity = f->curiosity;
-        s->age_s = (float)s_age[i]; s->rest_dx = f->rest_dx; s->rest_dy = f->rest_dy;
+        s->age_s = (float)t->fish[i].age_s; s->rest_dx = f->rest_dx; s->rest_dy = f->rest_dy;
         s->eaten = f->eaten; s->eaten_player = f->eaten_player; s->ms_bits = f->ms_bits;
         sv.ms_seen[i] = f->ms_seen;
         sv.drift_acc[i] = f->drift_acc;

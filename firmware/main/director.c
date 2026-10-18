@@ -17,6 +17,7 @@
 #include "esp_ota_ops.h"
 const char *net_port_manifest_url(void);
 bool net_port_set_manifest_url(const char *url);
+#include "friends.h"
 #include "touch_port.h"
 #include "battery_port.h"
 #include "display_port.h"
@@ -66,7 +67,7 @@ static void nvs_drop(const char *key) {
     else if (nvs_has(key)) ESP_LOGW(TAG, "drop %s: still there after the erase", key);
 }
 static bool stash(tank_t *t) {
-    progression_save(t);
+    if (t->gift.out_phase || t->gift.in_seq || t->fish_gift.journal.out_phase || t->fish_gift.journal.in_seq || !progression_save(t)) return false;
     bool ok = nvs_copy("save", "bk");
     ESP_LOGI(TAG, "%s", ok ? "real tank stashed (restore brings it back)" : "STASH FAILED - not touching the tank");
     return ok;
@@ -74,6 +75,7 @@ static bool stash(tank_t *t) {
 /* a staged tank replaces the live one: park the real save first unless a
  * stash is already parked (a second staging must not overwrite it) */
 static bool stage_guard(tank_t *t) {
+    if (t->gift.out_phase || t->gift.in_seq || t->fish_gift.journal.out_phase || t->fish_gift.journal.in_seq) { ESP_LOGW(TAG, "finish the pending gift before staging"); return false; }
     if (nvs_has("bk")) { ESP_LOGI(TAG, "stash already parked; staging over the current tank"); return true; }
     return stash(t);
 }
@@ -126,6 +128,7 @@ static void show_state(const tank_t *t) {
     int pellets = 0, cells = 0;
     for (int i = 0; i < MAX_FOOD; i++) pellets += t->food[i].alive;
     for (int i = 0; i < ALGAE_CELLS; i++) cells += t->algae[i] > 0;
+    ESP_LOGI(TAG, "low-battery shelter: %s", t->low_battery ? "active" : "off");
     ESP_LOGI(TAG, "pellets %d | trickle %s | ravenous %d | %s%s idle %.0fs | veg %.2f %.2f %.2f | algae cells %d/%d | courting %s%s%s%s | arrival %s",
              pellets, t->trickle_off ? "OFF" : t->autofeed_off ? "off (AUTO FEED off)" : "on", (int)t->ravenous,
              t->night ? "night" : "day", t->light_override ? " (manual)" : t->orient_lock ? " (rotation locked)" : "",
@@ -196,6 +199,7 @@ static void help(void) {
     ESP_LOGI(TAG, "milestones [off] (the page, on cue; on the device: tap the open stats card)");
     ESP_LOGI(TAG, "fry [open|roll|buy <0-2>] (the shop's fry: open = as if a fish was sold; roll = a fresh three now)");
     ESP_LOGI(TAG, "shop [off] (the sand dollar page) | dollars [n] (grant n; the balance and the chore counts) | buy plant|snail|castle|coral|cluster|shrimp|urchin|seahorse (at the price) | seahorse on|off (drawn or not: the fps A/B) | place [plant|castle|coral] [x [behind|among|front]] (the piece's spot; no x = the page; the castle has no among) | coral <0-7|rrggbb> (its colour) | coral grow <g> (its growth, 1 = the fan, 1.25 = the crown) | cluster look <0-2> | cluster grow <g> (1 = full size, 2 = every tentacle) | sell plant|castle|coral|cluster (20%% back)");
+    ESP_LOGI(TAG, "friends open|close|confirm|give N|fish N|accept|decline (nearby BLE gifts)");
     ESP_LOGI(TAG, "reset (the keeper's confirm prompt, as BOOT + tap opens it) | reset yes|no (answer it here) - YES WIPES EVERY SAVE, a parked tank too");
     ESP_LOGI(TAG, "setup [off] (the first-run flow: welcome, names, colours; off drops the panel - the birth flow too) | name <fish|idx> <newname> (up to %d letters, saved)", FISH_NAME_MAX);
     ESP_LOGI(TAG, "battery <pct> [charging|full|plugged]|real (a STAGED gauge: on battery at pct - the card's pill, and at 10 or less the low-battery notice + cue + the pill that stays - or on the cable: the bolt, the sweep while charging, the pill for a few seconds; not saved) | battery page [off] (the battery page, as a tap on the pill opens it) | battery (its numbers) | snd battery (just the notice + cue)");
@@ -247,7 +251,11 @@ static void run(tank_t *t, char *line) {
     const char *c = argv[0];
     if (!t && strcmp(c, "wifi") && strcmp(c, "ota") && strcmp(c, "help")) {   /* update mode: no tank to command */
         ESP_LOGW(TAG, "update mode: only wifi / ota / help (ota tap <x> <y>, ota page)"); return; }
+    if (friends_active() && strcmp(c,"friends") && strcmp(c,"state") && strcmp(c,"batlog") && strcmp(c,"help")) {
+        ESP_LOGW(TAG,"close Friends before other director commands"); return;
+    }
     if (!strcmp(c, "help")) help();
+    else if (!strcmp(c, "friends")) friends_command(t, argc, argv);
     else if (!strcmp(c, "state")) show_state(t);
     else if (!strcmp(c, "wifi")) {                            /* the saved network (docs/OTA.md) */
         char ssid[NET_SSID_MAX + 1], pass[NET_PASS_MAX + 1];
@@ -327,7 +335,9 @@ static void run(tank_t *t, char *line) {
         for (int i = 0; i < n; i++) {               /* (the console runs in the tank task: poll here, the task is blocked) */
             imu_port_poll(esp_timer_get_time());
             int16_t a[3]; int m; imu_port_last(a, &m);
-            ESP_LOGI(TAG, "imu poll: g=[%6d %6d %6d] motion %5d %s", a[0], a[1], a[2], m, imu_port_moving() ? "MOVING" : "still");
+            float ux, uy; imu_port_bubble_up(&ux, &uy);
+            ESP_LOGI(TAG, "imu poll: g=[%6d %6d %6d] motion %5d %s | bubble up [%.2f %.2f] inverted %d | water %.2f bend %.2f",
+                     a[0], a[1], a[2], m, imu_port_moving() ? "MOVING" : "still", ux, uy, imu_port_inverted(), imu_port_water_push(), t->veg_bend[0]);
             vTaskDelay(pdMS_TO_TICKS(250));
         }
     } else if (!strcmp(c, "screen")) {          /* a worn tank's way up (tank.h tank_screen_*): screen [normal|turned] */
