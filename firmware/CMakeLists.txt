@@ -14,6 +14,12 @@ endif()
 # execute_process runs at configure time only: without this, a build after a
 # new commit keeps the previous id (2026-09-30: the tank reported bb7751a from
 # a 092a913 tree). A change of HEAD or of the branch's ref reconfigures.
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-             ${CMAKE_CURRENT_LIST_DIR}/../.git/HEAD ${CMAKE_CURRENT_LIST_DIR}/../.git/index)
+foreach(PT_GIT_FILE HEAD index)
+    execute_process(COMMAND git rev-parse --path-format=absolute --git-path ${PT_GIT_FILE}
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+                    OUTPUT_VARIABLE PT_GIT_PATH OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+    if(PT_GIT_PATH)
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${PT_GIT_PATH})
+    endif()
+endforeach()
 project(pocket_tank)
