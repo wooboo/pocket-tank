@@ -17,7 +17,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 KEY=firmware/keys/ota_signing_key.pem
-. ~/esp/esp-idf/export.sh > /dev/null 2>&1 || { echo "ota_key: ESP-IDF export failed"; exit 1; }
+. "${IDF_PATH:-$HOME/esp/esp-idf}/export.sh" > /dev/null 2>&1 || { echo "ota_key: ESP-IDF export failed"; exit 1; }
 if [[ "${1:-}" == "--pub" ]]; then
   [ -f "$KEY" ] || { echo "ota_key: no $KEY"; exit 1; }
   T=$(mktemp); espsecure.py digest_sbv2_public_key --keyfile "$KEY" --output "$T" > /dev/null; xxd -p "$T" | tr -d "\n"; echo; rm -f "$T"

@@ -27,8 +27,8 @@ if not port:
 here = os.path.dirname(os.path.abspath(__file__))
 out_dir = os.path.join(here, "..", "docs", "batlog")
 os.makedirs(out_dir, exist_ok=True)
-stamp = datetime.datetime.now().strftime("%Y-%m-%d_%H%M")
-path = os.path.join(out_dir, f"{stamp}.txt")
+stamp = datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S_%f")
+path = os.path.join(out_dir, f"{stamp}-{os.path.basename(port)}.txt")
 
 s = serial.Serial(); s.port, s.baudrate, s.timeout = port, 115200, 0.1
 s.open(); s.reset_input_buffer()          # a plain open: DTR/RTS untouched, the tank keeps running
