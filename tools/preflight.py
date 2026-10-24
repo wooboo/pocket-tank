@@ -1,4 +1,4 @@
-#!/Users/strato/.espressif/python_env/idf5.4_py3.13_env/bin/python
+#!/usr/bin/env python3
 """preflight.py - archive what the tank knows BEFORE anything resets it.
 
 Run before every flash (tools/flash.sh does), and any morning after a night
