@@ -269,6 +269,12 @@ signed ESP-IDF 5.5 firmware. Shelter tests exercise depth scratch and compare
 shelter pixels with ordinary BEHIND swimming, check depth restoration, and
 retain coverage for the no-cache fallback.
 
+The first Linux CI run exposed a shop-test fixture issue: a bystander fish
+could cover the leaf used as the placement/depth probe. A GCC build reproduced
+the missing-leaf failure locally. Parking all fish before positioning the probe
+fish, then restoring their coordinates, made the same GCC test pass without
+changing any rendering code or depth assertions.
+
 On both USB tanks, pairing/cancellation/reopening passed and AI decisions
 advanced `[36, 20]` -> `[38, 22]`. At a staged 15%, all eight fish moved below
 the midpoint (observed y 219..332). Crops of actual displayed frames are in

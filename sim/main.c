@@ -8027,7 +8027,14 @@ static int selftest_shop(void) {
           render_debug_page_animals(true);                              /* (the page hides every creature since 0.3.9.4: the fish drawn for this check all the same) */
           float top; tank_veg_bed(&tank, 3, NULL, NULL, &top, NULL);
           int sy = (int)((top + TANK_BOT - 16) * 0.5f);
-          fish_t *f = &tank.fish[0]; float fx0 = f->x, fy0 = f->y;
+          /* Other fish must not cover the leaf used as the depth probe: their
+             positions after the long simulation differ between compilers. */
+          float fish_xy[N_FISH_MAX][2];
+          for (int i = 0; i < tank.n_fish; i++) {
+              fish_xy[i][0] = tank.fish[i].x; fish_xy[i][1] = tank.fish[i].y;
+              park_fish(&tank.fish[i]);
+          }
+          fish_t *f = &tank.fish[0];
           const int zs[3] = { DECOR_Z_FRONT, DECOR_Z_MIDDLE, DECOR_Z_BACK }; bool shows[3][2];
           /* the sway pinned and the loop bypassed: the grass steps a moment per drawn
              frame, so two renders would catch the leaf in two places (Linux did) */
@@ -8054,7 +8061,9 @@ static int selftest_shop(void) {
               shows[k][leaf] = over != bare;               /* the fish shows on the leaf's pixel */
           }
           render_force_veg_clock(-1); render_grass_loop_bypass(false); render_debug_page_animals(false);
-          f->x = fx0; f->y = fy0;
+          for (int i = 0; i < tank.n_fish; i++) {
+              tank.fish[i].x = fish_xy[i][0]; tank.fish[i].y = fish_xy[i][1];
+          }
           printf("selftest-shop: placement: dragged to x 300 (clamped %d..%d), FRONT; a fish on leaves 0/1 shows through FRONT %d/%d, MIDDLE %d/%d, BACK %d/%d\n",
                  TANK_FX0 + DECOR_MARGIN + PLANT_HALF_W, TANK_FX1 - DECOR_MARGIN - PLANT_HALF_W, shows[0][0], shows[0][1], shows[1][0], shows[1][1], shows[2][0], shows[2][1]);
           if (shows[0][0] || shows[0][1] || !shows[1][0] || !shows[1][1] || !shows[2][0] || !shows[2][1]) { printf("FAIL: the layer did not order the leaves and the fish\n"); return 1; }

@@ -375,9 +375,9 @@ int      render_grass_loop_n(void);
 int      render_grass_loop_ready(void);       /* moments baked and current */
 void     render_grass_loop_lock(int moments);
 int      render_grass_loop_moment(void);      /* the last frame's moment (stepping), -1 before one */
-void     render_grass_loop_arena(int *used_kb, int *cap_kb);
-int      render_grass_loop_nomem(int *why);
-void     render_grass_loop_top(int *bed, int *segs, int *beds);   /* (the log) the tallest back frond the band is sized for: its bed, its segments, the beds counted */   /* rows the plan gave up on (0: it did not) and where (1 the tables, 2 the bake's buffers, 3 fewer than four bands or no arena) */   /* the fine moments' differences: KB used of KB held */
+void     render_grass_loop_arena(int *used_kb, int *cap_kb);   /* the fine moments' differences: KB used of KB held */
+int      render_grass_loop_nomem(int *why);                  /* rows the plan gave up on (0: it did not) and where (1 the tables, 2 the bake's buffers, 3 fewer than four bands or no arena) */
+void     render_grass_loop_top(int *bed, int *segs, int *beds);   /* (the log) the tallest back frond the band is sized for: its bed, its segments, the beds counted */
 bool     render_grass_loop_patching(void);   /* THE PATCH (0.3.9.4): the loop stale inside boxes only - served with them repainted, rebaked inside them */
 int      render_grass_loop_boxes(int box[][4]);   /* ... the boxes (x0, y0, x1, y1 each; up to 6) */
 bool     render_grass_loop_dump(int j, uint16_t *px, uint32_t *mask, int *y0, int *rows);   /* (the tests) moment j as the loop holds it: its rows and its grass mask */
