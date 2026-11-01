@@ -6,6 +6,7 @@
 #include "advisor_core.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/idf_additions.h"
 #include "freertos/semphr.h"
 #include "esp_heap_caps.h"
 #include "esp_timer.h"
@@ -77,7 +78,14 @@ bool advisor_llm_esp_init(const uint8_t *model_bin, size_t model_len, const uint
              q4_model_bench(bm, 4, 44, esp_timer_get_time));
     g_mx = xSemaphoreCreateMutex(); g_req_sem = xSemaphoreCreateBinary();
     /* inference on core 1; render/tank own core 0 */
-    xTaskCreatePinnedToCore(worker, "advisor", 16384, NULL, 5, NULL, 1);
+    /* Inference never writes flash/NVS. Its stack belongs in PSRAM so the
+     * controller's contiguous internal reservation cannot prevent this task
+     * from starting (or silently leave the mailbox without a consumer). */
+    if (xTaskCreatePinnedToCoreWithCaps(worker, "advisor", 16384, NULL, 5, NULL, 1,
+                                      MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT) != pdPASS) {
+        ESP_LOGE(TAG, "advisor task could not start");
+        return false;
+    }
     const q4_config_t *c = advisor_core_config();
     ESP_LOGI(TAG, "model dim %d layers %d vocab %d seq %d, schema v%d, %s decoding",
              c->dim, c->n_layers, c->vocab_size, c->seq_len, advisor_core_schema(),

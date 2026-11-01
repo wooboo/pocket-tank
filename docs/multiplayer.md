@@ -68,8 +68,9 @@ sender tank identity (eight). Opcode zero introduces the tank after encryption.
 The other opcodes are OFFER, ACCEPT, COMMIT, DONE and REJECT.
 
 Render caches and NimBLE host allocations use PSRAM to leave internal RAM for
-the display DMA and controller. The grass bake task's 16 KB stack also lives
-in PSRAM. `friends_prepare()` reserves up to 48 KB of contiguous internal
+the display DMA and controller. The grass bake and advisor tasks' 16 KB
+stacks also live in PSRAM. Advisor initialization checks task creation so a
+failed task cannot masquerade as a working LLM. `friends_prepare()` reserves up to 48 KB of contiguous internal
 memory before the advisor allocates its hot buffers; opening Friends gives
 that block back to the controller. After close, it keeps at least the
 controller's 30 KB EMI block available for reopening (retrying after deferred
