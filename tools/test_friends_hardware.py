@@ -3,6 +3,7 @@
 
 Temporarily moves ten existing dollars each way; never mints currency or
 restores old saves. Run only on devices authorized for testing.
+--pair-only checks confirmation, cancellation and reopening without transfers.
 """
 import argparse
 import json
@@ -15,6 +16,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument('--a', required=True, help='tank with at least 10 dollars')
 ap.add_argument('--b', required=True)
 ap.add_argument('--log', required=True)
+ap.add_argument('--pair-only', action='store_true', help='verify pairing and cancellation without transferring dollars')
 a = ap.parse_args()
 ports = [serial.Serial(p, 115200, timeout=0) for p in (a.a, a.b)]
 buffers = [b'', b'']
@@ -94,6 +96,12 @@ try:
     print('PASS: both confirmations required; cancelled pairing closes cleanly',flush=True)
     pair()
     base=[s['balance'] for s in status]
+    if a.pair_only:
+        close()
+        assert [s['balance'] for s in status] == base
+        assert all(not s['out'] and not s['incoming'] for s in status)
+        print(json.dumps(dict(result='passed', mode='pair-only', balances=base)), flush=True)
+        raise SystemExit(0)
     assert base[0]>=10
     offer(0);send(1,'friends accept');balances([base[0]-10,base[1]+10])
     offer(1);send(0,'friends accept');balances(base)

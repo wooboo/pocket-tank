@@ -1,6 +1,8 @@
 #ifndef POCKET_FRIENDS_H
 #define POCKET_FRIENDS_H
 #include "tank.h"
+/* Reserve the controller's contiguous internal heap before the advisor. */
+void friends_prepare(void);
 void friends_open(tank_t *t);
 void friends_close(void);
 bool friends_active(void);

@@ -7,6 +7,7 @@
 #include "touch_port.h"
 #include "setup.h"
 #include "esp_log.h"
+#include "esp_err.h"
 #include "esp_random.h"
 #include "esp_timer.h"
 #include "esp_heap_caps.h"
@@ -24,6 +25,22 @@
 #include <stdlib.h>
 #include <string.h>
 static const char *TAG="friends";
+/* The controller needs a contiguous 0x7800-byte EMI block plus its other
+ * internal allocations. Keep room before the advisor fragments the heap;
+ * the radio itself remains off until Friends opens. */
+#define CONTROLLER_RESERVE_BYTES (48u * 1024u)
+#define CONTROLLER_EMI_BYTES (30u * 1024u)
+static void *controller_reserve;
+void friends_prepare(void) {
+    if (!controller_reserve)
+        controller_reserve=heap_caps_malloc(CONTROLLER_RESERVE_BYTES, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+    /* After the first stop the PHY keeps small allocations. The EMI block
+     * itself is returned intact, so keep that block for the next open. */
+    if (!controller_reserve)
+        controller_reserve=heap_caps_malloc(CONTROLLER_EMI_BYTES, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+    /* Task-stack cleanup after deinit is deferred to the idle task. If its
+     * block is not back yet, friends_open retries before starting the radio. */
+}
 static const ble_uuid128_t service=BLE_UUID128_INIT(0x51,0x54,0x41,0x4e,0x4b,0x47,0x49,0x46,0x54,0x53,0,0,0,0,0,1);
 static const ble_uuid128_t characteristic=BLE_UUID128_INIT(0x51,0x54,0x41,0x4e,0x4b,0x47,0x49,0x46,0x54,0x53,0,0,0,0,0,2);
 enum { EV_SYNC=1,EV_DISC,EV_CONNECT,EV_DISCONNECT,EV_CODE,EV_SECURE,EV_CHAR,EV_DATA,EV_FAIL };
@@ -125,6 +142,7 @@ void friends_close(void) {
         ESP_LOGI(TAG,"Bluetooth stopped; free internal heap %u",(unsigned)heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
     }
     conn=BLE_HS_CONN_HANDLE_NONE; connecting=false; secure=false; remote_handle=0; peer=0;
+    if (!initialized) friends_prepare();
 }
 void friends_open(tank_t *t) {
     if (active || setup_active() || touch_port_confirm_up() || touch_port_shelf() || touch_port_touch_lock()) return;
@@ -147,9 +165,20 @@ void friends_open(tank_t *t) {
         if (!progression_save(t)) { t->gift.identity=0; fail("SAVE FAILED. CLOSE AND RETRY"); return; }
     }
     if (!initialized) {
+        if (!controller_reserve) friends_prepare();
+        if (!controller_reserve) {
+            ESP_LOGE(TAG,"no contiguous controller memory: internal=%u largest=%u", (unsigned)heap_caps_get_free_size(MALLOC_CAP_INTERNAL), (unsigned)heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
+            fail("NOT ENOUGH MEMORY"); return;
+        }
         if (!events) events=xQueueCreate(32,sizeof(event_t));
         if (!events) { fail("NOT ENOUGH MEMORY"); return; }
-        if (nimble_port_init()!=ESP_OK) { vQueueDelete(events); events=NULL; fail("BLUETOOTH COULD NOT START"); return; }
+        heap_caps_free(controller_reserve); controller_reserve=NULL;
+        ESP_LOGI(TAG,"starting Bluetooth: internal=%u largest=%u", (unsigned)heap_caps_get_free_size(MALLOC_CAP_INTERNAL), (unsigned)heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
+        esp_err_t init_result = nimble_port_init();
+        if (init_result!=ESP_OK) {
+            ESP_LOGE(TAG,"Bluetooth init failed: %s (0x%x), internal=%u largest=%u", esp_err_to_name(init_result), (unsigned)init_result, (unsigned)heap_caps_get_free_size(MALLOC_CAP_INTERNAL), (unsigned)heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
+            vQueueDelete(events); events=NULL; friends_prepare(); fail("BLUETOOTH COULD NOT START"); return;
+        }
         initialized=true;
         ble_hs_cfg.sync_cb=on_sync; ble_hs_cfg.reset_cb=on_reset;
         ble_hs_cfg.sm_io_cap=BLE_HS_IO_DISPLAY_YESNO; ble_hs_cfg.sm_bonding=0;

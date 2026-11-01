@@ -10,6 +10,7 @@
 #include <math.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/idf_additions.h"
 #include "esp_log.h"
 #include "esp_timer.h"
 #include "esp_heap_caps.h"
@@ -1060,7 +1061,11 @@ static void start_tank_task(void *arg) {
     ESP_LOGI(TAG, "starting the tank task: internal heap %u KB free (largest block %u KB)",
              (unsigned)heap_caps_get_free_size(MALLOC_CAP_INTERNAL) / 1024, (unsigned)heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL) / 1024);
     s_render_lock = xSemaphoreCreateMutex();
-    render_set_grass_loop_task(s_render_lock && xTaskCreatePinnedToCore(bake_task, "bake", 16384, NULL, 6, NULL, 1) == pdPASS);
+    /* The bake never writes flash/NVS. Its stack can live in PSRAM; keeping
+     * another 16 KB internally prevents the on-demand BLE controller from
+     * starting alongside the tank and advisor (ESP_ERR_NO_MEM on hardware). */
+    render_set_grass_loop_task(s_render_lock && xTaskCreatePinnedToCoreWithCaps(
+        bake_task, "bake", 16384, NULL, 6, NULL, 1, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT) == pdPASS);
     if (xTaskCreatePinnedToCore(tank_task, "tank", 12288, NULL, 4, NULL, 0) != pdPASS)
         ESP_LOGE(TAG, "THE TANK TASK COULD NOT START: no internal RAM for its stack");
 }
@@ -1540,6 +1545,7 @@ void app_main(void) {
     else if (provision_mode_wanted()) provision_mode_run(fb[0]);   /* just installed, no network yet: the page's Wi-Fi step, the glass dark */
     s_rtc = rtc_port_init(board_i2c_bus());   /* wall clock for the ravenous rule (before the clockless night's sync) */
     net_clock_boot(fb[0]);            /* no RTC chip, a stopped one, or a chip not yet on real time, with a saved network: the time from the internet, before the advisor takes the heap */
+    friends_prepare();              /* contiguous controller memory before the advisor fragments SRAM */
     /* the advisor's hot buffers (~70 KB of internal SRAM, advisor_llm_esp.c)
        come before the discretionary caches below: the LLM is not optional */
     /* model: mmap the raw partition; weights are read through the flash cache */

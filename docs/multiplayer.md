@@ -19,6 +19,15 @@ Friends supports sand dollars (steps of 10 on screen) and individual fish
 (see Fish gifts below). Swaps and upgrade gifts remain future work. Dollar
 gifts change the spendable balance, not lifetime care earnings.
 
+For a hardware check without moving dollars or fish:
+
+```sh
+python tools/test_friends_hardware.py --a /dev/cu.usbmodemAAA --b /dev/cu.usbmodemBBB --log /tmp/pairing.txt --pair-only
+```
+
+It verifies matching codes, confirmation on both devices, cancellation,
+reopening, unchanged balances and clean radio shutdown.
+
 ## Transfers and recovery
 
 Pressing GIVE reserves the amount by subtracting it from the available
@@ -59,7 +68,15 @@ sender tank identity (eight). Opcode zero introduces the tank after encryption.
 The other opcodes are OFFER, ACCEPT, COMMIT, DONE and REJECT.
 
 Render caches and NimBLE host allocations use PSRAM to leave internal RAM for
-the display DMA and controller. The stack is initialized on demand and fully
+the display DMA and controller. The grass bake task's 16 KB stack also lives
+in PSRAM. `friends_prepare()` reserves up to 48 KB of contiguous internal
+memory before the advisor allocates its hot buffers; opening Friends gives
+that block back to the controller. After close, it keeps at least the
+controller's 30 KB EMI block available for reopening (retrying after deferred
+task cleanup if necessary). The advisor's existing fallback puts hot buffers
+that no longer fit in internal memory in PSRAM. This prevents the v0.3.9.5
+integration's `ESP_ERR_NO_MEM` and EMI allocation assertion on physical boards.
+The stack is initialized on demand and fully
 stopped/deinitialized on close or timeout. Saves with the journal should not
 be opened using old firmware: the old loader rejects saves larger than its
 known structure. Keep the per-device NVS backup before updating.
