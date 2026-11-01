@@ -1,0 +1,29 @@
+# pocket-tank preflight 2026-11-01_135549_948310 on /dev/cu.usbmodem311101
+I (25990) batlog: 4 samples (h:mm since the first | SoC | VBAT | bright | state | mA since previous)
+I (25990) batlog:     0:00 |  99% | 4140 mV |   0 | asleep | bed
+I (25994) batlog:   236:29 | 100% | 4160 mV |  91 | awake  | boot     -0.0 mA
+I (26001) batlog:   236:34 | 100% | 4160 mV |  91 | awake  |           0.0 mA
+I (26008) batlog:   236:39 | 100% | 4158 mV |  91 | awake  |           0.0 mA
+I (26015) batlog:   awake:  0.2 h, 0 mAh -> 0 mA average
+I (26020) batlog:   asleep: 236.5 h, -2.0 mAh -> -0.01 mA average
+I (26025) batlog:   (SoC is 1% = 2 mAh; short awake windows are coarse, a night is not)
+I (30077) director: 0 zori   elder age 272.0h size 1.45 hunger 10.0 energy 9.9 stress 0.0 curiosity 1.4 trust 7.1 social 0.051 (born 0.15) bold 0.949 (born 0.80) ms 1f3f  rest at 130,82
+I (30082) director: 1 chip   elder age 271.4h size 1.31 hunger 10.0 energy 10.0 stress 0.0 curiosity 0.3 trust 7.1 social 0.124 (born 0.55) bold 0.948 (born 0.59) ms 1f3f  rest at 135,24
+I (30099) director: 2 dolt   elder age 272.1h size 1.36 hunger 10.0 energy 9.5 stress 0.0 curiosity 0.7 trust 7.5 social 0.927 (born 0.76) bold 0.945 (born 0.25) ms 1f3f  seek_food at 162,50
+I (30115) director: 3 nori   elder age 200.7h size 1.45 hunger 10.0 energy 9.4 stress 0.0 curiosity 1.0 trust 4.4 social 0.103 (born 0.28) bold 0.949 (born 0.85) ms 1f3f  visit_bubbles at 212,42
+I (30132) director: low-battery shelter: off
+I (30136) director: pellets 0 | trickle off (AUTO FEED off) | ravenous 1 | night idle 20s | veg 0.55 0.54 0.55 | algae cells 0/644 | courting dolt+zori | arrival -
+I (30151) director: sand dollars 280 (earned 2305) | shop: plant snail castle coral cluster shrimp urchin seahorse | colonies 400 | 10937 cm trimmed
+I (30164) director: urchin at x 359 | resting | appetite 0.003 | 12074 cm grazed so far (keeps the grass over 0.40)
+I (30174) director: seahorse at 278,253 | A BLADE | 11.19 days with you, 3 hitches, +0.28 trust passed on | 3 pellets snapped (2 paid; next pays in 0 s)
+I (30187) director: snail at 226,348 heading 0 deg | no target, cell -1 at -1,-1 (film 0) | 0 cells on the glass | 5749 grazed so far
+I (30199) director: bed 0 fronds (x from 19, pitch 12): 0.56 0.54 0.56 0.54 0.55 0.55 0.54 0.53 0.56 0.54 0.56 0.57 0.55 0.56 0.54
+I (30211) director: bed 1 fronds (x from 376, pitch 12): 0.54 0.53 0.54 0.54 0.55
+I (30218) director: bed 2 fronds (x from 278, pitch 12): 0.52 0.56 0.54 0.53 0.55 0.52 0.57 0.57
+I (30226) director: bed 3 leaves (x from 201, pitch 14): 0.89 0.86 0.93 0.87
+I (30233) director: plant placed: centre x 222 (the keeper's), depth BEHIND the fish
+I (30240) director: castle placed: centre x 122 (the keeper's), IN FRONT of the grass (the fish swim through)
+I (30250) director: coral placed: centre x 282 (the keeper's), IN FRONT, colour 8a5be0, growth 1.25 of 1.25 (the crown is out)
+I (30261) director: reef cluster placed: centre x 346 (the keeper's), BEHIND, look LAGOON, growth 2.00 of 2 (in full bloom)
+I (30272) director: nursery bed 3 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (30281) director: battery 100% on the cable, full, VBAT 4159 mV | brightness 91/255 (level 60%)

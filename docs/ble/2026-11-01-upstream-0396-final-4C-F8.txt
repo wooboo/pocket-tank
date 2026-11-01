@@ -1,0 +1,419 @@
+E (53181) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (53181) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (53382) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (53383) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (53450) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (53450) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (53651) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (53652) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (53719) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (53719) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (53918) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (53918) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (53986) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (53986) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (54188) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (54189) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (54256) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (54256) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (54457) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (54457) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (54524) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (54525) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (54723) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (54723) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (54791) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (54791) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (54991) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (54992) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (55059) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (55060) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (55262) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (55263) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (55330) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (55330) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (55532) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (55532) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (55600) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (55601) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (55803) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (55803) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (55871) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (55872) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (56073) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (56074) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (56141) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (56141) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (56345) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (56345) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (56413) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (56414) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (56616) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (56616) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (56684) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (56685) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (56885) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (56886) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (56953) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (56953) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (57154) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (57154) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (57223) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (57223) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (57472) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (57473) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (57568) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (57569) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (57846) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (57846) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (57949) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (57949) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (58223) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (58224) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (58331) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (58331) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (58604) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (58605) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (58713) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (58714) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (58987) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (58987) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (59097) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (59098) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (59371) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (59372) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (59483) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (59483) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (59755) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (59755) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (59868) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (59868) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (60144) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (60145) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (60255) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (60255) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+I (60462) display: fb mid 0x8200 corner 0x0000 | scene mid 0x8200 ep 2 | night 1 prefetch 0
+I (60463) display: 13.4 fps | render 58.0 ms flush 13.2 ms | scene 8.5 shafts 0.0 veg 26.6 fd/bub 8.0 fish 0.0 vig 4.6 algae 0.1 | card 0.0 ms x0 | veg 0.55 0.55 0.56
+I (60474) display: grass loop: 48 moments, band 351 rows, diffs 230 of 788 KB, 0 bakes (all current)
+I (60483) display: swim depth: 1.22 ms a frame (0.25 ms a hidden fish, 4.8 of them a frame)
+I (60491) display: frame 74.8 ms = polls 1.0 + tick 1.7 + prefetch wait 0.0 + render 58.0 + flush 13.2 + tail 0.6 + sleep 0.5 | flush: fill 10.8, wire wait 0.0, send calls 2.3
+I (60506) display: the fish stage split: fish 3.0 | snail+urchin 3.9 | front pieces back 0.5 | front grass 0.0 | front overlays 2.0 | front lanes 0.0 | arch shade 0.0 ms
+I (60521) pocket-tank: t=63s 4 fish goals: visit_bubbles rest explore rest | asks 52 decisions 8 last 3699 ms 11.6 tok/s | starve-ignored 4 | heap int 7 KB psram 1660 KB | battery 100% 4170 mV bright 91
+E (60637) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (60637) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (60775) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (60776) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+I (60992) advisor: zone 2 hunger 2 energy 9 stress 0 curiosity 0 bold 8 social 9 stage elder trust 5 bored 3 food none friend mid 7 bubble mid 4 reef far 3 wall mid 10 last visit_bubbles time night -> follow_friend urgency 4 p=0.38  [3676 ms, 11.7 tok/s]
+I (61004) advisor: prof ms: matmul 2578 attn 583 norm/quant 114 rope 29 swiglu 358 decode 0
+E (61082) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (61082) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (61180) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (61181) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (61456) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (61456) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (61554) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (61554) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (61828) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (61829) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (61924) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (61925) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (62199) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (62199) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (62298) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (62299) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (62581) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (62582) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (62681) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (62681) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (62961) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (62961) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (63059) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (63060) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (63332) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (63332) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (63431) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (63432) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (63704) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (63705) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (63805) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (63805) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (64086) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (64086) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (64187) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (64187) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (64521) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (64522) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (64661) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (64661) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+I (64802) advisor: zone 2 hunger 2 energy 9 stress 0 curiosity 0 bold 8 social 9 stage elder trust 5 bored 0 food none friend mid 7 bubble mid 4 reef far 3 wall mid 10 last follow_friend time night -> follow_friend urgency 4 p=0.58  [3704 ms, 11.6 tok/s]
+I (64814) advisor: prof ms: matmul 2593 attn 608 norm/quant 116 rope 30 swiglu 343 decode 0
+E (64924) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (64925) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (65002) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (65002) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (65192) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (65192) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (65270) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (65270) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (65460) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (65461) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (65538) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (65538) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (65728) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (65728) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (65805) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (65806) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (65995) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (65995) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (66073) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (66073) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (66264) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (66265) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (66342) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (66342) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (66530) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (66531) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (66607) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (66607) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (66797) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (66798) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (66875) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (66875) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (67067) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (67067) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (67144) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (67144) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (67335) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (67336) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (67413) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (67413) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (67604) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (67605) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (67682) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (67682) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (67874) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (67875) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (67952) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (67952) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (68143) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (68144) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (68221) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (68221) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (68410) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (68410) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (68487) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (68488) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (68677) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (68677) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (68755) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (68755) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (68947) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (68948) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (69025) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (69025) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (69216) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (69216) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (69293) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (69294) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (69483) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (69483) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (69560) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (69561) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (69751) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (69751) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (69829) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (69829) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (70019) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (70019) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (70096) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (70097) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (70286) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (70286) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (70363) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (70364) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+I (70443) display: fb mid 0x8200 corner 0x0000 | scene mid 0x8200 ep 2 | night 1 prefetch 0
+I (70443) display: 12.7 fps | render 61.0 ms flush 13.7 ms | scene 9.0 shafts 0.0 veg 28.5 fd/bub 8.2 fish 0.0 vig 4.8 algae 0.1 | card 0.0 ms x0 | veg 0.55 0.55 0.56
+I (70455) display: grass loop: 48 moments, band 351 rows, diffs 230 of 788 KB, 0 bakes (all current)
+I (70464) display: swim depth: 1.06 ms a frame (0.25 ms a hidden fish, 4.2 of them a frame)
+I (70472) display: frame 78.8 ms = polls 1.0 + tick 1.8 + prefetch wait 0.0 + render 61.0 + flush 13.7 + tail 0.6 + sleep 0.5 | flush: fill 11.4, wire wait 0.0, send calls 2.3
+I (70487) display: the fish stage split: fish 2.9 | snail+urchin 4.2 | front pieces back 0.6 | front grass 0.0 | front overlays 2.0 | front lanes 0.0 | arch shade 0.0 ms
+I (70502) pocket-tank: t=73s 4 fish goals: follow_friend rest explore rest | asks 53 decisions 10 last 3704 ms 11.6 tok/s | starve-ignored 4 | heap int 7 KB psram 1660 KB | battery 100% 4166 mV bright 91
+E (70631) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (70631) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (70708) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (70709) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (70899) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (70899) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (71002) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (71002) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (71283) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (71284) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (71381) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (71381) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (71655) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (71656) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (71751) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (71751) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (72027) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (72027) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (72128) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (72129) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (72408) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (72409) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (72509) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (72509) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (72794) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (72795) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (72894) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (72895) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (73176) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (73177) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+I (73192) director: v0.3.9.6 alpha (build 4f7d63f) running from ota_0, next boot ota_0 | manifest https://github.com/mediacutlet/pocket-tank/releases/latest/download/latest-amoled18.json | ota check (= CHECK FOR UPDATES) | ota url <url>|default
+E (73287) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (73288) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (73574) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (73574) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (73672) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (73673) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (73945) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (73946) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (74047) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (74047) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (74393) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (74394) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (74530) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (74531) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+I (74626) advisor: zone 5 hunger 9 energy 9 stress 0 curiosity 0 bold 9 social 0 stage elder trust 8 bored 0 food none friend near 10 bubble mid 10 reef mid 1 wall near 4 last rest time night -> rest urgency 0 p=0.97  [3711 ms, 11.6 tok/s]
+I (74636) advisor: prof ms: matmul 2584 attn 610 norm/quant 122 rope 32 swiglu 350 decode 0
+E (74839) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (74839) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (74943) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (74944) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (75226) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (75226) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+I (75241) director: 0 sol    elder age 202.6h size 1.51 hunger 2.4 energy 9.1 stress 0.0 curiosity 0.0 trust 6.0 social 0.950 (born 0.83) bold 0.896 (born 0.40) ms 1f3f  follow_friend at 305,124
+I (75247) director: 1 gira   elder age 266.1h size 1.57 hunger 10.0 energy 10.0 stress 0.0 curiosity 0.0 trust 8.8 social 0.052 (born 0.36) bold 0.948 (born 0.69) ms 1f3f  rest at 151,295
+I (75264) director: 2 help   elder age 260.9h size 1.25 hunger 10.0 energy 9.0 stress 0.0 curiosity 3.1 trust 7.4 social 0.180 (born 0.55) bold 0.948 (born 0.70) ms 1f3f  explore at 363,145
+I (75280) director: 3 misa   elder age 207.6h size 1.57 hunger 10.0 energy 10.0 stress 0.0 curiosity 0.4 trust 3.3 social 0.051 (born 0.05) bold 0.950 (born 0.95) ms 1f3f  rest at 188,279
+I (75297) director: low-battery shelter: off
+I (75300) director: pellets 0 | trickle off (AUTO FEED off) | ravenous 0 | night idle 64s | veg 0.55 0.55 0.56 | algae cells 0/644 | courting gira+help | arrival -
+I (75315) director: sand dollars 391 (earned 1088) | shop: plant snail castle coral cluster shrimp urchin seahorse | colonies 193 | 7962 cm trimmed
+I (75328) director: urchin at x 206 | ambling | appetite 0.009 | 12082 cm grazed so far (keeps the grass over 0.40)
+I (75338) director: seahorse at 278,243 | A BLADE | 11.19 days with you, 0 hitches, +0.00 trust passed on | 0 pellets snapped (0 paid; next pays in 0 s)
+I (75351) director: snail at 359,348 heading 0 deg | no target, cell -1 at -1,-1 (film 0) | 0 cells on the glass | 5200 grazed so far
+I (75363) director: bed 0 fronds (x from 19, pitch 12): 0.56 0.55 0.56 0.55 0.51 0.55 0.55 0.54 0.57 0.54 0.56 0.52 0.55 0.56 0.54
+I (75375) director: bed 1 fronds (x from 376, pitch 12): 0.55 0.54 0.54 0.55 0.56
+I (75382) director: bed 2 fronds (x from 278, pitch 12): 0.58 0.57 0.55 0.54 0.55 0.57 0.57 0.52
+I (75390) director: bed 3 leaves (x from 208, pitch 14): 0.89 0.86 0.93 0.87
+I (75397) director: plant placed: centre x 229 (the default), depth BEHIND the fish
+I (75404) director: castle placed: centre x 262 (the keeper's), BEHIND the grass
+I (75412) director: coral placed: centre x 66 (the keeper's), IN FRONT, colour ff7a1e, growth 1.25 of 1.25 (the crown is out)
+I (75423) director: reef cluster placed: centre x 330 (the default), IN FRONT, look LAGOON, growth 1.80 of 2 (full size, blooming)
+I (75434) director: nursery bed 3 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (75443) director: battery 100% on the cable, full, VBAT 4170 mV | brightness 91/255 (level 60%)
+I (75451) pocket-tank: battery page: 100% FULL | since the cable moved 9D 21H (at 2%), screen on - | left - | a full charge ~200 min (drain 30.0 %/h, charge 58.3 %/h)
+E (75553) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (75554) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (75833) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (75833) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (75937) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (75937) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (76222) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (76222) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (76325) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (76326) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (76607) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (76607) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (76707) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (76708) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (76991) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (76991) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (77089) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (77090) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+I (77303) director: roster 0 name=sol id=2c59b054d853a61f:2 age=729254.4 body=f48fb1 accent=ffe08a paid=7 parents=,
+I (77304) director: roster 1 name=gira id=cadb9a72f3f25d16:4 age=957942.8 body=f48fb1 accent=ffbd59 paid=15 parents=dolt,zori
+I (77314) director: roster 2 name=help id=cadb9a72f3f25d16:5 age=939421.7 body=f48fb1 accent=ffbd59 paid=7 parents=dolt,zori
+I (77325) director: roster 3 name=misa id=cadb9a72f3f25d16:6 age=747229.2 body=f48fb1 accent=ffbd59 paid=7 parents=chip,zori
+I (77336) director: fish count=4 out=0 in=0 offered=0 name=-
+I (77341) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=391 out=0 in=0
+E (77415) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (77416) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (77521) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (77521) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (77802) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (77802) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (77919) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (77920) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (78297) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (78297) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+I (78339) advisor: zone 3 hunger 9 energy 9 stress 0 curiosity 3 bold 9 social 2 stage elder trust 7 bored 1 food none friend near 7 bubble mid 6 reef mid 3 wall mid 12 last explore time night -> rest urgency 0 p=0.87  [3667 ms, 11.7 tok/s]
+I (78350) advisor: prof ms: matmul 2574 attn 585 norm/quant 111 rope 29 swiglu 354 decode 0
+E (78396) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (78396) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (78674) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (78674) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (78772) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (78773) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (79044) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (79044) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (79143) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (79144) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+I (79348) director: fish count=4 out=0 in=0 offered=0 name=-
+I (79348) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=391 out=0 in=0
+E (79419) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (79419) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (79520) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (79520) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (79800) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (79801) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (79901) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (79901) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (80186) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (80186) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (80289) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (80289) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+I (80498) display: fb mid 0x8200 corner 0x0000 | scene mid 0x8200 ep 2 | night 1 prefetch 0
+I (80498) display: 10.1 fps | render 77.2 ms flush 15.1 ms | scene 10.8 shafts 0.0 veg 36.0 fd/bub 10.7 fish 0.0 vig 6.0 algae 0.1 | card 0.0 ms x0 | veg 0.55 0.55 0.56
+I (80510) display: grass loop: 48 moments, band 351 rows, diffs 230 of 788 KB, 0 bakes (all current)
+I (80519) display: swim depth: 1.19 ms a frame (0.24 ms a hidden fish, 5.0 of them a frame)
+I (80527) display: frame 99.3 ms = polls 3.9 + tick 2.0 + prefetch wait 0.0 + render 77.2 + flush 15.1 + tail 0.8 + sleep 0.5 | flush: fill 13.1, wire wait 0.0, send calls 2.0
+I (80542) display: the fish stage split: fish 3.5 | snail+urchin 6.2 | front pieces back 0.7 | front grass 0.0 | front overlays 2.4 | front lanes 0.0 | arch shade 0.0 ms
+I (80557) pocket-tank: t=83s 4 fish goals: follow_friend rest rest rest | asks 56 decisions 12 last 3667 ms 11.7 tok/s | starve-ignored 4 | heap int 7 KB psram 1660 KB | battery 100% 4170 mV bright 91
+E (80649) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (80650) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (80740) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (80741) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (81022) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (81023) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (81122) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (81122) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (81395) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (81396) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+I (81440) director: saved
+E (81526) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (81526) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (81871) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (81871) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (82008) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (82009) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+I (82112) advisor: zone 5 hunger 9 energy 9 stress 0 curiosity 0 bold 9 social 0 stage elder trust 3 bored 0 food none friend near 4 bubble mid 7 reef mid 10 wall mid 1 last rest time night -> rest urgency 0 p=0.98  [3702 ms, 11.6 tok/s]
+I (82123) advisor: prof ms: matmul 2606 attn 586 norm/quant 120 rope 31 swiglu 345 decode 0
+E (82263) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (82264) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (82341) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (82341) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (82535) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (82535) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (82613) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (82613) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (82806) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (82806) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (82883) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (82883) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (83075) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (83075) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (83152) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (83152) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (83345) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (83345) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E

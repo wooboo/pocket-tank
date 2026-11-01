@@ -1,0 +1,127 @@
+COMMAND battery 15
+I (200288) director: gauge STAGED at 15% on battery (10 or less: the notice, the cue, the pill stays up) (`battery real` ends it)
+I (200601) pocket-tank: battery: unplugged at 15%
+I (201120) display: fb mid 0x8200 corner 0x0000 | scene mid 0x8200 ep 6 | night 1 prefetch 0
+I (201120) display: 13.1 fps | render 57.6 ms flush 14.2 ms | scene 3.0 shafts 0.0 veg 29.4 fd/bub 8.4 fish 0.0 vig 4.8 algae 0.1 | card 0.0 ms x0 | veg 0.55 0.55 0.56
+I (201132) display: grass loop: 48 moments, band 351 rows, diffs 0 of 788 KB, 0 bakes (all current)
+I (201141) display: swim depth: 2.18 ms a frame (0.37 ms a hidden fish, 5.9 of them a frame)
+I (201149) display: frame 76.6 ms = polls 1.0 + tick 2.4 + prefetch wait 0.0 + render 57.6 + flush 14.2 + tail 0.6 + sleep 0.6 | flush: fill 12.4, wire wait 0.0, send calls 1.8
+I (201164) display: the fish stage split: fish 4.1 | snail+urchin 2.8 | front pieces back 0.4 | front grass 1.9 | front overlays 2.0 | front lanes 0.0 | arch shade 0.0 ms
+I (201179) pocket-tank: t=276s 4 fish goals: follow_friend rest rest rest | asks 45 decisions 32 last 3779 ms 11.4 tok/s | starve-ignored 0 | heap int 18 KB psram 1659 KB | battery 100% 4168 mV bright 91
+I (211226) display: fb mid 0x8200 corner 0x0000 | scene mid 0x8200 ep 6 | night 1 prefetch 0
+I (211227) display: 13.8 fps | render 54.7 ms flush 13.2 ms | scene 2.7 shafts 0.0 veg 25.9 fd/bub 7.4 fish 0.0 vig 4.8 algae 0.1 | card 0.0 ms x0 | veg 0.55 0.55 0.56
+I (211238) display: grass loop: 48 moments, band 351 rows, diffs 0 of 788 KB, 0 bakes (all current)
+I (211247) display: swim depth: 5.20 ms a frame (1.02 ms a hidden fish, 5.1 of them a frame)
+I (211255) display: frame 72.4 ms = polls 1.0 + tick 2.8 + prefetch wait 0.0 + render 54.7 + flush 13.2 + tail 0.6 + sleep 0.5 | flush: fill 11.4, wire wait 0.0, send calls 1.8
+I (211270) display: the fish stage split: fish 6.9 | snail+urchin 2.3 | front pieces back 0.4 | front grass 1.6 | front overlays 1.9 | front lanes 0.0 | arch shade 0.0 ms
+I (211285) pocket-tank: t=286s 4 fish goals: follow_friend rest rest rest | asks 47 decisions 32 last 3779 ms 11.4 tok/s | starve-ignored 0 | heap int 18 KB psram 1659 KB | battery 100% 4169 mV bright 91
+I (212346) advisor: zone 4 hunger 9 energy 8 stress 0 curiosity 1 bold 8 social 9 stage elder trust 5 bored 3 food none friend near 3 bubble mid 7 reef far 9 wall mid 11 last follow_friend time night -> rest urgency 0 p=0.28  [3757 ms, 11.4 tok/s]
+I (212357) advisor: prof ms: matmul 2628 attn 603 norm/quant 122 rope 31 swiglu 360 decode 0
+I (216154) advisor: zone 4 hunger 9 energy 8 stress 0 curiosity 1 bold 8 social 9 stage elder trust 5 bored 3 food none friend near 5 bubble mid 6 reef far 8 wall mid 11 last follow_friend time night -> rest urgency 0 p=0.37  [3754 ms, 11.5 tok/s]
+I (216165) advisor: prof ms: matmul 2636 attn 600 norm/quant 116 rope 31 swiglu 358 decode 0
+I (219983) advisor: zone 4 hunger 9 energy 9 stress 0 curiosity 1 bold 8 social 9 stage elder trust 5 bored 2 food none friend mid 5 bubble far 6 reef far 8 wall near 11 last rest time night -> rest urgency 0 p=0.69  [3757 ms, 11.4 tok/s]
+I (219993) advisor: prof ms: matmul 2630 attn 610 norm/quant 114 rope 31 swiglu 358 decode 0
+I (221237) display: fb mid 0x8200 corner 0x0000 | scene mid 0x8200 ep 6 | night 1 prefetch 0
+I (221237) display: 10.4 fps | render 73.7 ms flush 16.0 ms | scene 3.4 shafts 0.0 veg 35.2 fd/bub 9.6 fish 0.0 vig 5.5 algae 0.1 | card 0.0 ms x0 | veg 0.55 0.55 0.56
+I (221249) display: grass loop: 48 moments, band 351 rows, diffs 0 of 788 KB, 0 bakes (all current)
+I (221258) display: swim depth: 8.32 ms a frame (2.08 ms a hidden fish, 4.0 of them a frame)
+I (221266) display: frame 95.7 ms = polls 1.1 + tick 3.3 + prefetch wait 0.0 + render 73.7 + flush 16.0 + tail 0.8 + sleep 0.5 | flush: fill 14.1, wire wait 0.0, send calls 1.8
+I (221281) display: the fish stage split: fish 10.4 | snail+urchin 3.8 | front pieces back 0.5 | front grass 2.2 | front overlays 2.2 | front lanes 0.0 | arch shade 0.0 ms
+I (221296) pocket-tank: t=296s 4 fish goals: rest rest rest rest | asks 48 decisions 35 last 3757 ms 11.4 tok/s | starve-ignored 0 | heap int 18 KB psram 1659 KB | battery 100% 4169 mV bright 91
+I (229769) advisor: zone 4 hunger 9 energy 9 stress 0 curiosity 0 bold 9 social 2 stage elder trust 7 bored 0 food none friend mid 6 bubble mid 1 reef far 3 wall mid 8 last rest time night -> rest urgency 0 p=0.99  [3787 ms, 11.4 tok/s]
+I (229779) advisor: prof ms: matmul 2645 attn 618 norm/quant 120 rope 30 swiglu 360 decode 0
+I (231352) display: fb mid 0x8200 corner 0x0000 | scene mid 0x8200 ep 6 | night 1 prefetch 0
+I (231352) display: 12.6 fps | render 60.4 ms flush 14.2 ms | scene 3.0 shafts 0.0 veg 29.4 fd/bub 7.7 fish 0.0 vig 4.6 algae 0.1 | card 0.0 ms x0 | veg 0.55 0.55 0.56
+I (231364) display: grass loop: 48 moments, band 351 rows, diffs 0 of 788 KB, 0 bakes (all current)
+I (231373) display: swim depth: 6.00 ms a frame (1.50 ms a hidden fish, 4.0 of them a frame)
+I (231381) display: frame 79.4 ms = polls 1.0 + tick 2.9 + prefetch wait 0.0 + render 60.4 + flush 14.2 + tail 0.6 + sleep 0.5 | flush: fill 12.4, wire wait 0.0, send calls 1.8
+I (231396) display: the fish stage split: fish 7.8 | snail+urchin 2.9 | front pieces back 0.4 | front grass 1.8 | front overlays 2.0 | front lanes 0.0 | arch shade 0.0 ms
+I (231411) pocket-tank: t=307s 4 fish goals: rest rest rest rest | asks 51 decisions 36 last 3787 ms 11.4 tok/s | starve-ignored 0 | heap int 18 KB psram 1659 KB | battery 100% 4167 mV bright 91
+COMMAND state
+I (232374) director: 0 sol    elder age 202.5h size 1.51 hunger 10.0 energy 10.0 stress 0.0 curiosity 0.9 trust 6.0 social 0.950 (born 0.83) bold 0.896 (born 0.40) ms 1f3f  rest at 65,330
+I (232380) director: 1 gira   elder age 266.0h size 1.57 hunger 10.0 energy 10.0 stress 0.0 curiosity 0.0 trust 8.8 social 0.052 (born 0.36) bold 0.949 (born 0.69) ms 1f3f  rest at 322,310
+I (232396) director: 2 help   elder age 260.9h size 1.25 hunger 10.0 energy 10.0 stress 0.0 curiosity 0.0 trust 7.4 social 0.180 (born 0.55) bold 0.949 (born 0.70) ms 1f3f  rest at 116,220
+I (232413) director: 3 misa   elder age 207.5h size 1.57 hunger 10.0 energy 10.0 stress 0.0 curiosity 0.0 trust 3.3 social 0.051 (born 0.05) bold 0.950 (born 0.95) ms 1f3f  rest at 414,222
+I (232429) director: low-battery shelter: active
+I (232433) director: pellets 0 | trickle off (AUTO FEED off) | ravenous 0 | night idle 221s | veg 0.55 0.55 0.56 | algae cells 0/644 | courting gira+help | arrival -
+I (232448) director: sand dollars 391 (earned 1088) | shop: plant snail castle coral cluster shrimp urchin seahorse | colonies 193 | 7962 cm trimmed
+I (232461) director: urchin at x 159 | ambling | appetite 0.031 | 12082 cm grazed so far (keeps the grass over 0.40)
+I (232471) director: seahorse at 278,243 | A BLADE | 11.19 days with you, 0 hitches, +0.00 trust passed on | 0 pellets snapped (0 paid; next pays in 0 s)
+I (232485) director: snail at 324,354 heading 0 deg | no target, cell -1 at -1,-1 (film 0) | 0 cells on the glass | 5200 grazed so far
+I (232497) director: bed 0 fronds (x from 19, pitch 12): 0.56 0.55 0.56 0.55 0.51 0.55 0.55 0.53 0.56 0.54 0.56 0.52 0.55 0.56 0.54
+I (232508) director: bed 1 fronds (x from 376, pitch 12): 0.54 0.54 0.54 0.55 0.56
+I (232516) director: bed 2 fronds (x from 278, pitch 12): 0.58 0.57 0.54 0.54 0.55 0.57 0.57 0.52
+I (232524) director: bed 3 leaves (x from 208, pitch 14): 0.89 0.86 0.93 0.87
+I (232531) director: plant placed: centre x 229 (the default), depth BEHIND the fish
+I (232538) director: castle placed: centre x 262 (the keeper's), BEHIND the grass
+I (232545) director: coral placed: centre x 66 (the keeper's), IN FRONT, colour ff7a1e, growth 1.25 of 1.25 (the crown is out)
+I (232557) director: reef cluster placed: centre x 330 (the default), IN FRONT, look LAGOON, growth 1.80 of 2 (full size, blooming)
+I (232568) director: nursery bed 3 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (232577) director: battery 100% on the cable, full, VBAT 4168 mV | brightness 91/255 (level 60%)
+I (232586) pocket-tank: battery page: 15% ON BATTERY (STAGED) | since the cable moved 9D 21H (at 2%), screen on - | left 30M | a full charge ~200 min (drain 30.0 %/h, charge 58.3 %/h)
+I (233567) advisor: zone 6 hunger 9 energy 9 stress 0 curiosity 0 bold 9 social 0 stage elder trust 3 bored 0 food none friend mid 12 bubble far 2 reef mid 12 wall near 8 last rest time night -> rest urgency 0 p=0.98  [3734 ms, 11.5 tok/s]
+I (233578) advisor: prof ms: matmul 2621 attn 602 norm/quant 119 rope 31 swiglu 347 decode 0
+COMMAND battery real
+I (245085) director: the real gauge (battery <pct> [charging|full|plugged] stages one)
+I (245156) display: fb mid 0x8200 corner 0x0000 | scene mid 0x8200 ep 6 | night 1 prefetch 0
+I (245156) display: 2.2 fps | render 74.5 ms flush 16.4 ms | scene 3.4 shafts 0.0 veg 36.7 fd/bub 9.7 fish 0.0 vig 5.8 algae 0.1 | card 0.0 ms x0 | veg 0.55 0.55 0.56
+I (245168) display: grass loop: 48 moments, band 351 rows, diffs 0 of 788 KB, 0 bakes (all current)
+I (245177) display: swim depth: 6.63 ms a frame (1.66 ms a hidden fish, 4.0 of them a frame)
+I (245185) display: frame 460.9 ms = polls 362.7 + tick 3.4 + prefetch wait 0.0 + render 74.5 + flush 16.4 + tail 2.6 + sleep 0.5 | flush: fill 14.5, wire wait 0.0, send calls 1.8
+I (245200) display: the fish stage split: fish 8.8 | snail+urchin 4.1 | front pieces back 0.5 | front grass 2.4 | front overlays 2.3 | front lanes 0.0 | arch shade 0.0 ms
+I (245215) pocket-tank: t=310s 4 fish goals: rest rest rest rest | asks 51 decisions 38 last 3294 ms 13.1 tok/s | starve-ignored 0 | heap int 18 KB psram 1659 KB | battery 100% 4169 mV bright 91
+COMMAND state
+I (247206) director: 0 sol    elder age 202.5h size 1.51 hunger 10.0 energy 10.0 stress 0.0 curiosity 0.8 trust 6.0 social 0.950 (born 0.83) bold 0.896 (born 0.40) ms 1f3f  rest at 70,328
+I (247211) director: 1 gira   elder age 266.0h size 1.57 hunger 10.0 energy 10.0 stress 0.0 curiosity 0.0 trust 8.8 social 0.052 (born 0.36) bold 0.949 (born 0.69) ms 1f3f  rest at 318,313
+I (247228) director: 2 help   elder age 260.9h size 1.25 hunger 10.0 energy 10.0 stress 0.0 curiosity 0.0 trust 7.4 social 0.180 (born 0.55) bold 0.949 (born 0.70) ms 1f3f  rest at 112,222
+I (247244) director: 3 misa   elder age 207.5h size 1.57 hunger 10.0 energy 10.0 stress 0.0 curiosity 0.0 trust 3.3 social 0.051 (born 0.05) bold 0.950 (born 0.95) ms 1f3f  rest at 419,222
+I (247261) director: low-battery shelter: active
+I (247265) director: pellets 0 | trickle off (AUTO FEED off) | ravenous 0 | night idle 225s | veg 0.55 0.55 0.56 | algae cells 0/644 | courting gira+help | arrival -
+I (247280) director: sand dollars 391 (earned 1088) | shop: plant snail castle coral cluster shrimp urchin seahorse | colonies 193 | 7962 cm trimmed
+I (247293) director: urchin at x 154 | ambling | appetite 0.031 | 12082 cm grazed so far (keeps the grass over 0.40)
+I (247303) director: seahorse at 278,243 | A BLADE | 11.19 days with you, 0 hitches, +0.00 trust passed on | 0 pellets snapped (0 paid; next pays in 0 s)
+I (247316) director: snail at 337,354 heading 0 deg | no target, cell -1 at -1,-1 (film 0) | 0 cells on the glass | 5200 grazed so far
+I (247329) director: bed 0 fronds (x from 19, pitch 12): 0.56 0.55 0.56 0.55 0.51 0.55 0.55 0.53 0.56 0.54 0.56 0.52 0.55 0.56 0.54
+I (247340) director: bed 1 fronds (x from 376, pitch 12): 0.54 0.54 0.54 0.55 0.56
+I (247347) director: bed 2 fronds (x from 278, pitch 12): 0.58 0.57 0.54 0.54 0.55 0.57 0.57 0.52
+I (247356) director: bed 3 leaves (x from 208, pitch 14): 0.89 0.86 0.93 0.87
+I (247363) director: plant placed: centre x 229 (the default), depth BEHIND the fish
+I (247370) director: castle placed: centre x 262 (the keeper's), BEHIND the grass
+I (247377) director: coral placed: centre x 66 (the keeper's), IN FRONT, colour ff7a1e, growth 1.25 of 1.25 (the crown is out)
+I (247388) director: reef cluster placed: centre x 330 (the default), IN FRONT, look LAGOON, growth 1.80 of 2 (full size, blooming)
+I (247400) director: nursery bed 3 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (247409) director: battery 100% on the cable, full, VBAT 4167 mV | brightness 91/255 (level 60%)
+I (247417) pocket-tank: battery page: 100% FULL | since the cable moved 9D 21H (at 2%), screen on - | left - | a full charge ~200 min (drain 30.0 %/h, charge 58.3 %/h)
+
+RECOVERY CONFIRMATION (after the 30-second hysteresis)
+I (255198) display: fb mid 0x8200 corner 0x0000 | scene mid 0x82I (373312) director: 0 sol    elder age 202.6h size 1.51 hunger 10.0 energy 9.2 stress 0.0 curiosity 0.0 trust 6.0 social 0.950 (born 0.83) bold 0.896 (born 0.40) ms 1f3f  follow_friend at 230,228
+I (373319) director: 1 gira   elder age 266.1h size 1.57 hunger 10.0 energy 10.0 stress 0.0 curiosity 0.0 trust 8.8 social 0.052 (born 0.36) bold 0.949 (born 0.69) ms 1f3f  rest at 175,223
+I (373336) director: 2 help   elder age 260.9h size 1.25 hunger 10.0 energy 10.0 stress 0.0 curiosity 0.0 trust 7.4 social 0.180 (born 0.55) bold 0.949 (born 0.70) ms 1f3f  rest at 197,275
+I (373352) director: 3 misa   elder age 207.5h size 1.57 hunger 10.0 energy 10.0 stress 0.0 curiosity 0.0 trust 3.3 social 0.051 (born 0.05) bold 0.950 (born 0.95) ms 1f3f  rest at 163,304
+I (373369) director: low-battery shelter: off
+I (373373) director: pellets 0 | trickle off (AUTO FEED off) | ravenous 0 | night idle 351s | veg 0.55 0.55 0.56 | algae cells 0/644 | courting gira+help | arrival -
+I (373387) director: sand dollars 391 (earned 1088) | shop: plant snail castle coral cluster shrimp urchin seahorse | colonies 193 | 7962 cm trimmed
+I (373400) director: urchin at x 117 | ambling | appetite 0.049 | 12082 cm grazed so far (keeps the grass over 0.40)
+I (373411) director: seahorse at 278,243 | A BLADE | 11.19 days with you, 0 hitches, +0.00 trust passed on | 0 pellets snapped (0 paid; next pays in 0 s)
+I (373424) director: snail at 211,348 heading 180 deg | no target, cell -1 at -1,-1 (film 0) | 0 cells on the glass | 5200 grazed so far
+I (373436) director: bed 0 fronds (x from 19, pitch 12): 0.56 0.55 0.56 0.55 0.51 0.55 0.55 0.53 0.56 0.54 0.56 0.52 0.55 0.56 0.54
+I (373448) director: bed 1 fronds (x from 376, pitch 12): 0.55 0.54 0.54 0.55 0.56
+I (373455) director: bed 2 fronds (x from 278, pitch 12): 0.58 0.57 0.54 0.54 0.55 0.57 0.57 0.52
+I (373464) director: bed 3 leaves (x from 208, pitch 14): 0.89 0.86 0.93 0.87
+I (373470) director: plant placed: centre x 229 (the default), depth BEHIND the fish
+I (373478) director: castle placed: centre x 262 (the keeper's), BEHIND the grass
+I (373485) director: coral placed: centre x 66 (the keeper's), IN FRONT, colour ff7a1e, growth 1.25 of 1.25 (the crown is out)
+I (373496) director: reef cluster placed: centre x 330 (the default), IN FRONT, look LAGOON, growth 1.80 of 2 (full size, blooming)
+I (373507) director: nursery bed 3 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (373516) director: battery 100% on the cable, full, VBAT 4170 mV | brightness 91/255 (level 60%)
+I (373525) pocket-tank: battery page: 100% FULL | since the cable moved 9D 21H (at 2%), screen on - | left - | a full charge ~200 min (drain 30.0 %/h, charge 58.3 %/h)
+I (373568) director: saved
+I (375424) advisor: zone 5 hunger 9 energy 9 stress 0 curiosity 0 bold 9 social 2 stage elder trust 7 bored 0 food none friend near 4 bubble mid 9 reef mid 12 wall mid 2 last rest time night -> rest urgency 0 p=0.96  [3759 ms, 11.4 tok/s]
+I (375434) advisor: prof ms: matmul 2645 attn 589 norm/quant 123 rope 31 swiglu 358 decode 0
+I (375636) display: fb mid 0x8200 corner 0x0000 | scene mid 0x8200 ep 6 | night 1 prefetch 0
+I (375637) display: 13.3 fps | render 55.2 ms flush 13.7 ms | scene 2.8 shafts 0.0 veg 27.5 fd/bub 7.6 fish 0.0 vig 5.9 algae 0.1 | card 0.0 ms x0 | veg 0.55 0.55 0.56
+I (375648) display: grass loop: 48 moments, band 351 rows, diffs 0 of 788 KB, 0 bakes (all current)
+I (375657) display: swim depth: 1.69 ms a frame (0.44 ms a hidden fish, 3.9 of them a frame)
+I (375666) display: frame 75.0 ms = polls 2.9 + tick 2.3 + prefetch wait 0.0 + render 55.2 + flush 13.7 + tail 0.6 + sleep 0.5 | flush: fill 11.9, wire wait 0.0, send calls 1.8
+I (375681) display: the fish stage split: fish 3.9 | snail+urchin 2.5 | front pieces back 0.3 | front grass 1.8 | front overlays 2.0 | front lanes 0.0 | arch shade 0.0 ms
+I (375696) pocket-tank: t=440s 4 fish goals: follow_friend rest rest rest | asks 64 decisions 48 last 3759 ms 11.4 tok/s | starve-ignored 0 | heap int 18 KB psram 1659 KB | battery 100% 4169 mV bright 91

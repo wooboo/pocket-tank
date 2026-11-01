@@ -1,0 +1,31 @@
+# pocket-tank preflight 2026-11-01_135854_754336 on /dev/cu.usbmodem31201
+E (162298) async_mcp.gdma: mcp_gdma_memcpy(399): failed to creatI (210778) batlog: 6 samples (h:mm since the first | SoC | VBAT | bright | state | mA since previous)
+I (210778) batlog:     0:00 |  20% | 3753 mV |   0 | asleep | bed
+I (210783) batlog:   235:49 |  98% | 4204 mV |  91 | awake  | boot     -0.7 mA
+I (210789) batlog:   235:54 | 100% | 4187 mV |  91 | awake  |         -48.0 mA
+I (210796) batlog:   236:13 | 100% | 4171 mV |  91 | awake  | boot      0.0 mA
+I (210803) batlog:   236:18 | 100% | 4172 mV |  91 | awake  |           0.0 mA
+I (210810) batlog:   236:23 | 100% | 4171 mV |  91 | awake  |           0.0 mA
+I (210817) batlog:   awake:  0.6 h, -4 mAh -> -7 mA average
+I (210822) batlog:   asleep: 235.8 h, -156.0 mAh -> -0.66 mA average
+I (210828) batlog:   (SoC is 1% = 2 mAh; short awake windows are coarse, a night is not)
+I (214875) director: 0 sol    elder age 202.5h size 1.51 hunger 10.0 energy 9.5 stress 0.0 curiosity 0.0 trust 6.0 social 0.950 (born 0.83) bold 0.897 (born 0.40) ms 1f3f  follow_friend at 233,184
+I (214881) director: 1 gira   elder age 266.0h size 1.57 hunger 10.0 energy 10.0 stress 0.0 curiosity 0.0 trust 8.8 social 0.052 (born 0.36) bold 0.949 (born 0.69) ms 1f3f  rest at 170,255
+I (214898) director: 2 help   elder age 260.8h size 1.25 hunger 10.0 energy 10.0 stress 0.0 curiosity 0.0 trust 7.4 social 0.179 (born 0.55) bold 0.949 (born 0.70) ms 1f3f  rest at 185,196
+I (214914) director: 3 misa   elder age 207.5h size 1.57 hunger 10.0 energy 10.0 stress 0.0 curiosity 0.0 trust 3.3 social 0.051 (born 0.05) bold 0.950 (born 0.95) ms 1f3f  rest at 173,297
+I (214931) director: low-battery shelter: off
+I (214935) director: pellets 0 | trickle off (AUTO FEED off) | ravenous 0 | night idle 205s | veg 0.55 0.54 0.55 | algae cells 0/644 | courting gira+help | arrival -
+I (214949) director: sand dollars 391 (earned 1088) | shop: plant snail castle coral cluster shrimp urchin seahorse | colonies 193 | 7962 cm trimmed
+I (214962) director: urchin at x 99 | ambling | appetite 0.028 | 12081 cm grazed so far (keeps the grass over 0.40)
+I (214973) director: seahorse at 187,250 | A BLADE | 11.18 days with you, 0 hitches, +0.00 trust passed on | 0 pellets snapped (0 paid; next pays in 0 s)
+I (214986) director: snail at 48,198 heading 90 deg | no target, cell -1 at -1,-1 (film 0) | 0 cells on the glass | 5200 grazed so far
+I (214998) director: bed 0 fronds (x from 19, pitch 12): 0.56 0.55 0.56 0.55 0.51 0.55 0.55 0.53 0.56 0.54 0.56 0.52 0.55 0.56 0.54
+I (215009) director: bed 1 fronds (x from 376, pitch 12): 0.54 0.54 0.54 0.55 0.56
+I (215017) director: bed 2 fronds (x from 278, pitch 12): 0.58 0.56 0.54 0.54 0.55 0.57 0.57 0.52
+I (215026) director: bed 3 leaves (x from 208, pitch 14): 0.89 0.86 0.93 0.87
+I (215032) director: plant placed: centre x 229 (the default), depth BEHIND the fish
+I (215040) director: castle placed: centre x 262 (the keeper's), BEHIND the grass
+I (215047) director: coral placed: centre x 66 (the keeper's), IN FRONT, colour ff7a1e, growth 1.25 of 1.25 (the crown is out)
+I (215058) director: reef cluster placed: centre x 330 (the default), IN FRONT, look LAGOON, growth 1.80 of 2 (full size, blooming)
+I (215069) director: nursery bed 3 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (215079) director: battery 100% on the cable, full, VBAT 4168 mV | brightness 91/255 (level 60%)
