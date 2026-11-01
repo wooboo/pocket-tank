@@ -212,10 +212,6 @@ void audio_port_set_volume(int level) {
     ESP_LOGI(TAG, "volume %s", s_volume == 0 ? "off" : s_volume == 1 ? "quiet" : "normal");
 }
 int  audio_port_volume(void) { return s_volume; }
-void audio_port_set_night(bool night) {
-    if (!s_ok) return;
-    xSemaphoreTake(s_mx, portMAX_DELAY); audio_set_night(night); xSemaphoreGive(s_mx);
-}
 void audio_port_sleep(void) {
     if (!s_ok || !s_up) return;
     s_sleep_req = true; xTaskNotifyGive(s_task);

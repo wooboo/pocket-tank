@@ -39,7 +39,7 @@ bool    persist_port_load(void *buf, size_t max, size_t *got); /* the saved blob
                                                             * build wrote (*got = it); a NEWER build's longer one
                                                             * loads its first max bytes (*got = max); false = nothing */
 bool    persist_port_save(const void *buf, size_t len);
-bool    persist_port_erase(void);                          /* EVERY saved tank, parked copies included */
+bool    persist_port_erase(void);                          /* the tank on the glass (and a parked copy); the shelf and the board keys stay (D13) */
 int64_t clock_port_now_unix(void);                         /* 0 if unknown */
 /* the release (version.h PT_RELEASE_NUM) of the build that wrote the save
  * the last load read - 0 for a save from before release numbers, or none */
@@ -47,6 +47,12 @@ uint32_t progression_loaded_release(void);
 int64_t  progression_loaded_unix(void);                    /* the loaded save's wall-clock stamp, 0 = none (a clockless board seeds its clock from it) */
 const char *version_port_string(void);                     /* the build's git describe (device: the app
                                                             * descriptor; sim: PT_VERSION) - the settings page */
+/* the board the tank is running on, told from its chips at boot, as a release
+ * board id (version.h PT_BOARD) - NULL when it cannot be told. Not PT_BOARD when
+ * another board's version was installed (0.3.9.3: the 1.8's image runs on every
+ * board): the WRONG VERSION card, and CHECK FOR UPDATES offers this board's.
+ * The sim: PT_BOARD, or --hw <id>. */
+const char *board_port_hw(void);
 
 /* call after tank_init: restores the saved tank (or creates a new population)
  * and lives through the time since the save was written - since 2026-09-16
@@ -66,6 +72,21 @@ float progression_boot(tank_t *t);
  * eight-hour sleep should be worth 2 hours of growth") */
 #define SLEEP_GROWTH_FRAC 0.25f
 float progression_wake(tank_t *t, int64_t now_unix);
+/* the tank switcher (common/shelf.c): what the board shares goes with a swap -
+ * the wallet and the board's settings (docs/tank-switcher.md "The shared
+ * data"; the tool LOCK and AUTO FEED stay each tank's own, D14) - taken from
+ * the tank leaving the glass and given to the one that comes in */
+typedef struct {
+    int32_t  sd_balance;
+    uint16_t light_idle_s;
+    uint8_t  light_auto, light_tip_seen, screen_turned, orient_lock, orient_q, pad;
+} progression_carry_t;
+void progression_carry_take(const tank_t *t, progression_carry_t *c);
+void progression_carry_give(tank_t *t, const progression_carry_t *c);
+/* a stored save's saved_unix rewritten in place (the shelf: the wake then lives the time on the shelf) */
+bool progression_blob_set_saved_unix(void *blob, size_t len, int64_t unix);
+/* a stored save's pieces: its sd_unlocks (0 for a blob that is not a save) - the shelf's REMOVE values them */
+uint32_t progression_blob_unlocks(const void *blob, size_t len);
 /* live through one stretch of device sleep: tank_tick_sleep, growth at
  * SLEEP_GROWTH_FRAC, and the tank's "first full night's sleep" milestone once
  * a single stretch reaches FULL_NIGHT_S (progression_wake's path; the director's
@@ -77,6 +98,12 @@ void progression_slept(tank_t *t, float seconds);
 void progression_settings_changed(void);
 /* call every frame after tank_tick */
 void progression_tick(tank_t *t, float dt);
+/* fish i is nose to tail with another (the company that warms social) */
+bool progression_near_friend(const tank_t *t, int i);
+/* fish i is warmed by the keeper's finger: nose to tail with another there, or (0.3.9.3) round it
+ * with another - the fish circle a held finger a body apart, not piled under it (tank.c HOLD_RING_*),
+ * and a ring neighbour is company: SOCIAL_RING_X the nose-to-tail distance */
+bool progression_finger_company(const tank_t *t, int i);
 /* call on light-off / shutdown (autosaves on events + heartbeat anyway) */
 /* Save the current tank. False means the port rejected the write; the state
  * remains dirty so the periodic saver will retry. */
@@ -178,13 +205,27 @@ const char *const *progression_fry_tip(int kind);
  * in tank_t (sd_paid_fish, sd_colonies_paid, sd_inches_paid) keeps a save
  * from paying twice. A tank saved before the shop is paid what it already
  * earned on its first boot with it, once (Strato: "yes, pay it once"). */
-#define SD_MEAL        2
+#define SD_MEAL        1
+/* a meal pays SD_MEAL PER FISH, each fish once per SD_MEAL_GAP_S of awake
+ * time (0.3.9, Strato 2026-10-23: +1 a fish, was +2 a meal): one gap for the
+ * whole tank (0.3.7) left a hungry fish fed by hand unpaid because a
+ * tank-mate had just eaten (a keeper on Discord). +1 keeps a 2-fish tank at
+ * the 0.3.7 pace and lets a full tank of 5 earn 2.5x. The gap still stops a
+ * tap-spam paying a tap (a keeper on Discord, 2026-10-18); every feed gesture
+ * the fish eat from is still a MEAL (the fry's feeding gates count them as
+ * before). A night's sleep runs each wait down like awake time; a boot
+ * starts them clear. */
+#define SD_MEAL_GAP_S  300.0f
 #define SD_STAGE_JUV   5
 #define SD_STAGE_ADULT 10
 #define SD_STAGE_ELDER 25
 #define SD_BIRTH       20
 #define SD_TRUST       15
 #define SD_SNACK       10          /* the seahorse's snack, one paid per SH_SNACK_COOL_S (0.3.6) */
+#define SD_CRAB_FIND   10          /* a sand dollar the crab dug up and the keeper took (0.3.9; Strato 2026-10-24: a rare event, "worth a bit more") */
+#define SD_CRAB_FIND_AGAIN 20      /* ... every one after the first: the badge's reward (Strato 2026-10-24: "double the value of the subsequently found") */
+/* what n finds have paid: the crab's card shows this, not the count (0.3.9.1; Strato 10-24: the count of finds read as confusing) */
+#define SD_CRAB_FINDS_VALUE(n) ((n) == 0 ? 0u : (unsigned)SD_CRAB_FIND + (unsigned)SD_CRAB_FIND_AGAIN * ((unsigned)(n) - 1u))
 #define SD_CHORE       25          /* per SD_CHORE_EVERY colonies / SD_TRIM_CM of grass */
 #define SD_CHORE_EVERY 100
 /* the grass pays by length cut: 250 cm (2026-09-29, Strato; was 100 inches =
@@ -200,9 +241,12 @@ const char *const *progression_fry_tip(int kind);
 #define SD_PRICE_URCHIN 120       /* 2026-10-02: the grass's snail (the snail is 80, the grass pays 25 per 250 cm) */
 #define SD_PRICE_SEAHORSE 220     /* 0.3.6, Strato 2026-10-15: between the shrimp (180) and the cluster (240) */
 #define SD_PRICE_PUMPKIN 75       /* 0.3.6, Strato 2026-10-17: the seasonal lantern, "affordable" */
+#define SD_PRICE_VOLCANO 190      /* 0.3.9: Strato 2026-10-24 (it was the castle's 150 until he named one) */
+#define SD_PRICE_CRAB 140         /* 0.3.9: the strawberry crab - Strato 2026-10-24 */
 typedef struct {
     uint32_t    bit;               /* SD_ITEM_* */
-    const char *name;              /* <= 12 chars, the pixel font */
+    const char *name;              /* <= 15 chars: the row draws it at scale 2 from x 76, 178 px, short of the button at 300;
+                                    * the modal at scale 3, 267 px in 352 */
     const char *words, *words2;    /* what it does, two lines of <= 25 chars */
     int         price;
 } sd_item_t;
@@ -224,6 +268,24 @@ bool progression_pumpkin_offered(const tank_t *t);
 #define SD_SELL_PCT 20
 int  progression_sell_value(int item);
 bool progression_sell(tank_t *t, int item);
+/* the decoration shelf (0.3.9, Strato 2026-10-19: "anything you can MOVE
+ * you can SHELVE"; from the community: nothing bought ever disappears). A
+ * placeable piece in the tank goes on the shelf: still owned, out of the
+ * water, its spot / depth / color / growth kept - and the living ones keep
+ * growing there. No money moves. PUT BACK returns it on top of its stack
+ * and the platform opens the placement page with the old spot in place.
+ * SELL works from the shelf too (progression_sell). false = not owned, not
+ * placeable, or already where it is asked to go. */
+bool progression_shelve(tank_t *t, int item);
+bool progression_unshelve(tank_t *t, int item);
+/* the LOCK on a piece (0.3.9, Strato, from the community: a held finger on a
+ * decoration keeps opening its placement page by accident). on = a held
+ * finger passes the piece by from now on; its page opens from the shop's
+ * row (MOVE) only, where the same button reads LOCKED and undoes it. Each
+ * piece has its own lock; it rides the shelf and goes with a sale. Saved at
+ * once. false = not owned, not placeable, or already as asked. */
+bool progression_lock(tank_t *t, int item, bool on);
+#define SD_DECOR_BITS (SD_ITEM_PLANT | SD_ITEM_CASTLE | SD_ITEM_CORAL | SD_ITEM_CLUSTER | SD_ITEM_PUMPKIN | SD_ITEM_VOLCANO)   /* the placeable six */
 /* a fish sold (2026-10-01, Strato: a SELL button on the milestones page's
  * fish card - "the more mature a fish is, the more sand dollars it is
  * worth. once a fish is sold it opens up a slot for a new fry"). The price
@@ -278,7 +340,7 @@ int  progression_sd_take_award(void);
 /* director / tests: dollars from nowhere (negative takes them away) */
 void progression_sd_grant(tank_t *t, int n);
 /* the earn table for the shop page: one line per source, "+N WORDS" */
-#define SD_EARN_LINES 7
+#define SD_EARN_LINES 8
 const char *const *progression_sd_earn_lines(void);
 
 /* population ceiling. Compile-time so the device can ship lower until its
@@ -305,6 +367,23 @@ const char *const *progression_sd_earn_lines(void);
 /* trait drift: one full unit (0.11 of the 0..1 trait) per this many hours of
  * sustained pressure */
 #define DRIFT_HOURS      2.0f
+/* social (2026-10-29): company warms it, and it settles back to the birth temper.
+ * The gains stay small against the settle - the model follows almost always at
+ * social 7+, so a big follow gain is a runaway to the ceiling - except company
+ * the keeper brings: fish gathered together at a held finger */
+#define SOCIAL_FOLLOW_GAIN 0.08f /* per DRIFT_HOURS spent following a friend */
+#define SOCIAL_NEAR_GAIN   0.04f /* per DRIFT_HOURS spent nose to tail with another fish */
+#define SOCIAL_HOLD_GAIN   2.0f  /* ... the two of them gathered at the keeper's finger
+                                  * (ten minutes of it: ~half a step of the 0..9 bar for a
+                                  * pair, a step for a full tank; 1.0 measured on the 1.8
+                                  * 10-29 was a third of a step a pair - too slow to see) */
+#define SOCIAL_NEAR_PX     20.0f /* "nose to tail": centers closer than this x the two sizes */
+#define SOCIAL_RING_X      1.6f  /* ... and round a held finger, this much further (0.3.9.3) */
+#define TRAIT_SETTLE       0.25f /* bold's and social's pull back to the birth temper, per
+                                  * DRIFT_HOURS (the gap shrinks ~e-fold in 8 lit hours) */
+#define BOLD_CALM_GAIN     0.08f /* bold per DRIFT_HOURS fed + calm (was 0.5: every fish at 0.95
+                                  * in a lit day); against the settle a well-kept fish sits
+                                  * ~a step bolder than it was born */
 #define DRIFT_CHANGE     0.11f  /* CHANGE gate: this much accumulated drift pressure on the
                                  * youngest fish (~26 lit minutes fed and calm, or following) */
 

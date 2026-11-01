@@ -5,6 +5,7 @@
  * ~1 s (the pill answers a plug-in within a second); any I2C error or
  * absent battery hides the meter. */
 #include "battery_port.h"
+#include "advanced.h"
 #include "display_port.h"      /* board_is_square */
 #include "driver/i2c_master.h"
 #include "esp_timer.h"
@@ -135,19 +136,41 @@ void battery_port_key_init(void) {
     static const char *ON[4] = { "128 ms", "512 ms", "1 s", "2 s" }, *IRQ[4] = { "1 s", "1.5 s", "2 s", "2.5 s" };
     { uint8_t r20 = 0, r21 = 0, r48 = 0, r49 = 0, r4a = 0, r10 = 0;   /* what the PMIC saw before this boot: power-on / power-off source, the pending IRQ flags */
       rd(0x20, &r20); rd(0x21, &r21); rd(0x48, &r48); rd(0x49, &r49); rd(0x4A, &r4a); rd(0x10, &r10);
-      ESP_LOGI("battery", "PMIC at boot: power-on source %02x, power-off source %02x, common cfg %02x | IRQ status %02x %02x %02x (49: bit3 short press, bit2 long, bit1 release, bit0 press)",
+      ESP_LOGI("battery", "PMIC at boot: power-on source %02x, power-off source %02x, common cfg %02x | IRQ status %02x %02x %02x (49: bit3 short press, bit2 long, bit1 key down, bit0 key up)",
                r20, r21, r10, r48, r49, r4a); }
     bool ok = rd(0x27, &v27) && wr(0x27, (uint8_t)((v27 & ~0x0F) | 0x0C));   /* OFFLEVEL 10 s (the firmware's 1.5 s long press saves + cuts first), ONLEVEL 128 ms */
-    ok = rd(0x41, &v) && wr(0x41, (uint8_t)(v | 0x0C)) && ok;           /* short + long press IRQs on (the defaults, made sure of) */
+    ok = rd(0x41, &v) && wr(0x41, (uint8_t)(v | 0x0E)) && ok;           /* short + long press IRQs on (the defaults, made sure of), and the
+                                                                            key-down edge: a press must come after one (key_poll) */
     ok = wr(0x48, 0xFF) && wr(0x49, 0xFF) && wr(0x4A, 0xFF) && ok;       /* the power-on press itself: cleared */
     ESP_LOGI("battery", "PWR key%s: REG 27 was %02x (power-on hold %s, long press %s) -> power-on hold 128 ms; short press = sleep, %s = power-off, 10 s = the PMIC's own cut",
              ok ? "" : " (a register write FAILED)", v27, ON[v27 & 3], IRQ[(v27 >> 4) & 3], IRQ[(v27 >> 4) & 3]);
 }
+/* 2026-10-23: the watch turns itself off on USB. Its
+   PMIC raises a "long press" nobody made every ~2.5-3.5 min there (logged
+   2026-10-06: four in 10 min, the key untouched), and a long press is the
+   power-off at once. A real press always starts with the key-down edge
+   (REG 49 bit 1, on the PMIC's own clock - `keytime` times presses by it):
+   a short or long press counts only with one in the last 4 s (the long
+   press lands 1.5 s after it). The flags are latched, so a press must also
+   read the same twice - a garbled I2C byte does not. */
+#define KEY_EDGE_US 4000000
+static int64_t s_key_down_us = -KEY_EDGE_US;
 int battery_port_key_poll(void) {
     if (!s_dev) return 0;
-    uint8_t st;
-    if (!rd(0x49, &st) || !(st & 0x0C)) return 0;
-    wr(0x49, (uint8_t)(st & 0x0C));                                     /* clear what was taken */
+    uint8_t st, again = 0;
+    if (!rd(0x49, &st) || !(st & 0x0E)) return 0;
+    if ((st & 0x0C) && (!rd(0x49, &again) || (again & 0x0E) != (st & 0x0E))) {
+        ESP_LOGW("battery", "PWR key: REG 49 read %02x, then %02x - a misread, ignored", st, again);
+        return 0;
+    }
+    wr(0x49, (uint8_t)(st & 0x0E));                                     /* clear what was taken */
+    int64_t now = esp_timer_get_time();
+    if (st & 0x02) s_key_down_us = now;                                 /* the key went down */
+    if (!(st & 0x0C)) return 0;
+    if (now - s_key_down_us >= KEY_EDGE_US) {
+        ESP_LOGW("battery", "PWR key: a %s press with no key-down before it (REG 49 %02x) - noise, ignored", (st & 0x04) ? "long" : "short", st);
+        return 0;
+    }
     return (st & 0x04) ? 2 : 1;
 }
 
@@ -253,6 +276,18 @@ int battery_port_vbat_mv(void) {
  * channels (VBUS, VSYS, the die's temperature) are switched on for the read
  * and put back: they are off the rest of the time (the battery pass). */
 int battery_port_charge_ma(void) { uint8_t v; return s_dev && rd(0x62, &v) ? icc_ma(v & 0x1F) : 0; }
+bool battery_port_set_cell(int mah) {
+    if (!s_dev) return false;
+    bool own = mah == ADV_CELL_STOCK;                  /* the board's own cell: the board's own rates, as at boot */
+    int ma = own ? board_charge_ma() : adv_charge_ma(mah), tr = own ? board_trickle_ma() : adv_trickle_ma(mah);
+    uint8_t v = 0; bool ok = rd(0x62, &v) && wr(0x62, (uint8_t)((v & 0xE0) | icc_code(ma)));
+    for (int i = 0; i < 2; i++) {                      /* 61 precharge, 63 end of charge */
+        uint8_t reg = i ? 0x63 : 0x61;
+        ok = rd(reg, &v) && wr(reg, (uint8_t)((v & 0xF0) | (tr / 25))) && ok;
+    }
+    ESP_LOGI("battery", "cell %d mAh%s: charge %d mA, precharge + end of charge %d mA%s", mah, own ? " (the board's own)" : "", icc_ma(icc_code(ma)), tr, ok ? "" : " - a write FAILED");
+    return ok;
+}
 bool battery_port_set_charge_ma(int ma) {
     uint8_t v; if (!s_dev || !rd(0x62, &v)) return false;
     return wr(0x62, (uint8_t)((v & 0xE0) | icc_code(ma)));

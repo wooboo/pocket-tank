@@ -43,6 +43,22 @@ static void check(const char *path, const char *names[4], int balance) {
         assert(a.fish[i].color == b.fish[i].color && a.fish[i].accent == b.fish[i].accent);
         assert(a.sd_paid_fish[i] == b.sd_paid_fish[i]);
     }
+    /* The deployed 0.3.6 fork moved the journals to 1912; its padding
+     * at 1908 now belongs to upstream's shelf and must not become flags. */
+    unsigned char merged[8192]; memcpy(merged, blob, blob_len);
+    const size_t journals = sizeof gift + sizeof fish_gift;
+    memcpy(blob + 1912, merged + 1952, journals);
+    memset(blob + 1908, 0xa5, 4); /* old structure padding is not sd_shelved */
+    blob_len = 1912 + journals;
+    tank_init(&b, 3); progression_boot(&b);
+    assert(b.n_fish == a.n_fish && b.sd_balance == balance);
+    assert(!memcmp(&b.gift, &gift, sizeof gift));
+    assert(!memcmp(&b.fish_gift, &fish_gift, sizeof fish_gift));
+    assert(b.sd_shelved == 0 && b.sd_locked == 0 && b.cr_found == 0);
+    assert(progression_save(&b));
+    tank_init(&a, 4); progression_boot(&a);
+    assert(!memcmp(&a.gift, &gift, sizeof gift));
+    assert(!memcmp(&a.fish_gift, &fish_gift, sizeof fish_gift));
     printf("PASS: %s, four fish, %d dollars, identities/journals and merged-save round trip\n", path, balance);
 }
 int main(void) {

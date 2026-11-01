@@ -13,8 +13,8 @@
  *  - per-cue cooldowns (eat once per 250 ms, snip 150 ms, ...) and a
  *    global cap of AUDIO_MAX_PER_S starts per second: excess is DROPPED,
  *    never queued late
- *  - night: fish cues (tier 2) are muted, keeper feedback (tier 1) plays
- *    at -12 dB, progression/system cues (tier 3) play as they are
+ *  - the tank light changes nothing: a dark tank sounds like a lit one
+ *    (0.3.7; it used to mute tier 2 and dim tier 1)
  *  - volume: 0 off, 1 quiet (-12 dB), 2 normal; AUDIO_MASTER_DB under all
  *  - every voice fades in and out over 5 ms; a looping voice wraps at the
  *    clip's crossfaded seam and audio_stop fades it out over 50 ms
@@ -38,7 +38,6 @@
 void audio_init(const int16_t *bank, uint32_t n_samples);
 void audio_set_volume(int level);        /* 0..2, clamped */
 int  audio_volume(void);
-void audio_set_night(bool night);
 /* start a cue: returns true if a voice started. pitch_q8 scales the rate
  * (fry high, elder low); now_ms feeds the cooldowns (any monotonic ms). */
 bool audio_play(int cue, int pitch_q8, uint32_t now_ms);

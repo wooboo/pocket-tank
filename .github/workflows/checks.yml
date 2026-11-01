@@ -3,7 +3,7 @@ name: checks
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, fork]
 
 permissions:
   contents: read

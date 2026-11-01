@@ -1,7 +1,16 @@
 /* rtc_port_pcf85063.c — PCF85063 RTC (I2C 0x51) -> system wall clock.
- * At boot: if the RTC holds a plausible time, set the system clock from it;
- * if it is unset (year < 2024, e.g. first power-up), seed it from the firmware
- * build time so the ravenous-boot rule has a clock from day one. The
+ * At boot: if the RTC holds a plausible time, set the system clock from it.
+ * A chip that STOPPED (its OS flag, or a year before 2024: a board with no
+ * cell that was unplugged, or a first power-up) leaves the clock UNSET - 0
+ * from clock_port_now_unix - and main.c gives it back the way the clockless
+ * 1.75C gets its time: the internet at boot (the time away lived from the
+ * save), or the save's own stamp (rtc_port_seed; the stretch is owed). It
+ * used to seed BUILD TIME here and write it into the chip (2026-08 .. 0.3.8):
+ * older than any save, so a battery-less tank unplugged for the night woke
+ * with nothing lived - "unplugging 7+ hours doesn't count as a full night's
+ * sleep" (abumaia on Discord, 2026-10-24) - and a wrong clock for good, since
+ * a board with a chip never asked the internet. rtc_port_store writes the
+ * system clock back into the chip once something has set it. The
  * progression save stamps clock_port_now_unix(); nothing else needs RTC. */
 #include "rtc_port.h"
 #include "driver/i2c_master.h"
@@ -14,6 +23,7 @@
 #define REG_SECONDS   0x04     /* sec, min, hour, day, weekday, month, year (BCD) */
 static const char *TAG = "rtc";
 static i2c_master_dev_handle_t s_dev;
+static bool s_stopped;                                /* the chip answered but had lost its time at this boot (stays set: the boot log tells it) */
 
 static int bcd2bin(uint8_t b) { return (b >> 4) * 10 + (b & 0x0f); }
 static uint8_t bin2bcd(int v) { return (uint8_t)(((v / 10) << 4) | (v % 10)); }
@@ -67,16 +77,20 @@ bool rtc_port_init(i2c_master_bus_handle_t bus) {
         settimeofday(&tv, NULL);
         ESP_LOGI(TAG, "system clock set from RTC: %04d-%02d-%02d %02d:%02d", t.tm_year + 1900, t.tm_mon + 1, t.tm_mday, t.tm_hour, t.tm_min);
     } else {
-        /* seed from build time: "Aug 21 2026" "10:15:00" */
-        static const char mon[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
-        char ms[4] = {0}; int d, y, hh, mm, ss;
-        sscanf(__DATE__, "%3s %d %d", ms, &d, &y); sscanf(__TIME__, "%d:%d:%d", &hh, &mm, &ss);
-        memset(&t, 0, sizeof t);
-        t.tm_mon = (int)((strstr(mon, ms) - mon) / 3); t.tm_mday = d; t.tm_year = y - 1900;
-        t.tm_hour = hh; t.tm_min = mm; t.tm_sec = ss;
-        time_t secs = mktime(&t); struct timeval tv = { .tv_sec = secs }; settimeofday(&tv, NULL);
-        rtc_write(&t);
-        ESP_LOGW(TAG, "RTC was unset; seeded from build time %s %s", __DATE__, __TIME__);
+        /* the chip lost its power (no cell, the cable out; or a first power-up):
+           the clock stays UNSET - the internet or the save's stamp sets it
+           (main.c), then rtc_port_store puts it back into the chip */
+        s_stopped = true;
+        ESP_LOGW(TAG, "RTC chip STOPPED (it lost power): the clock is unset until the internet or the save gives it back");
     }
     return true;
+}
+bool rtc_port_stopped(void) { return s_stopped; }
+void rtc_port_store(void) {
+    if (!s_dev) return;
+    time_t now = time(NULL);
+    if (now < 1704067200) return;                       /* 2024-01-01: nothing worth keeping */
+    struct tm t; gmtime_r(&now, &t);                    /* the clock is UTC throughout (mktime/gmtime pair: TZ is never set) */
+    if (rtc_write(&t)) { ESP_LOGI(TAG, "RTC chip set from the system clock (%04d-%02d-%02d %02d:%02d)", t.tm_year + 1900, t.tm_mon + 1, t.tm_mday, t.tm_hour, t.tm_min); }
+    else ESP_LOGW(TAG, "RTC chip: the write failed");
 }

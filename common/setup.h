@@ -81,6 +81,7 @@ int  setup_take_renamed(void);
 bool setup_active(void);
 bool setup_is_birth(void);               /* the birth flow, not the first run */
 bool setup_is_place(void);               /* the placement page */
+bool setup_place_live(void);             /* ... and its piece has been changed on it (dragged, re-ranked, re-depthed, recolored): it is drawn live, out of the scene */
 int  setup_item(void);                   /* the placement page's SD item (-1 = none) */
 int  setup_fish(void);                   /* the fish the current page is about (-1 = none) */
 void setup_cancel(tank_t *t);            /* drop the pages; the save still says pending */
@@ -122,6 +123,8 @@ enum { SETUP_PG_RENAME = SETUP_PG_PLACE + 1 };
 #define SETUP_HIT_SELL  5                /* the placement page's SELL (top left): once arms it, twice sells the piece */
 #define SETUP_HIT_BCK   6                /* the placement page's order arrows (2026-10-17): one step back in the stack ... */
 #define SETUP_HIT_FWD   7                /* ... and one step forward (tank_decor_shift) */
+#define SETUP_HIT_SHELVE 8               /* the placement page's SHELVE (0.3.9, beside SELL): one tap puts the piece on the shelf and closes the page */
+#define SETUP_HIT_LOCK   9               /* the placement page's LOCK (0.3.9, between SHELVE and DONE): a toggle - LOCKED, a held finger passes the piece by */
 #define SETUP_HIT_UP    3                /* the active slot's letter: next (A -> B) */
 #define SETUP_HIT_DOWN  4                /* ... previous */
 #define SETUP_HIT_SLOT0 10               /* + 0..FISH_NAME_MAX-1: pick that slot */
@@ -151,9 +154,24 @@ enum { SETUP_PG_RENAME = SETUP_PG_PLACE + 1 };
 #define SETUP_TOP_BTN_Y (SETUP_Y + 24)
 #define SETUP_TOP_BACK_X (SETUP_X + 12)
 #define SETUP_TOP_NEXT_X (SETUP_X + SETUP_W - 12 - SETUP_TOP_BTN_W)
-#define SETUP_ORD_W      36                                 /* the order arrows, between SELL and DONE (the placement page) */
-#define SETUP_ORD_X0     (PAGE_W / 2 - SETUP_ORD_W - 8)
-#define SETUP_ORD_X1     (PAGE_W / 2 + 8)
+/* the placement page's top row (0.3.9): FOUR buttons - SELL | SHELVE | LOCK |
+ * DONE - a little narrower than the other pages' two (78 px at a 16 px gap
+ * fills the same 360 px, so SELL and DONE keep their corners and the row
+ * stays inside every glass, the round one included). SHELVE: Strato, "a held
+ * piece opens this page, so the shelf must be here"; LOCK: his ask, "a space
+ * between shelve and done" for it. */
+#define SETUP_PL_BTN_W 78
+#define SETUP_PL_GAP   16
+#define SETUP_PL_X(i)  (SETUP_TOP_BACK_X + (i) * (SETUP_PL_BTN_W + SETUP_PL_GAP))   /* 0 SELL, 1 SHELVE, 2 LOCK, 3 DONE */
+#define SETUP_TOP_SHELVE_X SETUP_PL_X(1)
+#define SETUP_TOP_LOCK_X   SETUP_PL_X(2)
+#define SETUP_TOP_DONE_X   SETUP_PL_X(3)                   /* the placement page's DONE (the other pages' NEXT sits at SETUP_TOP_NEXT_X) */
+#define SETUP_ORD_W      36                                 /* the order arrows (the placement page): at the two ends of the DEPTH row since 0.3.9
+                                                             * (SHELVE took their place on the top row); a two-depth piece's tiles leave the
+                                                             * room, the plant has no stack and shows none */
+#define SETUP_ORD_X0     SETUP_DEPTH_X
+#define SETUP_ORD_X1     (SETUP_DEPTH_X + SETUP_DEPTH_W - SETUP_ORD_W)
+#define SETUP_ORD_Y      (SETUP_DEPTH_Y + (SETUP_DEPTH_H - SETUP_BTN_H) / 2)
 /* the letter wheel: FISH_NAME_MAX slots of a 6x font (30 x 42 px glyphs) at
  * a 44 px pitch across the middle of the tank, chevrons 40 px above and
  * below the active one; a press in the row band picks the nearest slot, the

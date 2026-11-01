@@ -29,6 +29,17 @@ nothing.
     ~/.venvs/pocket-tank/bin/python tools/make_sounds.py import \\
         "/Volumes/Local-1/Projects/LLM Fish Tank/working-assets/sounds/exports"
     ~/.venvs/pocket-tank/bin/python tools/make_sounds.py build
+
+  add <wav> <cue>  one file as one cue's canonical clip (the import's
+                 processing), leaving every other cue's file in place -
+                 `import` rebuilds the whole set from an export folder.
+                 Then `build`.
+
+Without a working ffmpeg (2026-10-17: macOS 27 has no Rosetta and the
+Intel ffmpeg is dead) the decode falls back to macOS's own afconvert for
+the fold to mono and the resample, and the same high- and low-pass in
+numpy (RBJ biquads at ffmpeg's default Q, the high-pass run twice as the
+ffmpeg chain does).
 """
 import csv, math, os, re, struct, subprocess, sys, wave
 
@@ -54,6 +65,7 @@ CUES = [
     ("eat", 0), ("spook", 0), ("investigate", 0), ("bubbles", 0), ("beg", 0),
     ("welcome", 0), ("arrival", 0), ("milestone", 0), ("stage_up", 0),
     ("sleep", 0), ("wake", 0), ("low_battery", 0), ("error", 0),
+    ("crab_find", 0), ("crab_coin", 0),
 ]
 CUE_IDS = [c for c, _ in CUES]
 LOOPS = {c for c, l in CUES if l}
@@ -82,10 +94,53 @@ def decode(path):
     """ffmpeg: any WAV -> float32 mono at RATE, band-limited to the speaker."""
     af = (f"highpass=f={HP_HZ}:poles=2,highpass=f={HP_HZ}:poles=2,"
           f"lowpass=f={LP_HZ}:poles=2,aresample={RATE}")
-    out = subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-af", af,
-                          "-ac", "1", "-f", "f32le", "-"],
-                         capture_output=True, check=True).stdout
+    try:
+        out = subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-af", af,
+                              "-ac", "1", "-f", "f32le", "-"],
+                             capture_output=True, check=True).stdout
+    except (OSError, subprocess.CalledProcessError):
+        return decode_afconvert(path)
     return np.frombuffer(out, dtype=np.float32).astype(np.float64)
+
+
+def biquad(x, b, a):
+    y = np.zeros_like(x); x1 = x2 = y1 = y2 = 0.0
+    b0, b1, b2 = (v / a[0] for v in b); a1, a2 = a[1] / a[0], a[2] / a[0]
+    for i, v in enumerate(x):
+        o = b0 * v + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2
+        x2, x1, y2, y1 = x1, v, y1, o
+        y[i] = o
+    return y
+
+
+def rbj(kind, f, fs, q=0.707):
+    w = 2 * math.pi * f / fs; c, al = math.cos(w), math.sin(w) / (2 * q)
+    if kind == "hp":
+        return [(1 + c) / 2, -(1 + c), (1 + c) / 2], [1 + al, -2 * c, 1 - al]
+    return [(1 - c) / 2, 1 - c, (1 - c) / 2], [1 + al, -2 * c, 1 - al]
+
+
+def read_i32_wav(path):
+    with wave.open(path) as w:
+        assert w.getsampwidth() == 4 and w.getnchannels() == 1, path
+        return w.getframerate(), np.frombuffer(w.readframes(w.getnframes()), dtype="<i4").astype(np.float64) / 2 ** 31
+
+
+def decode_afconvert(path):
+    """the ffmpeg chain without ffmpeg: afconvert folds to mono (int32 PCM at
+    the file's own rate), numpy filters, afconvert resamples to RATE."""
+    import tempfile
+    with tempfile.TemporaryDirectory() as d:
+        a, b, c = (os.path.join(d, n) for n in ("mono.wav", "band.wav", "out.wav"))
+        subprocess.run(["afconvert", "-f", "WAVE", "-d", "LEI32", "-c", "1", path, a], check=True)
+        fs, x = read_i32_wav(a)
+        for kind, f in (("hp", HP_HZ), ("hp", HP_HZ), ("lp", LP_HZ)):
+            x = biquad(x, *rbj(kind, f, fs))
+        with wave.open(b, "wb") as w:
+            w.setnchannels(1); w.setsampwidth(4); w.setframerate(fs)
+            w.writeframes(np.clip(np.round(x * 2 ** 31), -2 ** 31, 2 ** 31 - 1).astype("<i4").tobytes())
+        subprocess.run(["afconvert", "-f", "WAVE", "-d", f"LEI32@{RATE}", "-c", "1", "-r", "127", b, c], check=True)
+        return read_i32_wav(c)[1]
 
 
 def trim_fade(x):
@@ -137,7 +192,7 @@ def read_gains():
 
 def write_gains(rows):
     with open(GAINS, "w", newline="") as f:
-        w = csv.writer(f)
+        w = csv.writer(f, lineterminator="\n")   # the file's own endings (csv's default \r\n rewrote every row)
         w.writerow(["cue", "gain_db"])
         for c in CUE_IDS:
             if c in rows:
@@ -184,6 +239,19 @@ def do_import(src):
     missing = [c for c in CUE_IDS if c not in measured]
     print(f"\n{len(measured)} cues imported; no file for: {', '.join(missing)}")
     print(f"gains.csv: {len(gains)} rows (edit gain_db to retune; never re-export for level)")
+
+
+def do_add(path, cue):
+    if cue not in CUE_IDS:
+        sys.exit(f"'{cue}' is not a cue (CUES)")
+    x = decode(path)
+    x = loop_xfade(x) if cue in LOOPS else trim_fade(x)
+    pk = write_wav(os.path.join(DST, f"{cue}.wav"), x)
+    gains = read_gains()
+    if cue not in gains:
+        gains[cue] = round(db(pk), 1)
+    write_gains(gains)
+    print(f"{cue}: {os.path.basename(path)} -> assets/sounds/{cue}.wav, {len(x) / RATE:.2f} s, export peak {db(pk):.1f} dB, gain {gains[cue]:.1f} dB")
 
 
 # ----------------------------------------------------------------- build ----
@@ -258,5 +326,7 @@ if __name__ == "__main__":
         do_import(sys.argv[2])
     elif len(sys.argv) == 2 and sys.argv[1] == "build":
         do_build()
+    elif len(sys.argv) == 4 and sys.argv[1] == "add":
+        do_add(sys.argv[2], sys.argv[3])
     else:
         sys.exit(__doc__)

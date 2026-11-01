@@ -13,6 +13,7 @@ static notice_t s_cur;
 static bool     s_up;
 static float    s_gap;                       /* seconds until the next may come up */
 static int      s_cue = -1;
+static bool     s_model_told;                /* NOTICE_MODEL_DAMAGED: once per start (a sync does not forget it) */
 
 /* never announced: they belong to the birth of a tank or a fish */
 #define MS_SILENT   (MS_ARRIVED | MS_INSPECTED | MS_RETIRED_6 | MS_RETIRED_7)   /* (MS_INSPECTED: no badge since 0.3.0) */
@@ -72,7 +73,7 @@ void notice_tick(const tank_t *t, float dt, bool blocked) {
             return;
         }
         s_cur.age += dt;
-        if (s_cur.age >= NOTICE_UP_S) { s_up = false; s_gap = NOTICE_GAP_S; }
+        if (s_cur.age >= NOTICE_UP_S && s_cur.kind != NOTICE_MODEL_DAMAGED && s_cur.kind != NOTICE_WRONG_BOARD) { s_up = false; s_gap = NOTICE_GAP_S; }   /* (these two wait for a tap) */
         return;
     }
     if (s_gap > 0) { s_gap -= dt; return; }
@@ -81,14 +82,16 @@ void notice_tick(const tank_t *t, float dt, bool blocked) {
     s_cur = s_q[0]; s_cur.age = 0;
     memmove(&s_q[0], &s_q[1], sizeof(notice_t) * (size_t)(s_qn - 1)); s_qn--;
     s_up = true;
-    s_cue = again || s_cur.kind == NOTICE_LIGHTS_OUT ? -1 : s_cur.kind == NOTICE_STAGE ? SND_STAGE_UP : s_cur.kind == NOTICE_LOW_BATTERY ? SND_LOW_BATTERY : SND_MILESTONE;
+    s_cue = again || s_cur.kind == NOTICE_LIGHTS_OUT ? -1 : s_cur.kind == NOTICE_STAGE ? SND_STAGE_UP : s_cur.kind == NOTICE_LOW_BATTERY || s_cur.kind == NOTICE_MODEL_DAMAGED || s_cur.kind == NOTICE_WRONG_BOARD ? SND_LOW_BATTERY : SND_MILESTONE;
 }
 
 const notice_t *notice_current(void) { return s_up ? &s_cur : NULL; }
 bool notice_dismiss(void) {
     if (!s_up) return false;
+    if (s_cur.kind == NOTICE_LIGHTS_OUT) { s_up = false; s_gap = NOTICE_GAP_S; return false; }   /* its tap goes on to the tank: the double-tap it asks for */
+    if (s_cur.age < NOTICE_HOLD_S) return true;   /* the hold: a tap this soon is spent, the notice stays (notice.h) */
     s_up = false; s_gap = NOTICE_GAP_S;
-    return s_cur.kind != NOTICE_LIGHTS_OUT;   /* its tap goes on to the tank: the double-tap it asks for */
+    return true;
 }
 void notice_low_battery(void) {
     for (int i = 0; i < s_qn; i++) if (s_q[i].kind == NOTICE_LOW_BATTERY) return;
@@ -96,5 +99,7 @@ void notice_low_battery(void) {
     push(NOTICE_LOW_BATTERY, -1, 0);
 }
 void notice_updated(void) { push(NOTICE_UPDATED, -1, 0); }
+void notice_model_damaged(void) { if (s_model_told) return; s_model_told = true; push(NOTICE_MODEL_DAMAGED, -1, 0); }
+void notice_wrong_board(void) { push(NOTICE_WRONG_BOARD, -1, 0); }
 int notice_take_cue(void) { int c = s_cue; s_cue = -1; return c; }
 int notice_pending(void) { return s_qn; }

@@ -1,15 +1,18 @@
 # Nearby gifts over BLE
 
-Hold BOOT for two seconds on **both awake tanks**, within 30 seconds of each
-other. Both show the same six-digit Bluetooth confirmation code. Check the
+Hold BOOT for at least two seconds, then release it on **both awake tanks**,
+within 30 seconds of each other. Discovery starts on release. Both show the same six-digit Bluetooth confirmation code. Check the
 codes and tap CONNECT on each. In FRIENDS, choose a number of sand dollars
 with minus/plus, tap GIVE, and have the recipient tap ACCEPT or DECLINE.
 CLOSE disconnects and shuts Bluetooth down. An inactive connected session
 closes after two minutes; initial discovery expires after 30 seconds.
 
-BOOT + a new touch **before** the two-second hold still opens the existing
-reset prompt. While Friends is open, that reset chord is suppressed. Holding
-BOOT again restarts discovery. First-run setup and reset confirmation must
+Hold BOOT for five seconds, then tap the glass to open the upstream reset
+prompt (or ADVANCED from settings). While Friends is open, that chord is
+suppressed. Holding BOOT for two seconds and releasing it again closes Friends.
+A double press keeps upstream's MY TANKS shortcut; it is disabled while Friends
+is open. Close setup, MY TANKS and reset/advanced pages and unlock touch before
+pairing. First-run setup and reset confirmation must
 be finished or dismissed before pairing. PWR still sleeps/powers off the tank.
 
 Friends supports sand dollars (steps of 10 on screen) and individual fish

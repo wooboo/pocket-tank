@@ -22,7 +22,7 @@ int main(void) {
             assert(p->alive || p->floor_s > FOOD_FLOOR_S);
             assert(p->x>=4 && p->x<=TANK_W-4 && p->y>=4 && p->y<=TANK_H-14);
         }
-        for(int j=0;j<550;j++) tank_tick(&tank,.04f,NULL);
+        for(int j=0;j<(int)((FOOD_LIFE_S + FOOD_FLOOR_S)/.04f)+1;j++) tank_tick(&tank,.04f,NULL);
         assert(!p->alive); /* upstream permits a late landing another FOOD_FLOOR_S on the floor */
     }
     const float dirs[][2]={{0,-1},{0,1},{-1,0},{1,0}};

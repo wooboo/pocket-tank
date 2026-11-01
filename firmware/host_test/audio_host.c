@@ -2,7 +2,7 @@
  * real bank. Build + run from firmware/host_test:
  *   cc -O1 -std=c11 -I../../common -o audio_host audio_host.c ../../common/audio.c ../../common/sounds.c && ./audio_host
  * Checks: a deferred cue is silent; cooldowns and the per-second cap drop
- * extra starts; night mutes tier 2 and dims tier 1; volume off is silence;
+ * extra starts; volume off is silence;
  * a loop keeps going past its length and audio_stop fades it to nothing;
  * a single cue at normal volume never clips. */
 #include <stdio.h>
@@ -42,15 +42,6 @@ int main(void) {
     for (int i = 0; i < 7; i++) started += audio_play(cues[i], AUDIO_PITCH_ONE, 5000 + i * 10);
     CHECK(started == 6, "cap: %d of 7 started (want 6)", started);
     audio_stop_all();
-
-    /* night: tier 2 muted, tier 1 plays quieter */
-    audio_set_night(false);
-    audio_play(SND_FEED, AUDIO_PITCH_ONE, 9000); render_all(buf, 8000); int day = peak_of(buf, 8000);
-    audio_set_night(true);
-    CHECK(!audio_play(SND_EAT, AUDIO_PITCH_ONE, 9500), "eat played at night");
-    audio_play(SND_FEED, AUDIO_PITCH_ONE, 10000); render_all(buf, 8000); int night = peak_of(buf, 8000);
-    CHECK(night > 0 && night < day / 2, "night feed %d vs day %d (want about a quarter)", night, day);
-    audio_set_night(false);
 
     /* volume off = silence */
     audio_set_volume(0);

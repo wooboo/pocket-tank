@@ -32,6 +32,7 @@ const char *const TMS_NAMES[TMS_COUNT] = {
     "first mutation",                    /* 0.4's (main); never set on 0.3.x */
     "first fish sold",
     "first seahorse feeding",            /* 0.3.6 */
+    "first sand dollar dug up",          /* 0.3.9: the crab's first find, taken - every find after it pays double */
 };
 
 /* the save keeps 644 film cells - the rectangle's 28 x 23 grid, frozen by the
@@ -195,8 +196,39 @@ typedef struct {
     /* the order of the pieces (0.3.6, later the same day): a rank per slot
      * (castle, coral, cluster, pumpkin, plant). Older saves read zeros: the
      * old fixed order. */
-    uint8_t  decor_rank[DECOR_SLOTS], pad_rank[3];
-    gift_save_t gift; /* BLE transfers: balance and journal in one NVS blob */
+    uint8_t  decor_rank[5], pad_rank[3];
+    /* the decoration shelf (0.3.9): the owned placeable pieces put away.
+     * Older saves read zero (everything in the tank); an older firmware
+     * ignores it and the shelved piece stands in the tank at its kept spot. */
+    uint32_t sd_shelved;
+    /* the bubble volcano (0.3.9): its spot (0 = the default), its depth + 1
+     * (0 = never placed: BEHIND), its rank among the pieces (the sixth slot:
+     * decor_rank above holds five). Older saves read zeros. */
+    float    volcano_x;
+    uint8_t  volcano_z1, volcano_rank, pad_vo[2];
+    /* LOCKED pieces (0.3.9): the owned placeable pieces a held finger passes
+     * by. Older saves read zero (nothing locked); an older firmware ignores it. */
+    uint32_t sd_locked;
+    /* the strawberry crab (0.3.9): its x on the floor (0 = not placed yet) and
+     * its seed pattern, and the pellets it has found (its card). Older saves
+     * read zeros: a crab at its first spot, pattern 0, none found. */
+    float    cr_x;
+    uint8_t  cr_variant, pad_cr;
+    uint16_t cr_eaten;
+    uint16_t cr_found, cr_found_paid;   /* its sand dollar finds, and the ledger's count of them (0.3.9, in the old padding: sizeof stays 1936) */
+    /* the crab's wait for its next find (0.3.9.1): seconds of lived time + 1,
+     * so an older save's zero reads "never written" - the first-find window
+     * again, a find soon for every keeper who updates. Until then a boot
+     * started the wait again at 2-4 h of awake time. */
+    uint32_t cr_find_wait;
+    /* the world this tank was laid out in (0.3.9.3): its glass and its floor's
+     * span, in its own px, and its film grid. A tank that moves to another
+     * board (that board's version installed over the 1.8's, which runs on
+     * every board) is laid out again in proportion: a castle 80% of the way
+     * across stays 80% across. Older saves read zeros (see load_save). */
+    uint16_t lay_w, lay_h, lay_fx0, lay_fx1;
+    uint8_t  lay_cols, lay_rows, pad_lay[2];
+    gift_save_t gift; /* fork-only tail after the frozen upstream prefix */
     fish_gift_save_t fish_gift;
 } save_t;
 /* The deployed September BLE build appended its journals at 1656, before
@@ -208,7 +240,14 @@ typedef struct {
     fish_gift_save_t fish_gift;
 } legacy_ble_save_t;
 _Static_assert(offsetof(legacy_ble_save_t, gift) == 1656, "legacy BLE journal moved");
-_Static_assert(offsetof(save_t, gift) == 1912, "merged BLE journal moved");
+_Static_assert(offsetof(save_t, gift) == 1952, "merged BLE journal moved");
+/* The October 0.3.6 fork put the same journals after its 1912-byte prefix. */
+typedef struct {
+    uint8_t prefix[1912];
+    gift_save_t gift;
+    fish_gift_save_t fish_gift;
+} ble036_save_t;
+_Static_assert(offsetof(ble036_save_t, gift) == 1912, "0.3.6 BLE journal moved");
 /* the smallest PTK2 save (pre-upkeep, 2026-08-30): anything shorter is not
  * ours. Every later build wrote sizeof(save_t) of its day - 448, 1112, 1304,
  * 1408, 1440, 1456 ... - and load_save takes ANY such length, so a tail only
@@ -298,7 +337,21 @@ SAVE_AT(pumpkin_x, 1892); SAVE_AT(pumpkin_z1, 1896); SAVE_AT(pad_pk, 1897);     
 _Static_assert(sizeof(save_t) >= 1904, "SAVE LAYOUT LOCK: save_t only ever grows");   /* 1900 of fields, padded to 8 */
 SAVE_AT(decor_rank, 1900); SAVE_AT(pad_rank, 1905);                                                    /* the pieces' order, 0.3.6 */
 _Static_assert(sizeof(save_t) >= 1912, "SAVE LAYOUT LOCK: save_t only ever grows");   /* 1908 of fields, padded to 8 */
-/* (the next field: SAVE_AT(its_name, 1908 or its type's alignment past it);) */
+SAVE_AT(sd_shelved, 1908);                                                                             /* the decoration shelf, 0.3.9 (main's 0.4 tail must reserve 1908) */
+_Static_assert(sizeof(save_t) >= 1912, "SAVE LAYOUT LOCK: save_t only ever grows");   /* 1908 of fields, padded to 8 */
+SAVE_AT(volcano_x, 1912); SAVE_AT(volcano_z1, 1916); SAVE_AT(volcano_rank, 1917); SAVE_AT(pad_vo, 1918);  /* the bubble volcano, 0.3.9 */
+_Static_assert(sizeof(save_t) >= 1920, "SAVE LAYOUT LOCK: save_t only ever grows");
+SAVE_AT(sd_locked, 1920);                                                                              /* the LOCK on a piece, 0.3.9 (main's 0.4 tail must reserve 1908..1935: the shelf, the volcano, the lock, the crab) */
+_Static_assert(sizeof(save_t) >= 1928, "SAVE LAYOUT LOCK: save_t only ever grows");   /* 1924 of fields, padded to 8 */
+SAVE_AT(cr_x, 1924); SAVE_AT(cr_variant, 1928); SAVE_AT(pad_cr, 1929); SAVE_AT(cr_eaten, 1930);         /* the strawberry crab, 0.3.9 */
+SAVE_AT(cr_found, 1932); SAVE_AT(cr_found_paid, 1934);                                                 /* its finds, 0.3.9 (the padding of the same day) */
+_Static_assert(sizeof(save_t) >= 1936, "SAVE LAYOUT LOCK: save_t only ever grows");   /* 1936 of fields */
+SAVE_AT(cr_find_wait, 1936);                                                                           /* the wait for its next find, 0.3.9.1 (main's 0.4 tail must reserve 1936..1939) */
+_Static_assert(sizeof(save_t) >= 1944, "SAVE LAYOUT LOCK: save_t only ever grows");   /* 1940 of fields, padded to 8 */
+SAVE_AT(lay_w, 1940); SAVE_AT(lay_h, 1942); SAVE_AT(lay_fx0, 1944); SAVE_AT(lay_fx1, 1946);            /* the world it was laid out in, 0.3.9.3 (main's 0.4 tail must reserve 1940..1951) */
+SAVE_AT(lay_cols, 1948); SAVE_AT(lay_rows, 1949); SAVE_AT(pad_lay, 1950);                              /* (main's 0.4 tail must reserve 1940..1951) */
+_Static_assert(sizeof(save_t) >= 1952, "SAVE LAYOUT LOCK: save_t only ever grows");
+/* (the next field: SAVE_AT(its_name, 1952 or its type's alignment past it);) */
 /* NVS budget: the save is one blob in the nvs partition (0x9000, 0x6000 =
  * 6 pages of 4096 B; tools/make_installer.py pins the row). A page is 126
  * entries of 32 B, and NVS keeps one page free for its garbage collection:
@@ -338,7 +391,6 @@ static bool  s_booted;
 static bool  s_setup_pending;        /* the first-run flow still owed (setup.c) */
 static int   s_newborn = -1;         /* the arrival still owed its birth flow (setup.c), or -1 */
 static int   s_sd_pending;           /* dollars awarded and not yet shown (the toast) */
-static int32_t s_sd_prev_feedings = -1;   /* player_feedings at the last tick (-1 = adopt at the next) */
 static int32_t s_sale_need;               /* player_feedings the next fry waits for since a fish was sold (0 = none sold) */
 static uint16_t s_fry_seed;               /* the fry offer (progression_fry_*): its seed, 0 = none drawn */
 static double   s_fry_age;                /* ... its age in tank seconds (a double, as fish.age_s) */
@@ -368,6 +420,8 @@ const sd_item_t SD_ITEMS[SD_ITEM_COUNT] = {
     { SD_ITEM_URCHIN,  "SEA URCHIN", "NIBBLES THE TALL GRASS,",  "EVEN WHILE THE TANK SLEEPS",  SD_PRICE_URCHIN },  /* 2026-10-02: the episode 5 promise, a resident like the snail */  /* 2026-09-29: a resident, like the snail; Strato: "should mention that they multiply" (28 chars, as the plant's) */
     { SD_ITEM_SEAHORSE, "SEAHORSE",  "HOLDS ON TO YOUR FINGER,",  "FISH TRUST YOU TWICE AS FAST", SD_PRICE_SEAHORSE },  /* 0.3.6: the tame one (28 chars, as the plant's) */
     { SD_ITEM_PUMPKIN, "PUMPKIN",    "GLOWS WHEN THE LIGHTS GO OUT", "FOR OCTOBER, YOURS TO KEEP", SD_PRICE_PUMPKIN },  /* 0.3.6: the seasonal lantern (Strato 10-17) */
+    { SD_ITEM_VOLCANO, "VOLCANO",    "A CONE OF ROCK AND LAVA,",    "GLOWING BUBBLES RISE FROM IT", SD_PRICE_VOLCANO },  /* 0.3.9: DonB's bubble volcano (28 chars, as the plant's) */
+    { SD_ITEM_CRAB,    "STRAWBERRY CRAB", "DIGS UP SAND DOLLARS,",      "NAPS IN THE CASTLE OR CAVE", SD_PRICE_CRAB },  /* 0.3.9: the strawberry crab (Vulcanite's crab, Strato's strawberry sheets) */
 };
 /* the pumpkin's season (0.3.6; Strato 2026-10-17: "it can remain on their
  * board until they upgrade ... whatever release comes after oct 31 will
@@ -400,25 +454,60 @@ static void sd_tick(tank_t *t) {
         if ((f->ms_bits & MS_REACHED_ELDER) && !(*paid & SD_PAID_ELDER)) { *paid |= SD_PAID_ELDER; sd_award(t, SD_STAGE_ELDER); }
         if (f->trust >= 10.0f && !(*paid & SD_PAID_TRUST))               { *paid |= SD_PAID_TRUST; sd_award(t, SD_TRUST); }
     }
-    if (s_sd_prev_feedings < 0) s_sd_prev_feedings = t->player_feedings;
-    if (t->player_feedings > s_sd_prev_feedings) sd_award(t, SD_MEAL * (t->player_feedings - s_sd_prev_feedings));
-    s_sd_prev_feedings = t->player_feedings;
+    for (int i = 0; i < t->n_fish; i++) {        /* a meal pays per fish, once per its own gap (0.3.9) */
+        fish_t *f = &t->fish[i];
+        if (f->meal_due && f->meal_pay_wait <= 0) { sd_award(t, SD_MEAL); f->meal_pay_wait = SD_MEAL_GAP_S; }
+        f->meal_due = false;
+    }
     int32_t hund = t->algae_colonies / SD_CHORE_EVERY;
     if (hund > t->sd_colonies_paid) { sd_award(t, SD_CHORE * (hund - t->sd_colonies_paid)); t->sd_colonies_paid = hund; }
     hund = (int32_t)(t->trim_px / (PX_PER_CM * SD_TRIM_CM));
     if (hund > t->sd_inches_paid) { sd_award(t, SD_CHORE * (hund - t->sd_inches_paid)); t->sd_inches_paid = hund; }
     if (t->sh_snack_pay > t->sd_snacks_paid) { sd_award(t, SD_SNACK * (t->sh_snack_pay - t->sd_snacks_paid)); t->sd_snacks_paid = t->sh_snack_pay; }   /* the seahorse's snack (0.3.6) */
+    while (t->cr_found > t->cr_found_paid) {    /* the crab's sand dollar, taken (0.3.9): the first pays SD_CRAB_FIND and earns the badge, every one after it double */
+        t->cr_found_paid++; sd_award(t, t->cr_found_paid == 1 ? SD_CRAB_FIND : SD_CRAB_FIND_AGAIN);
+    }
 }
 int progression_sell_value(int item) { return item < 0 || item >= SD_ITEM_COUNT ? 0 : SD_ITEMS[item].price * SD_SELL_PCT / 100; }
 bool progression_sell(tank_t *t, int item) {
     if (item < 0 || item >= SD_ITEM_COUNT || !tank_decor_placeable(item)) return false;   /* the snail stays */
     const sd_item_t *it = &SD_ITEMS[item];
     if (!(t->sd_unlocks & it->bit)) return false;
-    t->sd_unlocks &= ~it->bit;
+    t->sd_unlocks &= ~it->bit; t->sd_shelved &= ~it->bit; t->sd_locked &= ~it->bit;   /* sold from the tank or from the shelf alike; a sold piece's lock goes with it */
     int back = progression_sell_value(item);
     t->sd_balance += back; s_sd_pending += back;
     tank_decor_reset(t, item);
     mark_dirty(); progression_save(t);
+    return true;
+}
+/* ---- the decoration shelf (0.3.9) ---- */
+bool progression_shelve(tank_t *t, int item) {
+    if (item < 0 || item >= SD_ITEM_COUNT || !tank_decor_placeable(item)) return false;
+    const sd_item_t *it = &SD_ITEMS[item];
+    if (!(t->sd_unlocks & it->bit) || (t->sd_shelved & it->bit)) return false;
+    tank_decor_poof(t, item);                              /* it pops away into a plume of bubbles (Strato 2026-10-19) */
+    t->sd_shelved |= it->bit;
+    { int s = tank_decor_slot(item); if (s >= 0) t->decor_rank[s] = 0; }   /* it leaves the stack; the others close up */
+    mark_dirty(); progression_save(t);                     /* the shelf sticks at once, like a sale */
+    return true;
+}
+bool progression_unshelve(tank_t *t, int item) {
+    if (item < 0 || item >= SD_ITEM_COUNT || !tank_decor_placeable(item)) return false;
+    const sd_item_t *it = &SD_ITEMS[item];
+    if (!(t->sd_unlocks & it->bit) || !(t->sd_shelved & it->bit)) return false;
+    t->sd_shelved &= ~it->bit;
+    tank_decor_raise(t, item);                             /* back on top of its depth, as a purchase lands (2026-10-17) */
+    mark_dirty(); progression_save(t);
+    return true;
+}
+/* ---- the LOCK on a piece (0.3.9) ---- */
+bool progression_lock(tank_t *t, int item, bool on) {
+    if (item < 0 || item >= SD_ITEM_COUNT || !tank_decor_placeable(item)) return false;
+    const sd_item_t *it = &SD_ITEMS[item];
+    if (!(t->sd_unlocks & it->bit)) return false;
+    if (((t->sd_locked & it->bit) != 0) == on) return false;
+    if (on) t->sd_locked |= it->bit; else t->sd_locked &= ~it->bit;
+    mark_dirty(); progression_save(t);                     /* the lock sticks at once, like the shelf */
     return true;
 }
 /* ---- a fish sold (2026-10-01) ---- */
@@ -465,6 +554,8 @@ bool progression_buy(tank_t *t, int item) {
     if (it->bit == SD_ITEM_URCHIN) tank_urchin_place(t);
     if (it->bit == SD_ITEM_SEAHORSE) { tank_seahorse_place(t); t->sh_s = 0; t->sh_hitches = 0; t->sh_trust_passed = 0; }
     if (it->bit == SD_ITEM_PUMPKIN) tank_pumpkin_place(t);
+    if (it->bit == SD_ITEM_VOLCANO) tank_volcano_place(t);
+    if (it->bit == SD_ITEM_CRAB) { t->cr_variant = (uint8_t)(tank_randf(t, 0, 255.999f)); tank_crab_place(t); }   /* its seed pattern is drawn once, at the sale */
     if (tank_decor_placeable(item)) tank_decor_raise(t, item);   /* the piece placed last goes on top (2026-10-17) */
     progression_save(t);                                   /* a purchase sticks at once */
     return true;
@@ -473,13 +564,14 @@ const char *const *progression_sd_earn_lines(void) {
     static char lines[SD_EARN_LINES][30]; static const char *ptr[SD_EARN_LINES + 1]; static bool made;
     if (!made) {
         /* <= 25 chars each: the modal is 336 px wide at scale 2 */
-        snprintf(lines[0], 30, "+%d  EVERY MEAL EATEN", SD_MEAL);
+        snprintf(lines[0], 30, "+%d  EACH FISH YOU FEED", SD_MEAL);
         snprintf(lines[1], 30, "+%d/%d/%d  A FISH GROWS UP", SD_STAGE_JUV, SD_STAGE_ADULT, SD_STAGE_ELDER);
         snprintf(lines[2], 30, "+%d  A NEW FRY IS BORN", SD_BIRTH);
         snprintf(lines[3], 30, "+%d  A FISH FULLY TRUSTS", SD_TRUST);
         snprintf(lines[4], 30, "+%d  %d ALGAE COLONIES", SD_CHORE, SD_CHORE_EVERY);
         snprintf(lines[5], 30, "+%d  %d CM OF GRASS CUT", SD_CHORE, SD_TRIM_CM);
         snprintf(lines[6], 30, "+%d  THE SEAHORSE SNACKS", SD_SNACK);
+        snprintf(lines[7], 30, "+%d/%d  THE CRAB DIGS ONE UP", SD_CRAB_FIND, SD_CRAB_FIND_AGAIN);   /* the first, then every one after (the badge's reward) */
         for (int i = 0; i < SD_EARN_LINES; i++) ptr[i] = lines[i];
         ptr[SD_EARN_LINES] = NULL; made = true;
     }
@@ -799,17 +891,21 @@ void progression_fresh(tank_t *t) {
     for (int i = 0; i < N_FISH_MAX; i++) t->fish[i].starve_s = 0;
     s_setup_pending = true;          /* a new tank: welcome, names, colours */
     s_newborn = -1;
-    s_sd_prev_feedings = 0; s_sd_pending = 0;   /* a fresh ledger (tank_init zeroed the tank's) */
+    s_sd_pending = 0;                         /* a fresh ledger (tank_init zeroed the tank's) */
     s_sale_need = 0;
     s_fry_seed = 0; s_fry_age = 0; s_fry_sold = 0;
     s_booted = true;
     mark_dirty();
 }
 
+/* the keeper's reset (BOOT 5 s + a tap): the tank on the glass only (D13,
+   the tank switcher) - the shelf, the wallet and the board's settings stay */
 void progression_reset(tank_t *t, uint32_t seed) {
+    progression_carry_t c; progression_carry_take(t, &c);
     persist_port_erase();
     tank_init(t, seed);
     progression_fresh(t);
+    progression_carry_give(t, &c);
     progression_save(t);
 }
 
@@ -819,6 +915,42 @@ void progression_set_age(tank_t *t, int idx, float seconds) {
     apply_stage(&t->fish[idx], t->fish[idx].age_s, true);
     apply_growth(&t->fish[idx]);
     mark_dirty();
+}
+
+/* A tank laid out on another board's world (0.3.9.3): the 1.8's image runs on
+ * every board, so a keeper can live on a watch in the 1.8's 448 px world, then
+ * install the watch's own version (322 px of floor). Every spot on the floor
+ * moves in proportion to the floor (a castle 80% of the way across stays 80%
+ * across; the pieces' own clamps still hold them off the glass), the film is
+ * resampled onto this grid, and the snail starts again where a new snail
+ * would (it lives on the glass, which has another shape here).
+ *
+ * A save from before 0.3.9.3 has no world. Only the 1.8's image runs on other
+ * boards, so on any other board's version an older save with a spot past this
+ * floor came from the 1.8's world; anything else loads as it always did. */
+static bool lay_spot(float x) { return x > 0 && (x < TANK_FX0 || x > TANK_FX1); }
+static void relayout(tank_t *t, save_t *sv) {
+    if (!sv->lay_w && strcmp(PT_BOARD, "amoled18") != 0 &&
+        (lay_spot(sv->bubble_x) || lay_spot(sv->feed_spot_x) || lay_spot(sv->plant_x) || lay_spot(sv->castle_x) ||
+         lay_spot(sv->coral_x) || lay_spot(sv->cluster_x) || lay_spot(sv->pumpkin_x) || lay_spot(sv->volcano_x) ||
+         lay_spot(sv->urchin_x) || lay_spot(sv->cr_x))) {
+        sv->lay_w = 448; sv->lay_h = 368; sv->lay_fx0 = 0; sv->lay_fx1 = 448;   /* the 1.8's world (tank.h's rectangle) */
+        sv->lay_cols = 448 / 16; sv->lay_rows = 368 / 16;
+    }
+    if (!sv->lay_w || sv->lay_fx1 <= sv->lay_fx0 ||
+        (sv->lay_w == TANK_W && sv->lay_h == TANK_H && sv->lay_fx0 == TANK_FX0 && sv->lay_fx1 == TANK_FX1)) return;
+    const float k = (float)TANK_FW / (sv->lay_fx1 - sv->lay_fx0);
+    float *spots[] = { &sv->bubble_x, &sv->feed_spot_x, &sv->plant_x, &sv->castle_x, &sv->coral_x, &sv->cluster_x,
+                       &sv->pumpkin_x, &sv->volcano_x, &sv->urchin_x, &sv->cr_x };
+    for (size_t i = 0; i < sizeof spots / sizeof spots[0]; i++)
+        if (*spots[i] > 0) *spots[i] = fmaxf(1, TANK_FX0 + (*spots[i] - sv->lay_fx0) * k);   /* 0 = never placed: stays 0 */
+    sv->snail_x = sv->snail_y = 0;
+    int sc = sv->lay_cols, sr = sv->lay_rows;
+    if (sc > 0 && sr > 0 && sc * sr <= ALGAE_SAVE && (sc != ALGAE_COLS || sr != ALGAE_ROWS)) {   /* through the tank's own grid: no second copy on the stack */
+        for (int y = 0; y < ALGAE_ROWS; y++) for (int x = 0; x < ALGAE_COLS; x++)
+            t->algae[y * ALGAE_COLS + x] = sv->algae[(y * sr / ALGAE_ROWS) * sc + x * sc / ALGAE_COLS];
+        memcpy(sv->algae, t->algae, ALGAE_CELLS);
+    }
 }
 
 /* restore the saved tank into t; false = no usable save (t untouched).
@@ -831,13 +963,22 @@ static bool load_save(tank_t *t, int64_t *saved_unix) {
     size_t got = 0;
     bool loaded = persist_port_load(&sv, sizeof sv, &got) && got >= SAVE_CORE_SIZE && got <= sizeof sv;
     if (!loaded || sv.magic != SAVE_MAGIC || sv.n_fish < 2 || sv.n_fish > N_FISH_MAX) return false;
+    size_t ble_off = 0, ble_prefix = 0;
+    bool has_fish = false;
     if (got == sizeof(legacy_ble_save_t) || got == offsetof(legacy_ble_save_t, fish_gift)) {
+        ble_off = 1656; ble_prefix = 1652;
+        has_fish = got == sizeof(legacy_ble_save_t);
+    } else if (got == sizeof(ble036_save_t) || got == offsetof(ble036_save_t, fish_gift)) {
+        ble_off = 1912; ble_prefix = 1908;
+        has_fish = got == sizeof(ble036_save_t);
+    }
+    if (ble_off) {
         gift_save_t gift;
         fish_gift_save_t fish_gift = {0};
-        memcpy(&gift, (uint8_t *)&sv + offsetof(legacy_ble_save_t, gift), sizeof gift);
-        if (got == sizeof(legacy_ble_save_t))
-            memcpy(&fish_gift, (uint8_t *)&sv + offsetof(legacy_ble_save_t, fish_gift), sizeof fish_gift);
-        memset((uint8_t *)&sv + 1652, 0, sizeof sv - 1652);
+        memcpy(&gift, (uint8_t *)&sv + ble_off, sizeof gift);
+        if (has_fish)
+            memcpy(&fish_gift, (uint8_t *)&sv + ble_off + sizeof gift, sizeof fish_gift);
+        memset((uint8_t *)&sv + ble_prefix, 0, sizeof sv - ble_prefix);
         sv.gift = gift;
         sv.fish_gift = fish_gift;
     }
@@ -845,6 +986,7 @@ static bool load_save(tank_t *t, int64_t *saved_unix) {
         memmove(&sv.ms_seen, &sv.bubble_x, sizeof sv.ms_seen + sizeof sv.tank_ms_seen);
         sv.bubble_x = 0;                       /* = the default column */
     }
+    relayout(t, &sv);                          /* another board's world: in proportion (0.3.9.3) */
     *saved_unix = sv.saved_unix; s_loaded_unix = sv.saved_unix;
     s_loaded_release = sv.saved_release;
     t->n_fish = 0;
@@ -876,7 +1018,7 @@ static bool load_save(tank_t *t, int64_t *saved_unix) {
     t->light_tip_seen = sv.light_tip_seen != 0;
     t->tools_locked = sv.tools_locked != 0;
     tank_screen_set(t, sv.screen_turned != 0);
-    t->orient_lock = (sv.orient & 1) != 0; if (t->orient_lock) t->orient_inv = (sv.orient & 2) != 0;
+    t->orient_lock = (sv.orient & 1) != 0; if (t->orient_lock) t->orient_q = (uint8_t)TANK_QUARTER(((sv.orient & 2) ? 2 : 0) | ((sv.orient & 4) ? 1 : 0));   /* 4: on a side (0.3.9.3; an older build reads the turned-over half) */
     t->autofeed_off = sv.autofeed_off != 0;
     t->light_override = false; t->light_on = true;   /* never restored (2026-09-15): a saved
                                                       * override once froze a tank in permanent day */
@@ -896,6 +1038,8 @@ static bool load_save(tank_t *t, int64_t *saved_unix) {
     t->fish_gift = sv.fish_gift;
     for (int i=0;i<t->n_fish;i++) t->fish[i].family = sv.fish_gift.family[i];
     t->sd_balance = sv.sd_balance; t->sd_earned = sv.sd_earned; t->sd_unlocks = sv.sd_unlocks & ((1u << SD_ITEM_COUNT) - 1);
+    t->sd_shelved = sv.sd_shelved & t->sd_unlocks & SD_DECOR_BITS;   /* the shelf (0.3.9): only owned, placeable pieces are ever on it */
+    t->sd_locked = sv.sd_locked & t->sd_unlocks & SD_DECOR_BITS;     /* the locks (0.3.9): the same bits */
     for (int i = 0; i < N_FISH_MAX; i++) t->sd_paid_fish[i] = i < t->n_fish ? sv.sd_paid_fish[i] : 0;
     t->sd_colonies_paid = sv.sd_colonies_paid; t->sd_inches_paid = sv.sd_inches_paid;
     t->algae_colonies = sv.algae_colonies; t->trim_px = sv.trim_px;
@@ -917,7 +1061,11 @@ static bool load_save(tank_t *t, int64_t *saved_unix) {
     tank_pumpkin_place(t);                            /* the lantern's spot and depth (0.3.6) */
     if (sv.pumpkin_z1 == DECOR_Z_FRONT + 1) t->pumpkin_z = DECOR_Z_FRONT;
     if (sv.pumpkin_x > 0) tank_decor_set(t, 8, sv.pumpkin_x, t->pumpkin_z);
-    memcpy(t->decor_rank, sv.decor_rank, sizeof t->decor_rank);   /* the pieces' order (zeros = the old fixed one) */
+    memcpy(t->decor_rank, sv.decor_rank, sizeof sv.decor_rank);   /* the pieces' order (zeros = the old fixed one) */
+    t->decor_rank[5] = sv.volcano_rank;
+    tank_volcano_place(t);                            /* the volcano's spot and depth (0.3.9) */
+    if (sv.volcano_z1 == DECOR_Z_FRONT + 1) t->volcano_z = DECOR_Z_FRONT;
+    if (sv.volcano_x > 0) tank_decor_set(t, 9, sv.volcano_x, t->volcano_z);
     if (t->sd_unlocks & SD_ITEM_SHRIMP) {             /* the school back in the grass, its count and its progress */
         tank_shrimp_place(t, sv.shrimp_n >= SHRIMP_START ? sv.shrimp_n : SHRIMP_START);
         t->shrimp_food = sv.shrimp_food <= SHRIMP_PER_JOIN ? sv.shrimp_food : SHRIMP_PER_JOIN;
@@ -929,6 +1077,13 @@ static bool load_save(tank_t *t, int64_t *saved_unix) {
         if (sv.urchin_x > 0) t->urchin_x = sv.urchin_x;
         t->urchin_grazed_px = sv.urchin_grazed_px > 0 ? sv.urchin_grazed_px : 0;
     } else { t->urchin_x = -1; t->urchin_grazed_px = 0; }
+    if (t->sd_unlocks & SD_ITEM_CRAB) {             /* back where it stopped, with its seeds and its finds */
+        t->cr_variant = sv.cr_variant; t->cr_eaten = sv.cr_eaten;
+        tank_crab_place(t);
+        if (sv.cr_x > 0) t->cr_x = sv.cr_x;
+        t->cr_found = sv.cr_found; t->cr_found_paid = sv.cr_found_paid > sv.cr_found ? sv.cr_found : sv.cr_found_paid;
+        t->cr_find_cool = sv.cr_find_wait ? (float)(sv.cr_find_wait - 1) : tank_randf(t, CR_FIND_FIRST_LO_S, CR_FIND_FIRST_HI_S);   /* the saved wait (0.3.9.1); an older save: soon */
+    } else t->cr_x = -1;
     if (t->sd_unlocks & SD_ITEM_SEAHORSE) {           /* back on a blade, its tally */
         tank_seahorse_place(t);
         t->sh_s = sv.sh_s > 0 ? sv.sh_s : 0;
@@ -939,7 +1094,6 @@ static bool load_save(tank_t *t, int64_t *saved_unix) {
         t->sd_snacks_paid = sv.sd_snacks_paid > 0 ? sv.sd_snacks_paid : 0;
         t->sh_snack_cool = sv.sh_snack_cool > 0 && sv.sh_snack_cool <= SH_SNACK_COOL_S ? sv.sh_snack_cool : 0;
     } else { t->sh_x = -1; t->sh_s = 0; t->sh_hitches = 0; t->sh_trust_passed = 0; t->sh_eaten = 0; t->sh_snack_pay = 0; t->sd_snacks_paid = 0; t->sh_snack_cool = 0; }
-    s_sd_prev_feedings = t->player_feedings;         /* meals before this boot are not back-paid */
     s_sd_pending = 0;
     s_arrival_pending = sv.arrival_pending; s_spawn_in = -1;
     s_sale_need = sv.sale_meals_need > 0 ? sv.sale_meals_need : 0;
@@ -964,9 +1118,42 @@ float progression_boot(tank_t *t) {
 
 void progression_settings_changed(void) { mark_dirty(); }
 
+void progression_carry_take(const tank_t *t, progression_carry_t *c) {
+    memset(c, 0, sizeof *c);
+    c->sd_balance = t->sd_balance;
+    c->light_idle_s = (uint16_t)t->light_idle_s; c->light_auto = t->light_auto; c->light_tip_seen = t->light_tip_seen;
+    c->screen_turned = t->screen_turned; c->orient_lock = t->orient_lock; c->orient_q = t->orient_q;
+}
+void progression_carry_give(tank_t *t, const progression_carry_t *c) {
+    t->sd_balance = c->sd_balance;
+    t->light_idle_s = c->light_idle_s ? c->light_idle_s : LIGHT_IDLE_S;
+    t->light_auto = c->light_auto != 0; if (t->light_auto) t->light_manual_off = false;
+    t->light_tip_seen = c->light_tip_seen != 0;
+    tank_screen_set(t, c->screen_turned != 0);
+    t->orient_lock = c->orient_lock != 0; t->orient_q = t->orient_lock ? (uint8_t)TANK_QUARTER(c->orient_q) : 0;
+    mark_dirty();
+}
+bool progression_blob_set_saved_unix(void *blob, size_t len, int64_t unix) {
+    if (len < offsetof(save_t, saved_unix) + sizeof(int64_t)) return false;
+    uint32_t magic; memcpy(&magic, blob, sizeof magic);
+    if (magic != SAVE_MAGIC) return false;
+    memcpy((uint8_t *)blob + offsetof(save_t, saved_unix), &unix, sizeof unix);
+    return true;
+}
+
+uint32_t progression_blob_unlocks(const void *blob, size_t len) {
+    if (len < offsetof(save_t, sd_unlocks) + sizeof(uint32_t)) return 0;
+    uint32_t magic, u; memcpy(&magic, blob, sizeof magic);
+    if (magic != SAVE_MAGIC) return 0;
+    memcpy(&u, (const uint8_t *)blob + offsetof(save_t, sd_unlocks), sizeof u);
+    return u;
+}
+
 void progression_slept(tank_t *t, float seconds) {
     if (seconds <= 0) return;
     tank_tick_sleep(t, seconds);
+    for (int i = 0; i < t->n_fish; i++)       /* the meal pay's wait runs through sleep */
+        t->fish[i].meal_pay_wait = fmaxf(0, t->fish[i].meal_pay_wait - seconds);
     fry_age(t, seconds);                      /* the fry offer ages asleep too, in full */
     for (int i = 0; i < t->n_fish; i++) {     /* and they grew, slowly, in the dark */
         t->fish[i].age_s += seconds * SLEEP_GROWTH_FRAC;
@@ -994,6 +1181,19 @@ float progression_wake(tank_t *t, int64_t now_unix) {
     return slept;
 }
 
+bool progression_near_friend(const tank_t *t, int i) {
+    float d; int j = tank_nearest_friend(t, i, &d);
+    return j >= 0 && d < SOCIAL_NEAR_PX * (t->fish[i].size + t->fish[j].size);
+}
+bool progression_finger_company(const tank_t *t, int i) {
+    if (!tank_at_finger(t, i)) return false;
+    for (int j = 0; j < t->n_fish; j++)
+        if (j != i && tank_at_finger(t, j) &&
+            tank_dist(t->fish[i].x, t->fish[i].y, t->fish[j].x, t->fish[j].y) < SOCIAL_NEAR_PX * SOCIAL_RING_X * (t->fish[i].size + t->fish[j].size))
+            return true;
+    return false;
+}
+
 void progression_tick(tank_t *t, float dt) {
     if (!s_booted) return;
     float aged = dt * progression_time_scale;                    /* growth: every awake second, lit or not */
@@ -1004,13 +1204,29 @@ void progression_tick(tank_t *t, float dt) {
         t->fish[i].age_s += aged;
         apply_stage(f, t->fish[i].age_s, false);
         apply_growth(f);
-        /* trait drift, slow: calm + fed -> bolder/more social; startled -> shyer */
+        /* trait drift, slow: calm + fed -> bolder; startled -> shyer; and it
+         * settles back toward the temper it was born with (2026-10-29: calm +
+         * fed is most of a tended tank's day and stress > 7 almost never comes
+         * since the shadow went, so every fish ran to 0.95 within a lit day).
+         * The CHANGE gate's pressure keeps its old pace: it measures the
+         * experience, not how far the trait got to move. */
         float k = tended / (DRIFT_HOURS * 3600.0f);          /* full unit per DRIFT_HOURS of pressure */
         float pressure = 0;                                   /* what the traits WANTED to move, before the clamps */
         if (f->stress > 7) { f->bold = clampf(f->bold - k, 0.05f, 0.95f); pressure += k; }
-        else if (f->hunger < 4 && f->stress < 2) { f->bold = clampf(f->bold + k * 0.5f, 0.05f, 0.95f); pressure += k * 0.5f; }
-        if (f->goal.id == GOAL_FOLLOW_FRIEND) { f->sociable = clampf(f->sociable + k * 0.5f, 0.05f, 0.95f); pressure += k * 0.5f; }
-        else if (f->goal.id == GOAL_EXPLORE) { f->sociable = clampf(f->sociable - k * 0.2f, 0.05f, 0.95f); pressure += k * 0.2f; }
+        else if (f->hunger < 4 && f->stress < 2) { f->bold = clampf(f->bold + k * BOLD_CALM_GAIN, 0.05f, 0.95f); pressure += k * 0.5f; }
+        f->bold += (f->bold0 - f->bold) * k * TRAIT_SETTLE;
+        /* social (2026-10-29, Discord: every keeper's fish went SOLO): company
+         * warms a fish - following a friend, and every second spent nose to
+         * tail with one (at the food, in the grass, gathered at the keeper's
+         * finger: a hold is how a keeper brings a shy tank together) - and it
+         * settles back toward the temper it was born with. Exploring used to
+         * cool it, and the model only follows with a very social fish (7-9),
+         * so a middling fish never got the warmth back and sank to the floor;
+         * a social one ran to the ceiling. */
+        float warm = (f->goal.id == GOAL_FOLLOW_FRIEND ? SOCIAL_FOLLOW_GAIN : 0)
+                   + (progression_finger_company(t, i) ? SOCIAL_HOLD_GAIN : progression_near_friend(t, i) ? SOCIAL_NEAR_GAIN : 0);
+        if (warm > 0) { f->sociable = clampf(f->sociable + k * warm, 0.05f, 0.95f); pressure += k * warm; }
+        f->sociable += (f->sociable0 - f->sociable) * k * TRAIT_SETTLE;
         f->drift_acc += pressure;
         if (fabsf(f->bold - f->bold0) >= 0.11f || fabsf(f->sociable - f->sociable0) >= 0.11f) changed_someone = true;
 
@@ -1021,13 +1237,13 @@ void progression_tick(tank_t *t, float dt) {
             float rx, ry; tank_reef_spot(t, &rx, &ry);
             if (tank_dist(f->x, f->y, rx, ry) < 90) {
                 set_ms(f, MS_INSPECTED);                      /* no badge (0.3.0): it reveals the curiosity slider */
-                if (t->sd_unlocks & SD_ITEM_CLUSTER) reef_visit = true;
+                if (tank_decor_in(t, 4)) reef_visit = true;          /* (a cluster on the shelf is no landmark) */
             }
         }
         /* the seagrass: resting inside a canopy, or tucked into one while
            rattled - the grass as the place to be safe (2026-10-02, in the
            badge slot "first reef" had) */
-        if (((f->goal.id == GOAL_REST && f->goal_age > 2.0f) || f->stress >= 5.0f) && tank_in_grass(t, f->x, f->y))
+        if (((f->goal.id == GOAL_REST && f->goal_age > 2.0f) || f->stress >= 5.0f || f->breather > 2.0f) && tank_in_grass(t, f->x, f->y))
             set_ms(f, MS_FIRST_GRASS);
         if (f->goal.id == GOAL_FOLLOW_FRIEND && f->goal_age > 2.0f) set_ms(f, MS_FIRST_FOLLOW);
         if (f->goal.id == GOAL_DART_PLAY) n_dart++;
@@ -1042,6 +1258,7 @@ void progression_tick(tank_t *t, float dt) {
                                                                     (0.3.2; it was 30 cells, hours of film on a new tank) */
     if ((t->sd_unlocks & SD_ITEM_SHRIMP) && t->shrimp_n >= SHRIMP_MAX) set_tms(t, TMS_FULL_SCHOOL);
     if ((t->sd_unlocks & SD_ITEM_SEAHORSE) && t->sh_eaten > 0) set_tms(t, TMS_SEAHORSE_FED);   /* its first snack (0.3.6) */
+    if ((t->sd_unlocks & SD_ITEM_CRAB) && t->cr_found > 0) set_tms(t, TMS_CRAB_FIND);         /* the crab's first find, taken (0.3.9) */
     if (reef_visit) set_tms(t, TMS_FIRST_REEF);  /* a fish chose to look at the reef cluster */
     if (s_sale_need > 0) set_tms(t, TMS_FIRST_SALE);   /* a tank that sold a fish before 0.3.5: its badge, and the fry */
     fry_age(t, aged);
@@ -1049,6 +1266,7 @@ void progression_tick(tank_t *t, float dt) {
         s_prev_trims = t->trims; s_prev_cleaned = t->cells_cleaned;
         mark_dirty();
     }
+    for (int i = 0; i < t->n_fish; i++) if (t->fish[i].meal_pay_wait > 0) t->fish[i].meal_pay_wait -= dt;
     sd_tick(t);                                  /* the sand dollars owed for all of the above */
 
     /* ravenous: a starving tank with empty water begs at the surface (tank.c
@@ -1149,7 +1367,7 @@ bool progression_save(tank_t *t) {
     sv.light_tip_seen = t->light_tip_seen;
     sv.tools_locked = t->tools_locked;
     sv.screen_turned = t->screen_turned;
-    sv.orient = (uint8_t)(t->orient_lock ? 1 | (t->orient_inv ? 2 : 0) : 0);
+    sv.orient = (uint8_t)(t->orient_lock ? 1 | ((t->orient_q & 2) ? 2 : 0) | ((t->orient_q & 1) ? 4 : 0) : 0);
     sv.autofeed_off = t->autofeed_off;
     sv.arrival_pending = s_arrival_pending; sv.n_fish = (uint8_t)t->n_fish;
     sv.feed_spot_x = t->feed_spot_x; sv.player_feedings = t->player_feedings;
@@ -1161,7 +1379,7 @@ bool progression_save(tank_t *t) {
     }
     memcpy(sv.algae, t->algae, ALGAE_CELLS);
     sv.trims = t->trims; sv.cells_cleaned = t->cells_cleaned;
-    sv.sd_balance = t->sd_balance; sv.sd_earned = t->sd_earned; sv.sd_unlocks = t->sd_unlocks;
+    sv.sd_balance = t->sd_balance; sv.sd_earned = t->sd_earned; sv.sd_unlocks = t->sd_unlocks; sv.sd_shelved = t->sd_shelved; sv.sd_locked = t->sd_locked;
     for (int i = 0; i < N_FISH_MAX; i++) sv.sd_paid_fish[i] = t->sd_paid_fish[i];
     sv.sd_colonies_paid = t->sd_colonies_paid; sv.sd_inches_paid = t->sd_inches_paid;
     sv.algae_colonies = t->algae_colonies; sv.trim_px = t->trim_px;
@@ -1176,10 +1394,17 @@ bool progression_save(tank_t *t) {
     sv.cluster_growth = t->cluster_growth;
     sv.pumpkin_x = t->pumpkin_x > 0 ? t->pumpkin_x : 0; sv.pumpkin_z1 = (uint8_t)(t->pumpkin_z + 1);
     memcpy(sv.decor_rank, t->decor_rank, sizeof sv.decor_rank);
+    sv.volcano_rank = t->decor_rank[5];
+    sv.volcano_x = t->volcano_x > 0 ? t->volcano_x : 0; sv.volcano_z1 = (uint8_t)(t->volcano_z + 1);
     sv.shrimp_n = (t->sd_unlocks & SD_ITEM_SHRIMP) ? t->shrimp_n : 0; sv.shrimp_food = t->shrimp_food;
     sv.shrimp_cool = t->shrimp_cool > 0 ? t->shrimp_cool : 0; sv.shrimp_eaten = t->shrimp_eaten;
     sv.urchin_x = (t->sd_unlocks & SD_ITEM_URCHIN) && t->urchin_x > 0 ? t->urchin_x : 0;
     sv.urchin_grazed_px = t->urchin_grazed_px > 0 ? t->urchin_grazed_px : 0;
+    sv.cr_x = (t->sd_unlocks & SD_ITEM_CRAB) && t->cr_x > 0 ? t->cr_x : 0; sv.cr_variant = t->cr_variant; sv.cr_eaten = t->cr_eaten;
+    sv.cr_found = t->cr_found; sv.cr_found_paid = t->cr_found_paid;
+    sv.cr_find_wait = 1u + (t->cr_find > 0 ? 0u : (uint32_t)fmaxf(0, t->cr_find_cool));   /* one held up: due again at the next load */
+    sv.lay_w = TANK_W; sv.lay_h = TANK_H; sv.lay_fx0 = TANK_FX0; sv.lay_fx1 = TANK_FX1;   /* this board's world (0.3.9.3) */
+    sv.lay_cols = ALGAE_COLS; sv.lay_rows = ALGAE_ROWS;
     if (t->sd_unlocks & SD_ITEM_SEAHORSE) {
         sv.sh_s = t->sh_s > 0 ? t->sh_s : 0; sv.sh_hitches = t->sh_hitches; sv.sh_trust_passed = t->sh_trust_passed;
         sv.sh_eaten = t->sh_eaten; sv.sh_snack_pay = t->sh_snack_pay; sv.sd_snacks_paid = t->sd_snacks_paid; sv.sh_snack_cool = t->sh_snack_cool > 0 ? t->sh_snack_cool : 0;

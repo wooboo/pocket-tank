@@ -19,6 +19,8 @@ const snd_clip_t SND_CLIPS[SND_N_CLIPS] = {
     { 179584u, 36301u },
     { 215885u, 21579u },
     { 237464u, 27787u },
+    { 265251u, 14833u },
+    { 280084u, 9845u },
 };
 
 const snd_cue_t SND_CUES[SND_COUNT] = {
@@ -46,4 +48,6 @@ const snd_cue_t SND_CUES[SND_COUNT] = {
     { "wake", 15, 0, 0, 0 },
     { "low_battery", 15, 1, 0, 131 },
     { "error", 16, 1, 0, 151 },
+    { "crab_find", 17, 1, 0, 171 },
+    { "crab_coin", 18, 1, 0, 181 },
 };

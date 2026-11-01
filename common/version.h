@@ -17,13 +17,24 @@
  * records PT_RELEASE_NUM of the build that wrote it (progression.c). */
 #ifndef VERSION_H
 #define VERSION_H
+#include <string.h>
 
 #define PT_RELEASE_MAJOR 0
 #define PT_RELEASE_MINOR 3
-#define PT_RELEASE_PATCH 6
-#define PT_RELEASE       "0.3.6"
+#define PT_RELEASE_PATCH 9
+#define PT_RELEASE_HOTFIX 5                    /* a fourth part (2026-10-21): a fix between patches - 0.3.8.1 - that
+                                                  must not burn the next number. 0 = none, and the string has three parts */
+#define PT_RELEASE       "0.3.9.5"
 #define PT_RELEASE_STAGE "alpha"               /* pre-1.0: shown beside the number */
-#define PT_RELEASE_NUM   ((PT_RELEASE_MAJOR << 16) | (PT_RELEASE_MINOR << 8) | PT_RELEASE_PATCH)
+/* the packed number the tank compares (update.c newer(), the save's stamp):
+ * a byte each, major.minor.patch.hotfix. Until 0.3.8 it was three bytes
+ * (major << 16 | minor << 8 | patch): every four-byte number is larger than
+ * every three-byte one, so a tank on 0.3.8 (0x000308) sees 0.3.8.1
+ * (0x00030801) as newer, and 0.3.9 (0x00030900) ranks above both. A manifest's
+ * min_from under 0x10000 is read as the old packing (update.c). Any line that
+ * merges this forward (0.4) takes the four bytes with it, or its 0.4.0 would
+ * rank below 0.3.8.1. tools/make_ota_manifest.py packs the same way. */
+#define PT_RELEASE_NUM   ((PT_RELEASE_MAJOR << 24) | (PT_RELEASE_MINOR << 16) | (PT_RELEASE_PATCH << 8) | PT_RELEASE_HOTFIX)
 
 /* the model this build ships with (model/out/model_q4.bin): its tag, byte
  * length and sha256. The tank's model trailer (firmware/main/model_trailer.c)
@@ -55,6 +66,13 @@
 #define PT_BOARD         "amoled18"
 #define PT_BOARD_NAME    "ESP32-S3-Touch-AMOLED-1.8"
 #endif
+/* a board id in the keeper's words, for the glass (0.3.9.3: the WRONG VERSION
+ * card, a board's own version offered by CHECK FOR UPDATES); NULL = unknown */
+static inline const char *pt_board_words(const char *id) {
+    if (!id) return NULL;
+    return !strcmp(id, "amoled18") ? "1.8 INCH" : !strcmp(id, "round175c") ? "1.75 ROUND" :
+           !strcmp(id, "watch206") ? "2.06 WATCH" : !strcmp(id, "square216") ? "2.16 SQUARE" : NULL;
+}
 #define PT_BOARD_MAGIC   "PTBOARD"             /* the image's board marker begins with these 8 bytes (with the NUL) */
 #define PT_BOARD_MARKER_OFFSET 0x120           /* ... at this offset in the app image: the image header (24) + the
                                                   first segment's header (8) + esp_app_desc_t (256) */

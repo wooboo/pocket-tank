@@ -1,5 +1,6 @@
-/* imu_port.h — QMI8658 accelerometer -> screen orientation (180-degree flip
- * only, so the landscape tank keeps its aspect ratio either way up). */
+/* imu_port.h — QMI8658 accelerometer -> screen orientation (the 180-degree flip,
+ * so the landscape tank keeps its aspect ratio either way up; a square picture
+ * stands on any of its four sides, imu_port_sides). */
 #ifndef IMU_PORT_H
 #define IMU_PORT_H
 #include <stdbool.h>
@@ -11,8 +12,15 @@ void imu_port_poll(int64_t now_us);               /* call every frame; rate-limi
 /* Smoothed buoyancy direction in the current framebuffer orientation. */
 void imu_port_bubble_up(float *x, float *y);
 bool imu_port_take_shake(void); /* consumes one sustained-shaking event */
-float imu_port_water_push(void); /* transient screen-horizontal acceleration in g */
+float imu_port_water_push(int quarter); /* transient screen-horizontal acceleration in g */
 bool imu_port_inverted(void);                     /* true = device is upside down */
+void imu_port_seed_inverted(bool inv);            /* the way up the board had before this boot (main.c keeps it in NVS) */
+/* on a side (0.3.9.3, the square and the pendant): with sides on, the way up is
+ * any of four - the picture's quarter turns clockwise, 0..3 (tank_orient) */
+void imu_port_sides(bool on);
+int  imu_port_quarter(void);
+void imu_port_seed_quarter(int q);
+void imu_port_side_sign_flip(void);               /* director `turn sign`: the other side is the left one */
 /* handling detector (2026-09-15, for the audio port): true while the
  * device has moved within the last IMU_MOTION_HOLD_US - picked up, in a
  * hand, carried. Lying on a table it goes false. */

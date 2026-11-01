@@ -39,7 +39,23 @@ void render_tank(const tank_t *t, uint16_t *fb, int stride);
  * bubbles, 4 fish + front veg, 5 vignette sweep, 6 algae film). Accumulates
  * until the caller zeroes it. NULL = off. */
 extern int64_t (*render_clock_us)(void);
-extern int64_t render_prof_us[7];
+/* THE FRAMEBUFFER'S BYTE ORDER (2026-10-23, the frame rate on the big glasses): with PT_FB_SWAP the frame (and the
+ * scene it is primed from) holds every pixel as the panel's wire wants it - RGB565 high byte first, i.e. byte-swapped
+ * as a little-endian uint16 - so the SPI DMA can take the frame straight from PSRAM, and the flush's CPU fill (19 ms
+ * a frame on the square: the read out of PSRAM, the swap, the stripes) goes away. Every store into a frame or the
+ * scene goes through FB_SWAP16, every load back; rgb565() and the colour math stay native. The sim builds with it
+ * off (its pixel tests read the frame); `make OUT=fishsim-swap BUILD=build-arm-swap EXTRA_CFLAGS=-DPT_FB_SWAP=1`
+ * builds it on, and its frames must match the plain build's byte for byte (write_ppm unswaps). */
+#ifndef PT_FB_SWAP
+#define PT_FB_SWAP 0
+#endif
+#if PT_FB_SWAP
+#define FB_SWAP16(v) ((uint16_t)((((uint16_t)(v)) << 8) | (((uint16_t)(v)) >> 8)))
+#else
+#define FB_SWAP16(v) ((uint16_t)(v))
+#endif
+extern int64_t render_prof_us[14];   /* 0..6 the stages; 7..13 the fish stage split (2026-10-23): the fish, the snail + urchin,
+                                      * the pieces IN FRONT restored, the front grass, the front overlays, the front lanes, the arch shade */
 
 /* Optional static-scene cache (TANK_W*TANK_H uint16): the water gradient,
  * pebbles and backdrop decor are rendered once per lighting state and copied each
@@ -93,6 +109,24 @@ void render_fb_primed(const uint16_t *fb, unsigned epoch);
  * it and a centred card: the seahorse at 2x, its days with the keeper, its
  * hitches, the trust it passed on and what it is doing. */
 #define RENDER_CARD_SEAHORSE 96
+/* fish_idx == RENDER_CARD_CRAB (0.3.9): the strawberry crab's card - a ring on
+ * it and a centred card: the crab facing the glass at 2x, the pellets it has
+ * found and what it is doing. */
+#define RENDER_CARD_CRAB 95
+/* the critter cards' arrows (0.3.9.3, Strato: "cycle through all the
+ * critters from this UI"): two small boxes inside a critter card's top
+ * corners, in the NEXT FISH arrow's dress - the left one steps back, the
+ * right one on, through the critters this tank has (snail, shrimp, urchin,
+ * seahorse, crab, wrapping round; the fish keep their own arrow). Dim with
+ * only one, where there is nowhere to go. render_critter_nav_hit is the tap
+ * test while critter card `card` is up: -1 the left box, +1 the right, 0
+ * neither (the boxes plus slop); render_critter_step the card it steps to
+ * (the same card with one critter, or for a card that is not a critter's). */
+#define RENDER_CRIT_NAV_W  34     /* the NEXT FISH arrow's box */
+#define RENDER_CRIT_NAV_IN 8      /* in from the card's corner */
+int  render_critter_nav_hit(int card, float x, float y);
+int  render_critter_step(const tank_t *t, int card, int dir);
+bool render_critter_here(const tank_t *t, int card);   /* that critter is in the tank (its card would draw) */
 void render_stats_card(const tank_t *t, int fish_idx, uint16_t *fb, int stride);
 /* Optional card cache (RENDER_CARD_W x RENDER_CARD_H uint16): with the scene
  * cache live, the card is redrawn at most 4x/s and blitted otherwise (~7 ms
@@ -124,6 +158,8 @@ void render_stats_card(const tank_t *t, int fish_idx, uint16_t *fb, int stride);
 #define RENDER_CARD_HIT(x, y) ((x) >= RENDER_CARD_X - RENDER_CARD_HIT_SIDE && (x) < RENDER_CARD_X + RENDER_CARD_W + RENDER_CARD_HIT_SIDE && \
                                (y) >= RENDER_CARD_Y && (y) < RENDER_CARD_Y + RENDER_CARD_H + RENDER_CARD_HIT_BELOW)
 void render_set_card_cache(uint16_t *buf);
+void render_crab_cache(bool on);        /* the crab's pose grids kept (on, the default) or built every pose change: the selftest's A/B (0.3.9.1) */
+int  render_crab_builds(void);          /* the crab's grid builds so far */
 /* The TOOLBOX (2026-10-01): under a fish's card, a little apart from it so
  * MORE keeps its own ground, a box in the card's dress with two big buttons
  * - the SPONGE and the SCISSORS (tank.h TOOL_*). render_stats_card draws it
@@ -142,11 +178,27 @@ int  render_tools_hit(float x, float y);
  * double edge on a lighter fill - and the shackle's shape says it too,
  * never the hue alone. render_lock_hit is its tap test while a fish's card
  * is up: its column, from the toolbox's top edge down to the bezel. */
-#define RENDER_LOCK_X (RENDER_TOOLS_X + RENDER_TOOLS_W + RENDER_CARD_HIT_SIDE)
+#define RENDER_SIDE_GAP 6          /* the lock off the toolbox and the NEXT arrow off the card: one gap (0.3.9; the lock was 12) */
+#define RENDER_LOCK_X (RENDER_TOOLS_X + RENDER_TOOLS_W + RENDER_SIDE_GAP)
 #define RENDER_LOCK_W 44
 #define RENDER_LOCK_H 44
 #define RENDER_LOCK_Y (RENDER_TOOLS_Y + (RENDER_TOOLS_H - RENDER_LOCK_H) / 2)
 bool render_lock_hit(float x, float y);
+/* the NEXT FISH arrow (0.3.9, Bananna on Discord: "sometimes fish hide
+ * behind the stat screen"): a small box just outside the card's top right,
+ * in the lock's dress, one arrow; a tap steps the card on to the next fish
+ * (wrapping round). Dim with a single fish, where there is nowhere to go.
+ * render_next_hit is its tap test while a fish's card is up - the box plus
+ * slop, most of it right and below; the platforms test it BEFORE the card's
+ * own (RENDER_CARD_HIT's side slop reaches past the gap). A tap on it never
+ * reaches the water, dim or not. render_next_fish is the fish it steps to
+ * (the same one with a single fish). */
+#define RENDER_NEXT_W   34
+#define RENDER_NEXT_H   34
+#define RENDER_NEXT_X   (RENDER_CARD_X + RENDER_CARD_W + RENDER_SIDE_GAP)
+#define RENDER_NEXT_Y   RENDER_CARD_Y
+bool render_next_hit(float x, float y);
+int  render_next_fish(const tank_t *t, int fish_idx);
 /* With a tool in hand and no fish card up, a chip at the top left says so:
  * the tool and DONE. A tap on it (render_tool_chip_hit) puts the tool back
  * in the box. render_tool_chip draws nothing with TOOL_HAND, when
@@ -165,9 +217,13 @@ bool render_tool_chip_hit(const tank_t *t, float x, float y);
  * below and to the left) opens the battery page - while the pill shows. */
 #define RENDER_BAT_W 32
 #define RENDER_BAT_H 15
-#ifdef TANK_ROUND               /* the bowl has no top right corner: top centre, the bolt left of it */
-#define RENDER_BAT_X ((TANK_W - RENDER_BAT_W) / 2 + 10)
-#define RENDER_BAT_Y 16
+#ifdef TANK_ROUND               /* the bowl: in the NEXT arrow's lane, to the right - its right end 48 px in from the circle at its top
+                                   line (the glass is at x 400 there), the bolt left of it (0.3.9.1, Strato's mockup: a keeper tapping
+                                   the arrow to step through the fish opened the battery page - the pill sat top centre and its slop
+                                   reached over the arrow, and the pill's tap is tested first). Its slop now starts 18 px right of the
+                                   arrow's */
+#define RENDER_BAT_X 320
+#define RENDER_BAT_Y (RENDER_NEXT_Y + (RENDER_NEXT_H - RENDER_BAT_H) / 2)
 #elif defined(TANK_WATCH)       /* the watch: the top right, in from its round corner */
 #define RENDER_BAT_X (TANK_W - RENDER_BAT_W - 56)
 #define RENDER_BAT_Y 22
@@ -256,7 +312,13 @@ void render_milestones_leave(void);
  * SHOP_TAP_KEPT when a modal opened or closed. Page state is render-local;
  * render_shop_leave clears it when the page closes. */
 enum { SHOP_TAP_NONE = 0, SHOP_TAP_KEPT = 1, SHOP_TAP_CLOSE = 2, SHOP_TAP_BUY = 16, SHOP_TAP_MOVE = 32, SHOP_TAP_SELL = 64,
-       SHOP_TAP_FRY = 128 };   /* BUY / MOVE / SELL + item index; FRY + the fry's place in the offer (0.3.5) */
+       SHOP_TAP_FRY = 128, SHOP_TAP_SHELVE = 256, SHOP_TAP_PLACE = 512 };   /* BUY / MOVE / SELL / SHELVE / PLACE + item index; FRY + the fry's place in the offer (0.3.5) */
+/* SHOP_TAP_SHELVE / SHOP_TAP_PLACE (0.3.9, the decoration shelf): a piece in
+ * the tank has MOVE | SHELVE in its modal (SELL moved to the placement page);
+ * SHELVE puts it away (progression_shelve) and the shop stays up - its row
+ * now says ON THE SHELF with a PUT BACK button, and its modal PLACE | SELL.
+ * PUT BACK / PLACE return SHOP_TAP_PLACE + item: the platform unshelves it
+ * and opens the placement page with the kept spot in place. */
 /* THE FRY (0.3.5, progression_fry_*): once a fish has been sold the shop's
  * first row is FRY - the first fry still for sale at its left, the price,
  * CHOOSE (SOLD OUT with all three bought, FULL with no slot). Its modal
@@ -273,6 +335,9 @@ enum { SHOP_TAP_NONE = 0, SHOP_TAP_KEPT = 1, SHOP_TAP_CLOSE = 2, SHOP_TAP_BUY = 
 void render_shop(const tank_t *t, uint16_t *fb, int stride);
 int  render_shop_tap(const tank_t *t, float x, float y);
 void render_shop_leave(void);
+/* the tests: piece `item` painted pixel (x, y) in the last render_tank (its
+ * recorded silhouette; the castle's static one) */
+bool render_decor_covers(int item, int x, int y);
 int  render_coral_cells(float growth);   /* the coral sprite's filled cells at a growth (the sim's selftest) */
 int  render_cluster_cells(float growth); /* the reef cluster's, likewise */
 /* the decor scratch (2026-09-24): the coral's and the cluster's tables in one
@@ -282,7 +347,55 @@ size_t render_decor_scratch_size(void);
 /* the pumpkin lantern (0.3.6, SD_ITEM_PUMPKIN): its sprite's pixels, and
  * in *glow the ones redrawn every frame (the face + the flame) */
 int    render_pumpkin_px(int *glow);   /* its pixels; *glow = the ones redrawn every frame */
+/* the touched mask and the restore (2026-10-23; render.c "The TOUCHED mask"): the firmware keeps a mask per framebuffer
+ * (RENDER_DIRTY_WORDS words), hands the frame's over before render_tank, says when a frame is a whole page
+ * (render_touch_all), and once the frame has left the wire puts the scene back under it (render_restore_touched: the
+ * epoch it returns primes the buffer, render_fb_primed) */
+void     render_set_touched_mask(uint32_t *buf);
+/* the grass cache (2026-10-24, render.c "THE GRASS CACHE"): a scene-sized buffer and a RENDER_DIRTY_WORDS mask, then on/off and
+ * its period; the prof gives the refreshes' time and count since the last call */
+void     render_set_grass_cache(uint16_t *buf, uint32_t *mask);
+void     render_set_grass_cache_on(bool on, int period_ms);
+/* THE GRASS LOOP (0.3.9.3, render.c): the back grass baked into a loop of bands of its sway (up to 16), and eight
+ * fine moments a band kept as their difference from it; a frame is primed with the scene above the grass's band
+ * and the band of its moment below, its fine moment laid over that. The platform hands over an allocator
+ * (64-byte aligned; PSRAM on the board) and a memory budget, then turns it on. render_grass_loop_parts is the
+ * prefetch's: the scene and the band for the frame at `clock`, and the epoch to hand render_fb_primed (false: no
+ * band ready - copy render_scene_buf as before). render_grass_loop_n and _ready count fine moments.
+ * render_grass_loop_lock(m): the loop plans m moments (0: as many as the budget holds) and STEPS one a frame - the
+ * grass moves with the frames, its sway's period m frames x 2 (0: the moment is the clock's). */
+void     render_set_grass_loop(void *(*alloc)(size_t), void (*release)(void *), size_t budget);
+void     render_grass_loop_on(bool on);
+bool     render_grass_loop_is_on(void);
+bool     render_grass_loop_parts(float clock, const uint16_t **scene, size_t *top_bytes, const uint16_t **band, size_t *band_off, size_t *band_bytes, unsigned *ep);
+void     render_grass_loop_prof(int *n, int *bakes, int64_t *us, int *rows);   /* moments, bakes and their time since the last call, the band's rows */
+void     render_grass_loop_bypass(bool on);   /* (the sim's tests: the loop kept but not used - the old drawing) */
+void     render_force_veg_clock(float c);     /* (... and the sway pinned to a moment; -1 = the frame's) */
+int      render_grass_loop_n(void);
+int      render_grass_loop_ready(void);       /* moments baked and current */
+void     render_grass_loop_lock(int moments);
+int      render_grass_loop_moment(void);      /* the last frame's moment (stepping), -1 before one */
+void     render_grass_loop_arena(int *used_kb, int *cap_kb);   /* the fine moments' differences: KB used of KB held */
+bool     render_grass_loop_patching(void);   /* THE PATCH (0.3.9.4): the loop stale inside boxes only - served with them repainted, rebaked inside them */
+int      render_grass_loop_boxes(int box[][4]);   /* ... the boxes (x0, y0, x1, y1 each; up to 6) */
+bool     render_grass_loop_dump(int j, uint16_t *px, uint32_t *mask, int *y0, int *rows);   /* (the tests) moment j as the loop holds it: its rows and its grass mask */
+void     render_set_grass_loop_task(bool on);   /* THE SECOND CORE: the platform bakes the slices itself, between frames (render_grass_loop_bake_slice under its lock) */
+int      render_grass_loop_bake_slice(const tank_t *t);
+void     render_grass_loop_debug_budget(int us);   /* (the tests) a frame's budget for the bake's slices (0: as built) */
+void     render_grass_loop_debug_abort(void);   /* (the tests) THE PATCH's fallback forced: the ring refuses the next splice, the fine moments bake whole */
+bool     render_grass_cache_on(void);
+int      render_grass_cache_ms(void);
+void     render_grass_cache_prof(int64_t *us, int *n);
+void     render_set_veg_step(int s);   /* the grass in row pairs (2): about half the spans, 2 px steps on its edges; 1 = row by row */
+int      render_veg_step(void);
+void     render_veg_bench(const tank_t *t, uint16_t *fb, int bed, int64_t (*clock_us)(void), int64_t *full_us, int64_t dry_us[3], int *spans);   /* director `vegbench`: full, no stores, no stores + no vignette, no span_final at all */
+void     render_touch_all(void);
+unsigned render_restore_touched(uint16_t *fb, const uint32_t *touched);
+unsigned render_scene_epoch(void);
 void   render_set_pumpkin_hidden(bool hidden);   /* the frame-rate A/B (director `pumpkin off`): not drawn, no light */
+/* the bubble volcano (0.3.9, SD_ITEM_VOLCANO) */
+void   render_set_volcano_style(int style);   /* 0 stacked boulders (the tank's), 1 smooth rock (the sim's look, PT_VOLCANO_SMOOTH) */
+int    render_volcano_px(int *glow);   /* its pixels; *glow = the lava's, redrawn every frame */
 bool   render_pumpkin_hidden(void);
 void   render_set_decor_scratch(void *buf);
 /* the sand dollar toast: dollars awarded during play (progression_sd_take_award)
@@ -311,8 +424,11 @@ void render_confirm_reset(uint16_t *fb, int stride, float frac);
 int  render_confirm_hit(float x, float y);
 
 /* Settings page (2026-09-15; the brightness row left the milestones page
- * for it): BRIGHTNESS 30 / 60 / 100 % and VOLUME OFF / QUIET / NORMAL as
- * segment buttons - tap the one you want - then LIGHTS OUT, one row since
+ * for it): BRIGHTNESS, a slider since 0.3.9 (a keeper sensitive to light
+ * found 30 %, the lowest of the three buttons it had, too bright): a knob
+ * carrying the percent, 5 .. 100 % in steps of 5, dragged along the row or
+ * tapped where wanted; VOLUME OFF / QUIET / NORMAL as segment buttons - tap
+ * the one you want - then LIGHTS OUT, one row since
  * 0.3.2 (Strato: "takes up too much real estate ... condense it and give a
  * few options"): a value between two arrows, DOUBLE-TAP (MANUAL, the default:
  * the keeper's double-tap on the glass) and then AUTO after 5 SEC .. 30 MIN
@@ -325,7 +441,9 @@ int  render_confirm_hit(float x, float y);
  * The platform feeds render_settings_touch EVERY FRAME while the page is up
  * (x, y, finger down), as it feeds setup_touch: it classifies the taps,
  * applies the tank's own settings to the tank itself (and marks the save),
- * and returns what happened: SET_TAP_BRIGHT with *value = the percent,
+ * and returns what happened: SET_TAP_BRIGHT with *value = the percent
+ * (the finger lifted off the slider: keep it), SET_TAP_BRIGHT_LIVE (the
+ * knob moved under a finger still down: show it, do not save it yet),
  * SET_TAP_VOLUME 0..2 (those two are the platform's to apply),
  * SET_TAP_LIGHT (the row stepped to or from MANUAL: *value 1 = AUTO),
  * SET_TAP_IDLE (AUTO's time stepped: *value = the seconds now set),
@@ -339,10 +457,37 @@ enum { SET_TAP_NONE = 0, SET_TAP_CLOSE = 1, SET_TAP_BRIGHT = 2, SET_TAP_VOLUME =
        SET_TAP_SCREEN = 7,      /* a worn tank's SCREEN row (2026-10-02): *value 1 = TURNED, already applied and marked
                                    for the save - the platform only logs it (the picture turns on the next frame) */
        SET_TAP_FEED = 8,        /* AUTO FEED (0.3.2): *value 1 = ON; applied and marked for the save */
-       SET_TAP_ROTATE = 9 };    /* ROTATION (0.3.2): *value 1 = locked; applied and marked for the save */
+       SET_TAP_ROTATE = 9,      /* ROTATION (0.3.2): *value 1 = locked; applied and marked for the save */
+       SET_TAP_BRIGHT_LIVE = 10,
+       SET_TAP_TANKS = 11 };        /* MY TANKS (0.3.9.3): the platform opens the tank switcher (docs/tank-switcher.md) */  /* the BRIGHTNESS slider under a finger (0.3.9): *value = the percent, the panel's to
+                                       show now; SET_TAP_BRIGHT follows with the last one when the finger lifts */
 void render_settings(const tank_t *t, uint16_t *fb, int stride, int bright_pct, int volume);
+/* THE ADVANCED PAGE's pictures and hit tests (0.3.9.2; the page itself is
+ * common/advanced.c, hidden behind a BOOT chord on the settings page). The
+ * hit tests take FRAME px, like render_settings_tap.
+ * render_advanced: TOUCH (CALIBRATE) and BATTERY (the size picked between
+ * two arrows; a sign on it when it charges faster than the board's own;
+ * SET <size> while the pick is not the size in use), BACK.
+ * render_battery_warning: the sign, WARNING, the risk in plain words, the
+ * box to tick ("MY BATTERY IS <size> OR BIGGER"), CANCEL, CONTINUE (an
+ * outline with dim words until the box is ticked: brightness and fill, not
+ * hue). The touch pages: the first one (START; RESET TOUCH while the
+ * keeper's own map is in use; msg = a line of news, or NULL), a cross (i of
+ * n, its centre in FRAME px - as the panel reports), and the check that
+ * keeps the new map: one more cross before secs_left runs out. */
+enum { ADV_HIT_NONE = 0, ADV_HIT_BACK, ADV_HIT_CALIBRATE, ADV_HIT_PREV, ADV_HIT_NEXT, ADV_HIT_SET,
+       ADV_HIT_BOX, ADV_HIT_CANCEL, ADV_HIT_CONTINUE, ADV_HIT_START, ADV_HIT_RESET };
+void render_advanced(uint16_t *fb, int stride, int pick_mah, int pick_ma, int set_mah, bool stock, bool fast);
+int  render_advanced_tap(float x, float y);
+void render_battery_warning(uint16_t *fb, int stride, int cell_mah, int charge_ma, bool checked);
+int  render_battery_warning_tap(float x, float y);
+void render_touch_intro(uint16_t *fb, int stride, bool own_in_use, const char *msg);
+int  render_touch_intro_tap(float x, float y, bool own_in_use);
+void render_touch_cross(uint16_t *fb, int stride, int i, int n, int tx, int ty);
+void render_touch_check(uint16_t *fb, int stride, int tx, int ty, float secs_left, float secs_total);
 int  render_settings_tap(float x, float y, int *value);
 int  render_settings_touch(tank_t *t, float x, float y, bool down, int *value);
+void render_settings_cancel(void);              /* forget the press in hand (the BOOT chord took that finger to the ADVANCED page) */
 
 /* UI primitives (2026-09-13) for panels built outside this file (the first-
  * run setup in common/setup.c): the confirm prompt's pixel font, flat rects
@@ -378,6 +523,9 @@ void render_fish_portrait(uint16_t *fb, int stride, float x, float y, float size
 #define SHRIMP_CARD_H 190
 #define URCHIN_CARD_W 336
 #define URCHIN_CARD_H 194
+#define CRAB_CARD_W 336          /* the strawberry crab's (0.3.9): the urchin's size */
+#define CRAB_CARD_H 194
+bool render_crab_collect_hit(const tank_t *t, float x, float y);   /* the crab card's COLLECT (a sand dollar held up, 0.3.9.4) */
 #define SEAHORSE_CARD_W 336
 #define SEAHORSE_CARD_H 188
 /* the milestones page (the bowl has its own rows and buttons: render.c) */
@@ -415,16 +563,50 @@ void render_fish_portrait(uint16_t *fb, int stride, float x, float y, float size
 #else
 #define MSP_CLOSE_X   324               /* the CLOSE button, bottom right, inside the bezel curve; clear of the brightness row's number */
 #define MSP_CLOSE_Y   312
-#define MSP_SET_X     32                /* the SETTINGS button, bottom left, where the brightness row was */
+#define MSP_SET_X     178               /* the SETTINGS button, between UPGRADES and CLOSE (Strato, 2026-10-24: the two swapped places; it was bottom left) */
 #define MSP_SET_Y     MSP_CLOSE_Y
 #define SHP_CLOSE_X   MSP_CLOSE_X
 #define SET_CLOSE_X   MSP_CLOSE_X
+#endif
+/* THE KEEPER PAGE'S FOOT (0.3.9.1; Strato 2026-10-25 on the square: the row pinned to the bottom of the frame on every
+ * board, as low as taps stay reliable - the square and the watch had a band of glass under it). Its last row of pixels
+ * sits MSP_FOOT_GAP above the glass's bottom where the bottom is flat (the watch's settings foot has stood 13 px off its
+ * glass since 10-02), and where a curve takes the corners (the watch's 100 px arcs, the bowl's circle) as low as each
+ * button's lower corners stay MSP_FOOT_IN inside the glass - the watch's three also close in on the middle. Frame y =
+ * page y + PAGE_Y. --selftest-shop checks every board: inside the glass, and one px lower would not be. The shop and
+ * the settings keep their own feet (MSP_CLOSE_Y, SET_FOOT_Y). */
+#define MSP_FOOT_GAP  12
+#define MSP_FOOT_IN   6
+#ifdef TANK_ROUND
+#define MSP_FOOT_Y    353               /* the circle: UPGRADES' and CLOSE's outer corners (frame x 123, 342) at 6 px in; 35 px off the bottom at the middle */
+#elif defined(TANK_WATCH)
+#define MSP_FOOT_Y    371               /* the arcs: the outer corners (frame x 33, 376) at 6 px in; 35 px off the bottom at the middle */
+#elif defined(TANK_SQUARE)
+#define MSP_FOOT_Y    382               /* flat: the last row at frame y 467, 12 above the glass's 480 (the 40 px corners end before the buttons) */
+#else
+#define MSP_FOOT_Y    326               /* flat: the last row at y 355, 12 above the glass's 368 (was 312) */
+#endif
+/* the foot's tap strip reaches HALF WAY up the gap to the TANK row (Strato 2026-10-25 on the square: a quick tap just
+ * over the buttons, the way a child taps, opened a tank milestone): from the row's last drawn line (the balance under
+ * the coin, MSP_TANK_Y + 48) to the buttons' top, the lower half is the buttons' */
+#define MSP_TANK_BOT     (MSP_TANK_Y + 48)
+#define MSP_FOOT_HIT_Y   ((MSP_TANK_BOT + MSP_FOOT_Y) / 2)
+#if TANK_WORN
+#define MSP_FOOT_SLOP    5              /* the strip's split between two buttons: half their gap */
+#define MSP_FOOT_UPG_X   52             /* the watch's three, 10 px apart and centred: frame x 33..149 | 159..275 | 285..377 */
+#define MSP_FOOT_SET_X   178
+#define MSP_FOOT_CLOSE_X 304
+#else
+#define MSP_FOOT_SLOP    8
+#define MSP_FOOT_UPG_X   MSP_UPG_X
+#define MSP_FOOT_SET_X   MSP_SET_X
+#define MSP_FOOT_CLOSE_X MSP_CLOSE_X
 #endif
 #define MSP_SD_X      36                /* the sand dollar on the TANK row (the shop), centred like the fish portraits */
 #ifdef TANK_ROUND
 #define MSP_UPG_X     114
 #else
-#define MSP_UPG_X     178               /* the UPGRADES button, centred between SETTINGS and CLOSE: the shop too (Strato, 2026-09-15) */
+#define MSP_UPG_X     32                /* the UPGRADES button, bottom left where the brightness row was: the shop (centred between the others until 2026-10-24) */
 #endif
 #define MSP_UPG_W     116
 #define MSP_MODAL_X   56
@@ -475,7 +657,7 @@ void render_fish_portrait(uint16_t *fb, int stride, float x, float y, float size
 #define SHP_MODAL_H   244
 #define SHP_EARN_MODAL_Y 40
 /* the caption under the rows sits SHP_BTN_H + 12 under the last row (the third row, the castle, 2026-09-16: it used to be fixed at 224 / 244 and the castle's row ran into it) */
-#define SHP_EARN_MODAL_H 248        /* seven lines since the seahorse's snack (0.3.6) */
+#define SHP_EARN_MODAL_H 272        /* eight lines since the crab's find (0.3.9; seven since the seahorse's snack) */
 #define SHP_TWO_GAP 16               /* MOVE and SELL side by side in the modal */
 #define SHP_TWO_X0  (SHP_MODAL_X + (SHP_MODAL_W - 2 * MSP_HOW_W - SHP_TWO_GAP) / 2)
 #define SHP_TWO_X1  (SHP_TWO_X0 + MSP_HOW_W + SHP_TWO_GAP)
@@ -507,7 +689,7 @@ void render_fish_portrait(uint16_t *fb, int stride, float x, float y, float size
 #define SET_FOOT_Y    392            /* UPDATES and CLOSE */
 #else
 #define SET_TITLE_Y   14
-#define SET_ROW1_Y    58             /* BRIGHTNESS */
+#define SET_ROW1_Y    58             /* BRIGHTNESS: the slider */
 #define SET_ROW2_Y    108            /* VOLUME */
 #define SET_NOTE_Y    146            /* "FISH ARE QUIET AT NIGHT" */
 #define SET_ROW3_Y    176            /* LIGHTS OUT */
@@ -527,6 +709,15 @@ void render_fish_portrait(uint16_t *fb, int stride, float x, float y, float size
 #define SET_ARW_W     40
 #define SET_SPAN_W    (2 * SET_SEG_DX + SET_SEG_W)
 #define SET_SPAN_MID  (SET_SEG_X + SET_SPAN_W / 2)
+/* BRIGHTNESS (0.3.9): a slider across the same span - a rail, lit up to a
+ * knob that carries the percent; the knob's centre runs SET_BRT_X0 .. X1 for
+ * SET_BRT_MIN .. 100 % in steps of SET_BRT_STEP */
+#define SET_BRT_MIN   5
+#define SET_BRT_STEP  5
+#define SET_KNOB_W    60
+#define SET_BRT_X0    (SET_SEG_X + SET_KNOB_W / 2)
+#define SET_BRT_X1    (SET_SEG_X + SET_SPAN_W - SET_KNOB_W / 2)
+#define SET_BRT_X(pct) (SET_BRT_X0 + ((pct) - SET_BRT_MIN) * (SET_BRT_X1 - SET_BRT_X0) / (100 - SET_BRT_MIN))
 /* ROTATION: one icon button where the first segment stands, its word beside it */
 #define SET_ROT_WORD_X (SET_SEG_X + SET_SEG_W + 14)
 #define SET_UPD_W     112
@@ -537,5 +728,93 @@ void render_fish_portrait(uint16_t *fb, int stride, float x, float y, float size
 #else
 #define SET_UPD_X     (PAGE_BOWL ? 60 : 32)    /* the UPDATES button, bottom left (2026-09-30); in from the glass on the bowl */
 #endif
+
+/* ---- MY TANKS + THE LIBRARY: the tank switcher (docs/tank-switcher.md).
+ * ART FOR APPROVAL, 2026-10-29: the pages only, drawn from what the sim
+ * stages (--shelf-shot); nothing behind them yet. ---- */
+enum { SHELF_EMPTY, SHELF_NOW, SHELF_DORMANT, SHELF_PAUSED };
+typedef struct {
+    int state;                 /* SHELF_* */
+    const char *name;
+    bool experimental;
+    const uint16_t *thumb;     /* render_shelf_thumb_size, RGB565 (native order) */
+} shelf_slot_t;
+typedef struct {
+    const char *name, *line;   /* the tank type, its one plain line */
+    const uint16_t *thumb;
+    bool experimental, installed;
+    int price;                 /* sand dollars for the next tank of it, 0 = free */
+} library_row_t;
+/* LOADING (0.3.9.3): a tank's first seconds after a SWAP IN or a power-on, while its grass loop is first baked: the
+ * platform shows render_loading and bakes at full speed (render_grass_loop_bake_more: up to n moments, 0 = not ready to
+ * bake yet - draw a tank frame so the scene and the loop's look settle) until render_grass_loop_warming says false; line
+ * under the name: NULL = FILLING THE TANK (a SWAP IN), else e.g. WAKING THE TANK */
+void render_loading(uint16_t *fb, int stride, const char *name, float clock, const char *line);
+/* THE BOOT SHOW (common/boot_show.c): the pieces in the tank back to front (their count), the day scene with some
+ * left out (hide: a bit per item), the grass loop's baked band nearest the clock (rows from *y0; NULL: none yet) */
+/* SWIM DEPTH (0.3.9.4): the block a fish BEHIND or THROUGH the grass works in (render_depth_buf_bytes of PSRAM; NULL:
+ * every fish IN FRONT, as before) */
+size_t render_depth_buf_bytes(void);
+void render_set_depth_buf(void *buf);
+void render_depth_off(bool off);
+bool render_piece_covers(int item, int x, int y);
+#define PC_SHADOW_NEAR 3                 /* a piece's CONTACT SHADOW: its body shifted this far down and right, hard ... */
+#define PC_SHADOW_FAR  6                 /* ... and this far, soft (render.c pc_contact_shadow; the fronds over the rim take it too, 0.3.9.4) */
+bool render_bed_leaf(int x, int y);   /* (tests: the sword plant IN FRONT's leaves, last frame) */
+void render_debug_live_mask(bool on);
+void render_debug_rim_off(bool off);
+void render_debug_page_animals(bool show);   /* (tests: the creatures drawn under a placement page, which hides them since 0.3.9.4 - the layering checks) */
+void render_debug_grass_mask(bool on);  /* (tests: keep the frame's grass mask - the loop's, at its moment - for render_debug_grass_at) */
+bool render_debug_grass_at(int x, int y);
+#define DEP_ROOT_Y ((int)FISH_FLOOR_Y - 8)            /* (the grass comes back over an animal above this row only: below it the pebbles' edge and the roots) */   /* swim depth: the grass comes back over an animal down to this row; its feet and shadow stay over the roots */    /* (the A/B: a piece's contact shadow NOT falling on the fronds painted over its rim, as before 0.3.9.4) */   /* (tests: a piece drawn live on its page records its mask too, so render_piece_covers reads it) */
+int  render_debug_piece_grass(int item, int *bands, int *fines, void *(*alloc)(size_t), void (*release)(void *));   /* (director pkcheck) */   /* (tests: a piece's own body, as the last frame recorded it) */
+void render_depth_prof(int64_t *us, int *fish);   /* the depth's own work since the last call, and how many fish did it */   /* (the sim's grass tests: every fish IN FRONT) */
+void render_proto_veg_layer(int layer);   /* (exploration: the sim's --depth-shot) */
+int  render_boot_pieces(const tank_t *t, int items[DECOR_SLOTS]);
+void render_boot_scene(const tank_t *t, uint16_t *dst, uint32_t hide);
+void render_boot_scene_done(const tank_t *t);   /* after the last render_boot_scene: the tank's own scene and masks back */
+const uint16_t *render_boot_grass(const tank_t *t, int *y0);
+bool render_grass_loop_warming(void);
+int  render_grass_loop_bake_more(const tank_t *t, int n);
+void render_shelf_set_move(bool on, int i, const char *name);   /* MOVE (0.3.9.3): a tank in hand - the page's slot i lifted (-1: it is on another page) */
+void render_shelf_set_touch_lock(bool on);     /* THE TOUCH LOCK (0.3.9.3): MY TANKS's padlock button drawn shut (taps locked) */
+void render_touch_lock_hint(uint16_t *fb, int stride);   /* a tap on a locked tank: TOUCH IS LOCKED / PRESS BOOT TWICE TO UNLOCK */
+void render_shelf_thumb_size(int *w, int *h);
+void render_shelf_thumb(const uint16_t *frame, uint16_t *thumb);   /* a whole frame -> its little-tank picture */
+void render_shelf(uint16_t *fb, int stride, const shelf_slot_t slot[8], int page, int pages);
+enum { SHELF_TAP_NONE, SHELF_TAP_CLOSE, SHELF_TAP_LIBRARY, SHELF_TAP_PREV, SHELF_TAP_NEXT, SHELF_TAP_TOUCH_LOCK, SHELF_TAP_SLOT0 = 10 };
+int  render_shelf_tap(float x, float y);                           /* SHELF_TAP_*, a slot = SHELF_TAP_SLOT0 + i (frame coordinates) */
+void render_shelf_card(uint16_t *fb, int stride, const shelf_slot_t *s, const char *kind, int shelf_days, int age_days);
+/* SWAP IN tapped (0.3.9.4): the card's button pulses and says SWAPPING (t: seconds since the tap, < 0 off) for
+ * SWAP_PULSE_S x 1, then the glass fades out over SWAP_FADE_S (render_fade) and the swap runs in the dark */
+#define SWAP_PULSE_S 0.35f
+#define SWAP_FADE_S  0.30f
+void render_shelf_card_swapping(float t);
+void render_fade(uint16_t *fb, int stride, int light);   /* the frame at light/256 */
+/* MORE: REMOVE (0.3.9.3) - the panel (part 1 its backdrop, drawn once; 2 the panel, every frame while the hold fills: hold
+   0..1) and its places: BACK, HOLD TO SELL (held SHM_HOLD_S), outside it */
+#define SHM_HOLD_S 2.0f
+enum { SHM_TAP_NONE, SHM_TAP_OUTSIDE, SHM_TAP_BACK, SHM_TAP_HOLD };
+void render_shelf_remove(uint16_t *fb, int stride, const shelf_slot_t *s, int refund, float hold, int part);
+int  render_shelf_remove_hit(float x, float y);
+/* a tank's RENAME (0.3.9.3): the keyboard's state (the name's two lines, the one being typed, the keys' page), its page
+ * (part 1 the backdrop - drawn once with the shelves; 2 the rest, every frame; 3 both) and its touch: a key acts when the
+ * finger lifts on the key it landed on (SHR_TICK); BACK / DONE end it (SHR_DONE: render_shelf_rename_name). The keys'
+ * places for tests and the director: render_shelf_rename_hit / _key_xy, the characters of a page _keys */
+typedef struct { char line[2][8]; int row, page; bool down; float px, py; } shelf_rename_t;   /* two lines of 7 */
+enum { SHR_NONE, SHR_TICK, SHR_CANCEL, SHR_DONE };
+enum { SHK_NONE, SHK_CHAR0 = 1, SHK_MORE = 20, SHK_DEL, SHK_SPACE, SHK_LINE, SHK_BACK, SHK_DONE, SHK_LINE1, SHK_LINE2, SHK_CLEAR };   /* SHK_CHAR0 + 0..13: a page's keys */
+void render_shelf_rename_begin(shelf_rename_t *r, const char *name);
+void render_shelf_rename(uint16_t *fb, int stride, const shelf_slot_t *s, const shelf_rename_t *r, int part, float clock);
+int  render_shelf_rename_touch(shelf_rename_t *r, float x, float y, bool down);
+void render_shelf_rename_name(const shelf_rename_t *r, char *out, size_t cap);   /* the name, stored form: "LINE 1\nLINE 2" */
+int  render_shelf_rename_hit(float x, float y);
+void render_shelf_rename_key_xy(int key, float *x, float *y);
+const char *render_shelf_rename_keys(int page);   /* a page's fourteen characters (0..2) */
+enum { SHC_TAP_NONE, SHC_TAP_OUTSIDE, SHC_TAP_DORMANT, SHC_TAP_PAUSED, SHC_TAP_SWAP, SHC_TAP_RENAME, SHC_TAP_MORE };
+int  render_shelf_card_tap(float x, float y);
+void render_library(uint16_t *fb, int stride, const library_row_t *row, int n, int wallet, const char *checked);
+enum { LIB_TAP_NONE, LIB_TAP_BACK, LIB_TAP_ROW0 = 10 };
+int  render_library_tap(float x, float y, int n);
 
 #endif

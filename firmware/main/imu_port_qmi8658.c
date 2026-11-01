@@ -39,6 +39,9 @@ static int s_up_sign = -1;   /* the round 1.75C, 2026-10-01 (Strato holding it u
  * in-screen axis, so lying flat or held sideways still holds last state. */
 #define FLIP_THRESH        3500   /* ~0.21 g at +-2g full scale (16384 counts/g) */
 #define FLIP_HOLD_POLLS    3      /* ~750 ms the other way up before flipping */
+/* on a side (0.3.9.3): a new way up must carry gravity 1.3x the other in-screen axis
+ * (~52 degrees from the last), so a tank tilted near 45 degrees never flaps between two */
+#define SIDE_MARGIN_X10    13
 /* motion = the sum over healthy axes of |a - a_prev| between two polls
  * (250 ms apart). A table reads a few tens of counts of noise; a hand
  * holding still a few hundred; a pick-up thousands. */
@@ -47,11 +50,13 @@ static int s_up_sign = -1;   /* the round 1.75C, 2026-10-01 (Strato holding it u
 
 static const char *TAG = "imu";
 static i2c_master_dev_handle_t s_dev;
-static bool s_inverted;
-static int s_streak;              /* consecutive polls voting for a flip */
+static int s_q;                   /* the way up, in quarter turns clockwise of the picture: 0 upright, 2 inverted, 1 / 3 on a side */
+static bool s_sides;              /* the square and the pendant (0.3.9.3): a side counts too */
+static int s_side_sign = 1;       /* gravity's pull along the other in-screen axis that reads + with the glass's left edge down (q 1) */
+static int s_streak, s_want;      /* consecutive polls voting for the same new way up, and which */
 static int64_t s_next_us, s_detector_next_us, s_sample_us;
 static imu_gravity_t s_gravity = {0, -1};
-static imu_water_t s_water;
+static imu_water_t s_water, s_water_y;
 static imu_shake_t s_shake;
 static bool s_shake_pending;
 static int16_t s_prev[3]; static bool s_have_prev;
@@ -132,17 +137,24 @@ void imu_port_poll(int64_t now_us) {
     float sample_dt = s_sample_us ? (now_us - s_sample_us) / 1e6f : 0.032f;
     if (sample_dt > 0.1f) sample_dt = 0.032f;
     s_sample_us = now_us;
-    imu_water_sample(&s_water, a[0] / 16384.0f, sample_dt);
+    float up = a[IMU_UP_AXIS] * IMU_UP_SIGN / 16384.0f;
+    /* The square/bowl/watch's axis map uses the same physical right axis.
+     * The rectangle retains its measured +X right-edge-up calibration. */
+    float right = (board_is_round() || board_is_square() || board_is_watch())
+        ? a[IMU_UP_AXIS == 0 ? 1 : 0] * s_side_sign / 16384.0f
+        : a[0] / 16384.0f;
+    imu_water_sample(&s_water, right, sample_dt);
+    imu_water_sample(&s_water_y, -up, sample_dt);
     float gravity[3] = {a[0]/16384.0f, a[1]/16384.0f, a[2]/16384.0f};
     if (imu_shake_sample(&s_shake, gravity, sample_dt)) s_shake_pending = true;
-    imu_gravity_sample(&s_gravity, a[0] / 16384.0f, a[1] / 16384.0f,
+    imu_gravity_sample(&s_gravity, right, -up,
                        a[2] / 16384.0f, sample_dt);
     for (int i = 0; i < 3; i++) s_last[i] = a[i];
     /* Preserve the existing motion thresholds and 750 ms flip debounce. */
     if (now_us < s_detector_next_us) return;
     s_detector_next_us = now_us + DETECTOR_INTERVAL_US;
     static int logged;
-    if (logged < 3) { logged++; ESP_LOGI(TAG, "g=[%d %d %d] inverted=%d", a[0], a[1], a[2], (int)s_inverted); }
+    if (logged < 3) { logged++; ESP_LOGI(TAG, "g=[%d %d %d] quarter=%d", a[0], a[1], a[2], s_q); }
     /* handling: movement since the last poll, railed channels ignored */
     if (s_have_prev) {
         int m = 0;
@@ -186,12 +198,19 @@ void imu_port_poll(int64_t now_us) {
         ESP_LOGW(TAG, "axis %c railed (sensor damage?) - flip runs on the up axis alone",
                  IMU_UP_AXIS == 0 ? 'Y' : 'X');
     }
-    bool dominant = RAILED(other) || (v > 0 ? v : -v) > (other > 0 ? other : -other);
-    bool wants_flip = dominant && (s_inverted ? (v > FLIP_THRESH) : (v < -FLIP_THRESH));
-    s_streak = wants_flip ? s_streak + 1 : 0;      /* flat / sideways: hold state */
+    int av = v > 0 ? v : -v, ao = other > 0 ? other : -other;
+    int want = -1;                                 /* flat, or between two ways up: hold state */
+    if (RAILED(other) || av > ao) {
+        if (av > FLIP_THRESH && (!s_sides || RAILED(other) || av * 10 > ao * SIDE_MARGIN_X10)) want = v > 0 ? 0 : 2;
+    } else if (s_sides && ao > FLIP_THRESH && ao * 10 > av * SIDE_MARGIN_X10) {
+        want = other * s_side_sign > 0 ? 1 : 3;    /* on a side (0.3.9.3) */
+    }
+    if (want < 0 || want == s_q) { s_streak = 0; return; }
+    s_streak = want == s_want ? s_streak + 1 : 1; s_want = want;
     if (s_streak >= FLIP_HOLD_POLLS) {
-        s_inverted = !s_inverted; s_streak = 0;
-        ESP_LOGI(TAG, "orientation: %s", s_inverted ? "inverted" : "upright");
+        s_q = want; s_streak = 0;
+        static const char *const QN[4] = { "upright", "on its side (the left edge down)", "inverted", "on its side (the right edge down)" };
+        ESP_LOGI(TAG, "orientation: %s", QN[s_q]);
     }
 }
 
@@ -199,19 +218,35 @@ void imu_port_bubble_up(float *x, float *y) {
     if (!s_dev || !s_sample_us || esp_timer_get_time() - s_sample_us > 500000) {
         *x = 0; *y = -1; return;
     }
-    imu_gravity_screen(&s_gravity, s_inverted, x, y);
+    imu_gravity_rotate(s_gravity.x, s_gravity.y, s_q, x, y);
 }
 
-float imu_port_water_push(void) {
+float imu_port_water_push(int quarter) {
     if (!s_dev || !s_sample_us || esp_timer_get_time()-s_sample_us > 500000) return 0;
-    return s_inverted ? -s_water.push : s_water.push;
+    float x, y; imu_gravity_rotate(s_water.push, s_water_y.push, quarter, &x, &y);
+    return x;
 }
 
 bool imu_port_take_shake(void) {
     bool pending = s_shake_pending; s_shake_pending = false; return pending;
 }
 
-bool imu_port_inverted(void) { return s_inverted; }
+bool imu_port_inverted(void) { return s_q == 2; }
+int  imu_port_quarter(void) { return s_q; }
+void imu_port_sides(bool on) {
+    s_sides = on;
+    /* the side axis's sign, from the up axis: Z runs out of the glass (both boards read +1 g on Z lying face up on
+       the desk, 2026-10-30), so the glass's right is up x Z - +X when up is +Y (the square), -Y when up is +X (the
+       pendant); its left edge down puts gravity's pull (the reading's sign) on that right */
+    s_side_sign = (IMU_UP_AXIS == 1 ? 1 : -1) * IMU_UP_SIGN;
+    if (!on && (s_q & 1)) s_q = 0;
+}
+void imu_port_side_sign_flip(void) { s_side_sign = -s_side_sign; ESP_LOGI(TAG, "side sign now %+d", s_side_sign); }
+/* the way up it had before the restart (a swap, a flash, a power-on): kept until gravity clearly says
+   otherwise, as the flip always has - a tank reclined on a desk never says, and came up upright (Strato,
+   2026-10-29, after a swap: "i need to do a quick flip of the tank up and down") */
+void imu_port_seed_inverted(bool inv) { s_q = inv ? 2 : 0; s_streak = 0; }
+void imu_port_seed_quarter(int q) { s_q = s_sides ? (q & 3) : (q & 2); s_streak = 0; }
 void imu_port_last(int16_t out[3], int *motion) { for (int i = 0; i < 3; i++) out[i] = s_last[i]; if (motion) *motion = s_motion; }
 bool imu_port_handled(void) { return s_handled_us && esp_timer_get_time() - s_handled_us < IMU_MOTION_HOLD_US; }
 bool imu_port_moving(void) { return s_moved_us && esp_timer_get_time() - s_moved_us < IMU_MOTION_HOLD_US; }
@@ -231,7 +266,7 @@ void imu_port_power_down(void) {
 void imu_port_wake(void) {
     if (!s_dev) return;
     s_sample_us = s_next_us = s_detector_next_us = 0;
-    s_water = (imu_water_t){0};
+    s_water = s_water_y = (imu_water_t){0};
     s_shake = (imu_shake_t){0}; s_shake_pending = false;
     s_have_prev = false; s_prev_moved = false; s_streak = 0;
     if (!imu_reset_config()) ESP_LOGW(TAG, "wake reconfig failed");

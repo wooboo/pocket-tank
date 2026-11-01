@@ -40,7 +40,7 @@ typedef struct {
     uint32_t off, len;       /* clip, in bank samples */
     uint32_t pos;            /* 16.16 into the clip */
     uint32_t step;           /* 16.16 per output sample */
-    int32_t  gain_q8;        /* cue gain x volume x night x master */
+    int32_t  gain_q8;        /* cue gain x volume x master */
     uint32_t played;         /* output samples so far (fade-in) */
     int32_t  fade_left;      /* > 0: fading out over this many samples, then free */
     int32_t  fade_total;
@@ -51,7 +51,6 @@ static const int16_t *s_bank;
 static uint32_t s_bank_n;
 static voice_t  s_v[AUDIO_VOICES];
 static int      s_volume = 2;
-static bool     s_night;
 static uint32_t s_last_ms[SND_COUNT];        /* cooldown clocks */
 static uint32_t s_starts[AUDIO_MAX_PER_S];   /* ring of recent start times */
 static int      s_starts_i;
@@ -61,7 +60,8 @@ static double pow10_(double db) {            /* 10^(db/20) without libm's pow in
     double x = db / 20.0, r = 1.0, b = 10.0;
     int neg = x < 0; if (neg) x = -x;
     int n = (int)x; x -= n;
-    while (n--) r *= b;
+    for (int i = 0; i < n && i < 32; i++) r *= b;   /* bounded (0.3.7): gcc -O2 on CI flagged the open loop once the
+                                                    * night term left db two values; |db| stays far under 640 */
     /* fractional part by a short series of exp(x ln10) */
     double t = x * 2.302585092994046, e = 1.0, term = 1.0;
     for (int i = 1; i < 12; i++) { term *= t / i; e += term; }
@@ -77,7 +77,6 @@ void audio_init(const int16_t *bank, uint32_t n_samples) {
 }
 void audio_set_volume(int level) { s_volume = level < 0 ? 0 : level > 2 ? 2 : level; }
 int  audio_volume(void) { return s_volume; }
-void audio_set_night(bool night) { s_night = night; }
 bool audio_active(void) { for (int i = 0; i < AUDIO_VOICES; i++) if (s_v[i].cue >= 0) return true; return false; }
 const char *audio_cue_name(int cue) { return cue >= 0 && cue < SND_COUNT ? SND_CUES[cue].name : "?"; }
 int audio_cue_by_name(const char *s) {
@@ -87,9 +86,11 @@ int audio_cue_by_name(const char *s) {
 
 static int gain_for(int cue) {
     if (s_volume == 0) return 0;
-    const policy_t *p = &POLICY[cue];
-    if (s_night && p->tier == 2) return 0;
-    int db = AUDIO_MASTER_DB + (s_volume == 1 ? -12 : 0) + (s_night && p->tier == 1 ? -12 : 0);
+    /* the light plays no part (0.3.7): until then a dark tank muted the
+     * fish's cues and took 12 dB off the keeper's - a rule from the days the
+     * light went out by itself on an idle desk. Since the double-tap the dark
+     * is a keeper's choice while watching, and the tank sounds the same. */
+    int db = AUDIO_MASTER_DB + (s_volume == 1 ? -12 : 0);
     int g = (int)(SND_CUES[cue].gain_q8 * pow10_(db));
     return g;
 }

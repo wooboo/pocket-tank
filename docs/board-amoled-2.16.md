@@ -22,7 +22,7 @@ estimates) are in git history; what follows is the board on the bench.
 | PMIC | AXP2101: DCDC1 = VCC3V3, ALDO1 = A3V3 (codec + ES7210) | the panel's 3V3 is VCC3V3 (no rail to cut), DSI_PWR_EN pulled up |
 | audio | ES8311: DSDIN 8, BCLK 9, LRCK 45, MCLK **42**, amp 46 | the 1.8's pins but the master clock (16 there) |
 | ES7210 mics | 0x40 | suspended at boot like the 1.75C's / the watch's |
-| RTC | PCF85063 at 0x51 | time runs through a power-off (no clock sync page) |
+| RTC | PCF85063 at 0x51 | time runs through a power-off; the clock sync page once (0.3.9), and after a stop (no cell, unplugged) |
 | IMU | QMI8658 at 0x6B | axes not read yet: the 1.8's default |
 | keys | PWR through the PMIC, SYS_OUT on GPIO 16; BOOT GPIO 0; KEY3 GPIO 18 (unused) | |
 | cell | 3.7 V **1000 mAh** (Waveshare's optional pack; the 1.8 = 200, the pendant 500, the watch 400) | 4.3 h awake at 60% brightness, the light on: 100 -> 66%, the firmware learned 8.5 %/h = ~12 h on screen, ~79 mA (docs/batlog/2026-10-12_square-4h-awake.txt); VBAT 4127 -> 3841 mV over it. A NIGHT POWERED OFF (2026-10-12/13): 77% -> 77% in 10 h 10 min, 3936 -> 3968 mV - under the gauge's 1%, so under ~1 mA (docs/batlog/2026-10-13_square-night-off.txt); the RTC keeps the time |

@@ -29,6 +29,15 @@ static inline void imu_gravity_screen(const imu_gravity_t *g, bool inverted,
     *x = inverted ? -g->x : g->x;
     *y = inverted ? -g->y : g->y;
 }
+/* Same quarter-turn convention as display_port and touch_port. */
+static inline void imu_gravity_rotate(float ux, float uy, int q, float *x, float *y) {
+    switch (q & 3) {
+    case 1: *x = uy; *y = -ux; break;
+    case 2: *x = -ux; *y = -uy; break;
+    case 3: *x = -uy; *y = ux; break;
+    default: *x = ux; *y = uy; break;
+    }
+}
 /* High-pass acceleration drives transient water movement; unlike buoyancy,
  * it deliberately keeps shake impulses. The first sample seeds the baseline. */
 typedef struct { float baseline, push; bool ready; } imu_water_t;

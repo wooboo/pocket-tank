@@ -1,5 +1,8 @@
 # pocket-tank 🐟
 
+This fork integrates our additions on `fork`; `main` mirrors upstream.
+See [the fork workflow](docs/fork-workflow.md) for feature branches, updates and upstream PRs.
+
 **A tiny language model keeps a fish tank alive on an $8 chip.**
 The ESP32-S3 board, with screen and battery used in this project is actually around $35.
 
@@ -31,7 +34,7 @@ no toolchain needed. Come hang out with other keepers on the
 **[Pocket Tank Discord](https://pocketank.com/discord)**: show off your tank,
 get help, and share ideas for what comes next.
 
-The current release is **v0.3.6** (alpha); the settings page shows the one
+The current release is **v0.3.8.1** (alpha); the settings page shows the one
 on your tank. What changed in each release:
 **[pocketank.com/updates](https://pocketank.com/updates/)**.
 
@@ -245,7 +248,8 @@ fish in its own colors, with an outline for each open place.
 ![A gate's HOW? tip](docs/media/sim-fry-how.png)
 
 **Sand dollars.** Caring for the tank earns points, and the shop spends
-them on things for the tank. A meal the fish eat from your hand pays 2; a
+them on things for the tank. A meal the fish eat from your hand pays 2
+(one every five minutes, however many taps); a
 fish growing up pays 5, 10 and 25 for juvenile, adult and elder; a fry
 born 20; a fish that comes to trust you completely 15; every hundred algae
 colonies you wipe away pay 25, and so does every 250 cm of grass you
@@ -370,6 +374,32 @@ the grass and whatever swims by, and anything in front of it, the castle
 too, throws a shadow across the sand. Finally a good reason to turn the
 tank light off.
 
+**The bubble volcano.** The tenth thing in the shop (190). A cone of
+stacked boulders as wide as the castle, with a pool of lava at the top
+that breathes, a stream of bubbles rising from the crater and a cave at
+its foot. Turn the tank light off and the lava and the bubbles keep their
+glow on the water and the sand. BEHIND or IN FRONT, like the castle.
+
+**The strawberry crab.** The eleventh thing in the shop (140). A small red
+crab with white spots that lives on the sand. It strolls, digs, eats the
+pellets that reach the floor, naps in the castle's arch or the volcano's
+cave, and comes out more with the light off. Tap it for its card; three
+quick raps send it running for cover. When the shrimp crowd a pellet it
+wants, it raises its claws and they scatter; after three pellets it is
+full for a while. Now and then a dig turns up a sand dollar. The find
+waits for you - the light on and the tank touched in the last few minutes -
+and the crab holds it up in both claws for three minutes, with a sound:
+tap it to take it, 10 sand dollars the first time and 20 every time after.
+The crab, the urchin and the snail wander in front of your decorations as
+often as behind them.
+
+**The shelf, and the lock.** Since 0.3.9 anything you can move you can
+also put away: SHELVE on a piece's page or in its shop panel, and it waits
+on the shelf, drawn as it is in a little tank on its shop row, where a
+coral or a plant keeps growing; PUT BACK returns it to its spot. LOCK on
+the page keeps a piece where it stands: a held finger passes it by from
+then on, and the shop's MOVE still moves it.
+
 **The night shift.** The snail and the urchin keep working while the tank
 sleeps. A tank with a snail wakes up with about a third less algae on the
 glass, and a tank with an urchin wakes up to shorter grass. Since 0.3.6 the
@@ -417,7 +447,9 @@ sale; they are permanent residents.
 ![SELL armed in the castle's modal](docs/media/sim-shop-sell.png)
 
 **The light.** Two quick taps on the glass turn the tank light off and on;
-in the dark the fish rest and the palette dims. The first time a double-tap
+in the dark the fish rest and the palette dims, and everything else works
+as it does with the light on: the sounds, the finger, the seahorse (it
+rests on its perch until the light comes back). The first time a double-tap
 turns the light off, a small LIGHTS OUT notice says what happened and how
 to turn it back on, once per tank. The settings page has a
 LIGHTS OUT row that can hand the light to the tank instead: step it from
@@ -477,7 +509,8 @@ deepest sleep: the only chip still awake is the power-management chip, and
 its rule is that the key must be held for about an eighth of a second
 before it turns the board on - a quick tap does nothing. Press it like you
 mean it. The tank decides how deep it sleeps; you never do. Holding PWR
-powers it off at once. Hold BOOT and tap the glass to reset the tank. Flip
+powers it off at once. Hold BOOT for five seconds, then tap the glass, to
+reset the tank. Flip
 the device and the screen follows.
 
 **First run.** A new tank, whether a fresh install or a reset, opens with a
@@ -510,14 +543,16 @@ for you when you come back.
 ![Naming the new fry](docs/media/sim-birth-name_new.png)
 ![The family page: what it inherited](docs/media/sim-birth-family.png)
 
-**Starting over.** Hold BOOT and tap the glass: a *Reset tank?* prompt
+**Starting over.** Hold BOOT for five seconds, then tap the glass (a tap
+sooner is just a tap, so small hands can't wipe a tank by accident): a
+*Reset tank?* prompt
 appears over the water with a NO and a YES. YES wipes the save and two new
 fry take the tank, with the first-run setup to name them; NO, a sleep, or
 twenty seconds of silence keep everything.
 
 ## Nearby gifts
 
-Hold **BOOT for two seconds on both awake tanks** to connect over BLE. Compare
+Hold **BOOT for two seconds, then release it on both awake tanks** to connect over BLE. Compare
 and confirm the code on both screens, then give sand dollars from the FRIENDS
 menu. The recipient accepts or declines. Closing the menu shuts Bluetooth off.
 Interrupted gifts remain pending and resume when those tanks reconnect.
@@ -617,7 +652,8 @@ flash (NVS at `0x9000`) that none of the four parts cover, so your fish,
 their names, trust, history, badges, sand dollars and decorations carry on.
 Every version loads the saves of every earlier one (the save only ever grows
 at the tail, and the one field that went in mid-struct is slid into place on
-load). To start over, hold BOOT and tap the glass for the *Reset tank?*
+load). To start over, hold BOOT for five seconds and tap the glass for the
+*Reset tank?*
 prompt; the page also has an "erase and install fresh" button for a board
 that won't get that far. The settings page shows the release at its foot,
 small and dim ("V0.3.3 ALPHA", then the build id), so you can tell what
@@ -809,5 +845,17 @@ first boot on real glass, and the tank growing into a pet.
 
 ## License
 
-MIT, see [LICENSE](LICENSE). `model/llama2.c/` and `sim/lvgl/` are cloned
-separately and carry their own MIT licenses.
+Pocket Tank is free. Use it, change it, build it on your own board and share
+it, for any noncommercial purpose. That covers keepers, hobbyists, schools
+and clubs.
+
+Selling it, or selling anything built on it (flashed boards, kits, a
+crowdfunding campaign), needs written permission first:
+strato@pocketank.com. Just ask.
+
+The terms are the [PolyForm Noncommercial License 1.0.0](LICENSE). Versions up
+to v0.3.9.2 were released under MIT and stay under it; see [NOTICE](NOTICE).
+`model/llama2.c/` and `sim/lvgl/` are cloned separately and carry their own
+MIT licenses.
+
+Want to send a pull request? Read [CONTRIBUTING.md](CONTRIBUTING.md) first.

@@ -69,6 +69,38 @@ elder 8 h; lights-off pauses aging), size = stage scale × meal bonus; silent.*
 and calm; social drifts up while following friends, down while solo exploring —
 one trait unit per ~6 h of pressure. Trust (touch) also persists.*
 
+*Changed 2026-10-29 (Discord: every keeper's fish went SOLO): exploring no
+longer cools social. The model follows only at social 7-9 (the cliff in
+progression-next.md), so a middling fish never earned the warmth back and sank
+to the floor, while a social one ran to the ceiling. Now company warms a fish
+and social settles back toward the birth temper (`TRAIT_SETTLE`, the gap
+shrinks ~e-fold in 8 lit hours); a tank already at the floor climbs back by
+itself and its fish follow friends again. Company is following a friend
+(`SOCIAL_FOLLOW_GAIN`) and every second nose to tail with another fish
+(`SOCIAL_NEAR_GAIN`, centers within `SOCIAL_NEAR_PX` x the two sizes) - small
+gains, since the model follows almost always at 7+ and a big one runs away -
+and, much stronger, fish gathered together at a held finger (`SOCIAL_HOLD_GAIN`,
+Strato: the keeper's way to bring a shy tank together): ten minutes of a hold
+~+0.06 a fish in a pair (measured on the 1.8 at half this gain: +0.033 in 12
+min, doubled), about half a step of the bar, and ~a step in a full tank. `fishsim --selftest-drift` (~6
+min, not in `make check`) runs 72 lit hours on the model, then ten real minutes
+alone against ten of a hold.*
+
+*Changed 2026-10-29 (later, Strato: "all of my fish are bold" - variety, not
+strong biases): bold had the same ratchet - fed + calm (39% of fish-time in the
+sim) raised it at 0.25 a lit hour and stress > 7 (0.0% since the shadow went)
+was the only way down, so every fish sat at 0.95 within a lit day. Now bold
+settles to its birth temper too (`TRAIT_SETTLE`) and fed + calm raises it at
+`BOLD_CALM_GAIN` (a sixth of the old rate): a well-kept fish ends ~a step bolder
+than it was born. The CHANGE gate's pressure keeps the old pace. Fry (tank.c
+`tank_add_fish`) inherit each trait from the parents' BIRTH tempers (what
+drifted was their life), blended at a ratio of their own +-0.15, and one trait
+in three (`TEMPER_OWN`) rolls fresh in the founders' 0.1-0.9: the old average
+of the drifted values +-0.15 bred bold from bold and squeezed a family of five
+to the middle (spread 0.20 -> 0.09 in eight generations; now 0.16, with no more
+fish at the ends than founders). Shop fry roll 0.1-0.9 (was 0.25-0.75).
+`fishsim --selftest-temper` (in `make check`) breeds the generations.*
+
 - In, but **kept simple**: two drifting traits only — **bold** and **social**
   (0–9). Slow drift (days), small event-driven nudges, always recoverable.
 - These traits enter the model's state string (schema v2) so the LLM expresses
@@ -163,6 +195,42 @@ was before.
   The spot and the layer ride in the save (`plant_x`, `plant_z`); older saves
   read the default spot, AMONG. The snail is not placeable - it goes where
   the film is.
+- **The decoration shelf (0.3.9, Strato 2026-10-19: "anything you can
+  MOVE you can SHELVE").** A placeable piece in the tank (the sword plant,
+  the castle, the coral, the reef cluster, the pumpkin) has MOVE | SHELVE in
+  its shop modal. SHELVE puts it on the shelf: still the keeper's (its bit in
+  `sd_unlocks` stays), out of the water (`sd_shelved`, append-only in the
+  save at 1908; `tank_decor_in` is the word every "is it here" test reads -
+  the order of the pieces, the reef landmark, the seahorse's posts, the
+  finger, the pumpkin's light, the castle's shadow, the plant as a bed), its
+  spot / depth / color / look kept, and the living ones KEEP GROWING there
+  (the coral and the cluster through their own ticks, the plant's bed
+  through `veg_grow` - but it is no bed: not drawn, not cover, not cut, not
+  grazed). No money moves; the piece pops away into a plume of bubbles
+  (`tank_decor_poof`, the free bubbles across its footprint). Its row says
+  ON THE SHELF with a PUT BACK button;
+  a living piece shows AS IT IS in a little glass tank in the row's icon
+  slot (its painter at full size into the frame as scratch, box-filtered
+  into a 64 px thumb in the decor scratch, rebuilt only when its growth
+  moves a percent or the shop reopens); the castle and the pumpkin sit as
+  their icon on a shelf board. Its modal has PLACE | SELL: PLACE (or the
+  row's PUT BACK) returns it on top of its depth and opens the placement
+  page with the old spot in place; SELL (armed, then confirmed) sells it from
+  the shelf at the same 20%. The placement page itself (a held piece on the
+  glass opens it) has SELL | SHELVE on its top row with DONE, so a piece can
+  be put away from the glass without the shop; its order arrows sit at the
+  ends of the DEPTH row. SELL left the in-tank modal: selling a piece in
+  the tank is MOVE, then the placement page's SELL (top left, armed twice) -
+  one more tap for the one irreversible act. An older firmware ignores the
+  field: the shelved piece stands in the tank at its kept spot (nothing
+  lost). Director: `shelve` / `unshelve <piece>`.
+- **Seasons (0.3.9):** a seasonal piece leaves the SHOP, never the tank
+  (community feedback, 2026-10-19: nothing bought ever disappears). The
+  pumpkin is sold while `SD_PUMPKIN_IN_SHOP` is 1 - 0 from the first release
+  of November; an owner keeps it, its row (MOVE / SHELVE / SELL) and its
+  light, and the shelf is where it winters until the flag is 1 again in
+  October. Its modals say NOT IN THE SHOP NOW while the build does not sell
+  it, so a SELL is an informed one.
 - Dollars earned during play show as a small "+N" toast over the live tank.
 
 ## IMU (motion)

@@ -9,10 +9,11 @@
  * out - the radio is off whenever the tank is running.
  *
  *   the store     NVS namespace "wifi": ssid, pass, url (the director's
- *                 manifest override - the test channel). Its own namespace:
- *                 the tank's reset wipes "tank", never this.
- *   the manifest  OTA_MANIFEST_URL (a GitHub Release's "latest" asset), one
- *                 per board: latest-<PT_BOARD>.json. Small JSON: release,
+ *                 manifest override - the test channel), chan (the radio
+ *                 channel the saved network last answered on, 0.3.9). Its
+ *                 own namespace: the tank's reset wipes "tank", never this.
+ *   the manifest  OTA_MANIFEST_BASE + the board (a GitHub Release's "latest" asset), one
+ *                 per board: latest-<board>.json. Small JSON: release,
  *                 board, build, min_from, app{url,size,sha256}, note,
  *                 needs_cable, model{version,size,url}. A manifest naming
  *                 another board is refused (common/update.c)
@@ -53,9 +54,10 @@
 
 static const char *TAG = "net";
 #define WIFI_NVS_NS   "wifi"
-#ifndef OTA_MANIFEST_URL
-#define OTA_MANIFEST_URL "https://github.com/mediacutlet/pocket-tank/releases/latest/download/latest-" PT_BOARD ".json"
-#endif
+/* the release channel: latest-<board>.json, the board this tank IS (0.3.9.3,
+ * update_target_board: another board's version installed here fetches this
+ * board's own) */
+#define OTA_MANIFEST_BASE "https://github.com/mediacutlet/pocket-tank/releases/latest/download/latest-"
 /* the board marker: in .rodata_custom_desc, which the linker places right
  * after esp_app_desc_t - a fixed offset in the image (PT_BOARD_MARKER_OFFSET;
  * tools/make_ota_manifest.py and make_installer.py read it back from the .bin) */
@@ -76,6 +78,7 @@ bool net_port_creds_get(char *ssid, char *pass) {
 }
 bool net_port_creds_set(const char *ssid, const char *pass) {
     nvs_handle_t h; if (nvs_open(WIFI_NVS_NS, NVS_READWRITE, &h) != ESP_OK) return false;
+    nvs_erase_key(h, "chan");                               /* a new network: its channel is learned at the first connect */
     bool ok = nvs_set_str(h, "ssid", ssid) == ESP_OK && nvs_set_str(h, "pass", pass ? pass : "") == ESP_OK && nvs_commit(h) == ESP_OK;
     nvs_close(h);
     ESP_LOGI(TAG, "network saved: %s (%s)", ssid, pass && pass[0] ? "with a password" : "open");
@@ -83,13 +86,18 @@ bool net_port_creds_set(const char *ssid, const char *pass) {
 }
 void net_port_creds_forget(void) {
     nvs_handle_t h; if (nvs_open(WIFI_NVS_NS, NVS_READWRITE, &h) != ESP_OK) return;
-    nvs_erase_key(h, "ssid"); nvs_erase_key(h, "pass"); nvs_commit(h); nvs_close(h);
+    nvs_erase_key(h, "ssid"); nvs_erase_key(h, "pass"); nvs_erase_key(h, "chan"); nvs_commit(h); nvs_close(h);
     ESP_LOGI(TAG, "network forgotten");
 }
 const char *net_port_manifest_url(void) {                   /* the director's override, else the release channel */
     static char url[NET_URL_MAX + 1];
     if (nvs_get_str_ns("url", url, sizeof url) && url[0]) return url;
+#ifdef OTA_MANIFEST_URL
     return OTA_MANIFEST_URL;
+#else
+    snprintf(url, sizeof url, OTA_MANIFEST_BASE "%s.json", update_target_board());
+    return url;
+#endif
 }
 bool net_port_set_manifest_url(const char *url) {           /* NULL / "" = back to the default */
     nvs_handle_t h; if (nvs_open(WIFI_NVS_NS, NVS_READWRITE, &h) != ESP_OK) return false;
@@ -167,35 +175,76 @@ static void do_scan(void) {
     ESP_LOGI(TAG, "scan: %d networks (%d shown)", n, s_n_aps);
     s_state = NET_DONE;
 }
-static void do_connect_n(int attempts, int wait_ms) {
+/* the channel the saved network last answered on (0 = not known): the boot's
+ * first try goes straight there instead of sweeping all thirteen (0.3.9) */
+static int chan_get(void) {
+    nvs_handle_t h; uint8_t c = 0;
+    if (nvs_open(WIFI_NVS_NS, NVS_READONLY, &h) == ESP_OK) { nvs_get_u8(h, "chan", &c); nvs_close(h); }
+    return c >= 1 && c <= 14 ? c : 0;
+}
+static void chan_learn(void) {                               /* written only when it moved: the boot connects every morning */
+    wifi_ap_record_t ap;
+    if (esp_wifi_sta_get_ap_info(&ap) != ESP_OK || ap.primary == chan_get()) return;
+    nvs_handle_t h; if (nvs_open(WIFI_NVS_NS, NVS_READWRITE, &h) != ESP_OK) return;
+    nvs_set_u8(h, "chan", ap.primary); nvs_commit(h); nvs_close(h);
+    ESP_LOGI(TAG, "%s answers on channel %d", s_ssid, ap.primary);
+}
+static int s_tries, s_last_reason; static bool s_last_timed_out;   /* the last connect, for net_time_why */
+static void sta_config(int chan) {                           /* chan 0: sweep every channel, the strongest answer wins */
     wifi_config_t wc = { 0 };
     memcpy(wc.sta.ssid, s_ssid, sizeof wc.sta.ssid);             /* 32 bytes, NUL-padded or full (the driver takes both) */
     memcpy(wc.sta.password, s_pass, sizeof wc.sta.password);
     wc.sta.threshold.authmode = s_pass[0] ? WIFI_AUTH_WPA_PSK : WIFI_AUTH_OPEN;
     wc.sta.pmf_cfg.capable = true; wc.sta.pmf_cfg.required = false;
-    wc.sta.scan_method = WIFI_ALL_CHANNEL_SCAN; wc.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
+    wc.sta.channel = chan;                                       /* fast scan from there: the first answer on it is taken (a mesh's nearest node), */
+    wc.sta.scan_method = chan ? WIFI_FAST_SCAN : WIFI_ALL_CHANNEL_SCAN;   /* and a router that moved is still found further on */
+    wc.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
     esp_wifi_set_config(WIFI_IF_STA, &wc);
+}
+/* boot: the morning time check (net_time_sync). A router not seen is tried
+ * again rather than given up on (a cold radio's first sweep misses one now
+ * and then - Bananna's pendant, 2026-10-23, two mornings running), the first
+ * try uses the learned channel, and deadline_us bounds the whole thing. A
+ * router still not seen after the tries is swept for until the deadline: an
+ * empty sweep ends a try in ~2-4 s, so three were over in 12-15 s (Strato's
+ * stopwatch, 2026-10-23) and the 30 s went unused. The page keeps its quick
+ * NO SIGNAL. */
+static void do_connect_n(int attempts, int wait_ms, int64_t deadline_us, bool boot) {
+    int chan = boot ? chan_get() : 0;
+    sta_config(chan);
     int err = NET_ERR_NO_SIGNAL;
-    for (int attempt = 0; attempt < attempts && !s_abort; attempt++) {    /* routers refuse first tries; the page's TRY AGAIN does five more */
+    s_tries = 0; s_last_reason = 0; s_last_timed_out = false;
+    for (int attempt = 0; !s_abort; attempt++) {                  /* routers refuse first tries; the page's TRY AGAIN does five more */
+        if (attempt >= attempts && !(boot && deadline_us && s_last_reason == WIFI_REASON_NO_AP_FOUND)) break;
+        int wait = wait_ms;
+        if (deadline_us) {
+            int64_t left_ms = (deadline_us - esp_timer_get_time()) / 1000;
+            if (left_ms < 2000) break;                           /* not worth a try: the glass has waited long enough */
+            if (left_ms < wait) wait = (int)left_ms;
+        }
         xEventGroupClearBits(s_ev, EV_GOT_IP | EV_DISCONNECTED);
-        s_disc_reason = 0;
+        s_disc_reason = 0; s_tries = attempt + 1;
         if (esp_wifi_connect() != ESP_OK) { err = NET_ERR_RADIO; break; }
-        EventBits_t b = xEventGroupWaitBits(s_ev, EV_GOT_IP | EV_DISCONNECTED, pdTRUE, pdFALSE, pdMS_TO_TICKS(wait_ms));
-        if (b & EV_GOT_IP) { ESP_LOGI(TAG, "connected to %s", s_ssid); s_state = NET_DONE; return; }
+        EventBits_t b = xEventGroupWaitBits(s_ev, EV_GOT_IP | EV_DISCONNECTED, pdTRUE, pdFALSE, pdMS_TO_TICKS(wait));
+        if (b & EV_GOT_IP) { ESP_LOGI(TAG, "connected to %s (attempt %d)", s_ssid, attempt + 1); chan_learn(); s_state = NET_DONE; return; }
         int r = s_disc_reason;
-        ESP_LOGW(TAG, "connect attempt %d: %s (reason %d)", attempt + 1, b & EV_DISCONNECTED ? "disconnected" : "timed out", r);
-        if (r == WIFI_REASON_NO_AP_FOUND) { err = NET_ERR_NO_SIGNAL; break; }
+        s_last_reason = r; s_last_timed_out = !(b & EV_DISCONNECTED);
+        ESP_LOGW(TAG, "connect attempt %d%s: %s (reason %d)", attempt + 1, chan ? " (learned channel)" : "", b & EV_DISCONNECTED ? "disconnected" : "timed out", r);
+        if (r == WIFI_REASON_NO_AP_FOUND && !boot) { err = NET_ERR_NO_SIGNAL; break; }
         if (r == WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT || r == WIFI_REASON_AUTH_FAIL || r == WIFI_REASON_HANDSHAKE_TIMEOUT
             || r == WIFI_REASON_AUTH_EXPIRE || r == WIFI_REASON_ASSOC_EXPIRE || r == WIFI_REASON_NO_AP_FOUND_W_COMPATIBLE_SECURITY
             || r == WIFI_REASON_CONNECTION_FAIL) err = NET_ERR_PASSWORD;
         else err = NET_ERR_NO_SIGNAL;
-        vTaskDelay(pdMS_TO_TICKS(1000 + attempt * 500));
+        if (chan) { esp_wifi_disconnect(); chan = 0; sta_config(0); }   /* the learned channel missed: sweep them all from here */
+        int pause = 1000 + (attempt < attempts ? attempt : attempts - 1) * 500;   /* the sweeps past the tries keep the last pause */
+        if (deadline_us && (deadline_us - esp_timer_get_time()) / 1000 < pause + 2000) break;
+        vTaskDelay(pdMS_TO_TICKS(pause));
     }
     esp_wifi_disconnect();
     s_err = s_abort ? NET_ERR_ABORTED : err; s_state = NET_FAILED;
 }
 static int s_attempts = 5, s_wait_ms = 15000;
-static void do_connect(void) { do_connect_n(s_attempts, s_wait_ms); }
+static void do_connect(void) { do_connect_n(s_attempts, s_wait_ms, 0, false); }
 /* provisioning at install (update_mode.c): the page waits 45 s for an answer */
 void net_port_esp_connect_budget(int attempts, int wait_ms) { s_attempts = attempts; s_wait_ms = wait_ms; }
 
@@ -226,29 +275,51 @@ static bool ntp_ask(const char *host, int64_t *unix_out) {
     if (!ok) ESP_LOGW(TAG, "time: no answer from %s", host);
     return ok;
 }
+/* A dark glass is waiting: three tries of 10 s, all of it inside 30 s
+ * (Strato, 2026-10-23; it was two of 8 s, and one when the first sweep
+ * missed the router); a router not seen is swept for until the 30 s are
+ * up (do_connect_n). The page's five stay the page's. */
+#define SYNC_TRIES    3
+#define SYNC_WAIT_MS  10000
+#define SYNC_BUDGET_US 30000000LL
+static char s_why[80] = "no sync yet";
+const char *net_time_why(void) { return s_why; }
+static void why_connect_failed(void) {
+    const char *what = s_err == NET_ERR_RADIO ? "the radio would not start"
+                     : s_last_reason == WIFI_REASON_NO_AP_FOUND ? "the router was not seen"
+                     : s_err == NET_ERR_PASSWORD ? "the router refused (password?)"
+                     : s_last_timed_out ? "no answer from the router" : "the router dropped it";
+    snprintf(s_why, sizeof s_why, "%s, %d %s, reason %d", what, s_tries, s_tries == 1 ? "try" : "tries", s_last_reason);
+}
 bool net_time_sync(int64_t *unix_out, int64_t *at_us) {
     char ssid[NET_SSID_MAX + 1], pass[NET_PASS_MAX + 1];
-    if (!net_port_creds_get(ssid, pass)) return false;
-    int64_t t0 = esp_timer_get_time();
+    if (!net_port_creds_get(ssid, pass)) { snprintf(s_why, sizeof s_why, "no network saved"); return false; }
+    int64_t t0 = esp_timer_get_time(), deadline = t0 + SYNC_BUDGET_US;
     if (!s_ev) s_ev = xEventGroupCreate();
     snprintf(s_ssid, sizeof s_ssid, "%s", ssid); snprintf(s_pass, sizeof s_pass, "%s", pass);
     s_abort = false; s_state = NET_BUSY;
     bool ok = false;
-    if (radio_up()) {
-        do_connect_n(2, 8000);                                   /* a dark glass is waiting: two tries, not the page's five */
-        if (s_state == NET_DONE) {
+    if (!radio_up()) snprintf(s_why, sizeof s_why, "the radio would not start");
+    else {
+        do_connect_n(SYNC_TRIES, SYNC_WAIT_MS, deadline, true);
+        if (s_state != NET_DONE) why_connect_failed();
+        else {
             static const char *HOSTS[] = { "pool.ntp.org", "time.google.com", "time.cloudflare.com" };
-            for (size_t i = 0; i < sizeof HOSTS / sizeof *HOSTS && !ok; i++)
+            for (size_t i = 0; i < sizeof HOSTS / sizeof *HOSTS && !ok; i++) {
+                if (i && esp_timer_get_time() > deadline) break;  /* the first server is always asked */
                 if (ntp_ask(HOSTS[i], unix_out)) { *at_us = esp_timer_get_time(); ok = true; }
+            }
+            if (ok) snprintf(s_why, sizeof s_why, "on the network at try %d", s_tries);
+            else snprintf(s_why, sizeof s_why, "on the network (try %d), but no time server answered", s_tries);
         }
     }
     net_port_off();
-    ESP_LOGI(TAG, "time from the internet: %s in %d ms", ok ? "got it" : "FAILED", (int)((esp_timer_get_time() - t0) / 1000));
+    ESP_LOGI(TAG, "time from the internet: %s in %d ms (%s)", ok ? "got it" : "FAILED", (int)((esp_timer_get_time() - t0) / 1000), s_why);
     return ok;
 }
 static uint32_t parse_release(const char *s) {
-    int a = 0, b = 0, c = 0; if (sscanf(s, "%d.%d.%d", &a, &b, &c) < 2) return 0;
-    return ((uint32_t)a << 16) | ((uint32_t)b << 8) | (uint32_t)c;
+    int a = 0, b = 0, c = 0, d = 0; if (sscanf(s, "%d.%d.%d.%d", &a, &b, &c, &d) < 2) return 0;
+    return ((uint32_t)a << 24) | ((uint32_t)b << 16) | ((uint32_t)c << 8) | (uint32_t)d;   /* version.h: four bytes since 0.3.8.1 */
 }
 static bool parse_manifest(const char *json, update_manifest_t *m) {
     cJSON *root = cJSON_Parse(json); if (!root) return false;
@@ -336,14 +407,15 @@ static void do_install(void) {
         int got = esp_https_ota_get_image_len_read(s_ota);
         if (!board_checked && got >= 4096) {                 /* the marker is in the first sector, written by now */
             pt_board_marker_t mk; board_checked = true;
+            const char *want = update_target_board();       /* the board this IS (0.3.9.3), not always this build's */
             bool ok = esp_partition_read(slot, PT_BOARD_MARKER_OFFSET, &mk, sizeof mk) == ESP_OK
-                   && !memcmp(mk.magic, PT_BOARD_MAGIC, sizeof mk.magic) && !strncmp(mk.board, PT_BOARD, sizeof mk.board);
+                   && !memcmp(mk.magic, PT_BOARD_MAGIC, sizeof mk.magic) && !strncmp(mk.board, want, sizeof mk.board);
             if (!ok) {
                 mk.board[sizeof mk.board - 1] = 0;
-                ESP_LOGE(TAG, "download: the image is for board \"%s\", this is %s - refused", memcmp(mk.magic, PT_BOARD_MAGIC, 8) ? "(no marker)" : mk.board, PT_BOARD);
+                ESP_LOGE(TAG, "download: the image is for board \"%s\", this is %s - refused", memcmp(mk.magic, PT_BOARD_MAGIC, 8) ? "(no marker)" : mk.board, want);
                 esp_https_ota_abort(s_ota); s_ota = NULL; s_err = NET_ERR_BOARD; s_state = NET_FAILED; return;
             }
-            ESP_LOGI(TAG, "download: the image is for %s - this board", PT_BOARD);
+            ESP_LOGI(TAG, "download: the image is for %s - this board%s", want, strcmp(want, PT_BOARD) ? " (its own version, over the 1.8's)" : "");
         }
         s_percent = total > 0 ? (int)((int64_t)got * 99 / total) : 0;
         int64_t now = esp_timer_get_time();

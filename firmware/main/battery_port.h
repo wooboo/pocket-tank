@@ -28,6 +28,10 @@ int  battery_port_vbat_mv(void);
 int  battery_port_charge_ma(void);
 bool battery_port_set_charge_ma(int ma);
 void battery_port_charge_report(void);
+/* the cell's size (0.3.9.2, the hidden ADVANCED page): the charge, precharge and end-of-charge currents for a
+ * cell of mah (common/advanced.c adv_charge_ma / adv_trickle_ma; the board's own cell keeps the board's own
+ * rates below). Called at boot with the saved size and when the keeper SETs one; false = no PMIC */
+bool battery_port_set_cell(int mah);
 /* rails (2026-09-11, from the board schematic): DCDC1 is VCC3V3 - the ESP32,
  * flash, PSRAM, panel (VCI + VDDIO), touch, expander, IMU, SD, the codec's
  * digital side and the speaker amp - and RTCLDO feeds the RTC; both are

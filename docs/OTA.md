@@ -299,9 +299,9 @@ Small JSON, one per release, fetched before anything is downloaded.
 
 | field | meaning |
 |---|---|
-| release, release_num | "0.4.0" and its number; the tank compares the number |
+| release, release_num | "0.4.0" and its number; the tank compares the number. Since 0.3.8.1 the number packs FOUR bytes, major.minor.patch.hotfix (three until 0.3.8: every four-byte number is larger than every old one, so an old tank still sees the next release as newer; a line merging 0.3.8.1 forward takes the packing with it) |
 | build | the git build id, for the settings page and reports |
-| min_from | the oldest release this one can update from (a save-format floor) |
+| min_from | the oldest release this one can update from (a save-format floor). Leave it unset in a release that tanks on 0.3.8 or older must take: they compare it in the three-byte packing (a 0.3.8.1+ tank reads a value under 0x10000 as that packing) |
 | app: url, size, sha256 | the signed image |
 | model: version, sha256, url, size | the model this app needs; url present only when it is offered over the air (phase two) |
 | note | one plain line for the YES / NOT NOW page, from the changelog |

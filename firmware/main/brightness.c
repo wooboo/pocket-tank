@@ -7,10 +7,12 @@
 static const char *TAG = "brightness";
 static int s_pct = 100, s_applied = -1;
 
+static bool level_ok(int pct) { return pct >= 5 && pct <= 100 && pct % 5 == 0; }   /* the slider's steps (0.3.9; 30 / 60 / 100 before) */
+
 void brightness_init(void) {
     nvs_handle_t h; uint8_t v;
     if (nvs_open("tank", NVS_READONLY, &h) != ESP_OK) return;
-    if (nvs_get_u8(h, "bright", &v) == ESP_OK && (v == 30 || v == 60 || v == 100)) s_pct = v;
+    if (nvs_get_u8(h, "bright", &v) == ESP_OK && level_ok(v)) s_pct = v;
     nvs_close(h);
 }
 void brightness_save(void) {
@@ -20,11 +22,12 @@ void brightness_save(void) {
 }
 int brightness_level(void) { return s_pct; }
 bool brightness_set_level(int pct) {
-    if (pct != 30 && pct != 60 && pct != 100) return false;
+    if (!level_ok(pct)) return false;
     s_pct = pct; brightness_save(); s_applied = -1;
     ESP_LOGI(TAG, "level %d%%", s_pct);
     return true;
 }
+void brightness_preview(int pct) { if (level_ok(pct)) { s_pct = pct; s_applied = -1; } }
 void brightness_cycle(void) { brightness_set_level(s_pct == 100 ? 60 : s_pct == 60 ? 30 : 100); }
 void brightness_apply(bool night) {
     int target = s_pct * 255 / 100;

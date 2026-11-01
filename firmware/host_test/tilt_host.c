@@ -55,6 +55,14 @@ static void bubbles(float x, float y) {
 }
 
 int main(void) {
+    float x, y;
+    const float expected[4][2] = {{0,-1}, {-1,0}, {0,1}, {1,0}};
+    for (int q = 0; q < 4; q++) {
+        imu_gravity_rotate(0, -1, q, &x, &y);
+        close_to(x, expected[q][0]); close_to(y, expected[q][1]);
+        imu_gravity_rotate(x, y, -q, &x, &y);
+        close_to(x, 0); close_to(y, -1);
+    }
     heading(0,-1,0,0,-1);
     heading(1,0,0,1,0);
     heading(-1,0,0,-1,0);

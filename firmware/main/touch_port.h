@@ -15,6 +15,7 @@ bool touch_port_milestones(void);
 void touch_port_show_milestones(bool on);
 void touch_port_dismiss(void);    /* drop the card and the page: a flow (the birth flow) took the glass */
 void touch_port_set_inverted(bool inverted);   /* mirror coords when the screen is flipped */
+void touch_port_set_quarter(int q);            /* ... or turned a quarter at a time (tank_orient; 0.3.9.3) */
 /* reset confirm prompt (render_confirm_reset): opened by main.c's chord -
  * BOOT held, then a finger lands on the glass - or the director's `reset`.
  * While it is up every other gesture is swallowed; a press AND release on
@@ -33,6 +34,11 @@ bool touch_port_pressed_since(int64_t us);     /* a finger is down and landed af
 bool touch_port_settings(void);
 void touch_port_show_settings(bool on);
 int  touch_port_take_setting(int *value);       /* SET_TAP_* or 0 */
+/* the ADVANCED page (0.3.9.2, common/advanced.c): opened by main.c's chord on the settings page (BOOT held 5 s,
+ * then a finger lands); while it is up adv_up() is true and it owns the glass. take_adv hands main ADV_ACT_CELL /
+ * ADV_ACT_FIT once (save it; tell the charger) */
+void touch_port_open_advanced(void);
+int  touch_port_take_adv(void);
 /* the shop page (2026-09-15): up / show it; an UNLOCK or MOVE tapped hands
  * the raw tap code (SHOP_TAP_BUY / SHOP_TAP_MOVE + item; 0 = none) to main
  * once, which buys (progression_buy) or opens the placement page */
@@ -43,6 +49,12 @@ int  touch_port_take_shop(void);
  * it drew the pill (a tap in RENDER_BAT_HIT counts only then); the page is up
  * until any release, or 30 s; touch_port_show_battery is the director's cue */
 void touch_port_set_pill(bool up);
+/* THE TOUCH LOCK (0.3.9.3): while on, nothing a finger does reaches the tank or opens a page - only MY TANKS
+ * (BOOT twice) takes taps, its padlock undoes it. A touch shows the way back (touch_port_lock_hint) */
+bool touch_port_finger(float *x, float *y);   /* the finger this poll, calibrated (false: none - x, y its last place) */
+void touch_port_set_touch_lock(bool on);
+bool touch_port_touch_lock(void);
+bool touch_port_lock_hint(void);               /* a touch on the locked glass in the last 2 s: draw render_touch_lock_hint */
 bool touch_port_battery(void);
 void touch_port_show_battery(bool on);
 /* the UPDATES page (2026-09-30, docs/OTA.md): from the settings page's
@@ -50,6 +62,9 @@ void touch_port_show_battery(bool on);
  * saves and restarts into update mode; CLOSE returns to the settings page */
 bool touch_port_updates(void);
 void touch_port_show_updates(bool on);
+bool touch_port_shelf(void);                  /* MY TANKS (the tank switcher, docs/tank-switcher.md): BOOT twice */
+void touch_port_show_shelf(bool on);
+bool touch_port_take_shelf_tap(float *x, float *y);   /* a tap on MY TANKS, once (frame coordinates) */
 int  touch_port_take_update(void);              /* UPD_TAP_CHECK once, else 0 */
 /* update mode's raw read (no tank, no pages): the finger in tank space, true while down */
 bool touch_port_read_raw(float *x, float *y);

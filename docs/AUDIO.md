@@ -33,7 +33,7 @@ Any of these is fine as a source; the build tool converts them:
   every cue and stores a per-cue playback gain in the manifest
   (`assets/sounds/gains.csv`, seeded from the levels of the first export
   batch), so relative loudness is tuned in one text file without re-export.
-  The device applies volume and night attenuation on top.
+  The device applies volume on top.
 - **Nothing below ~600 Hz counts.** The speaker cannot reproduce it, but it
   still eats headroom and amp power. The tool high-passes at 600 Hz; a cue
   whose energy is mostly down there comes out faint and thin on the device.
@@ -131,6 +131,7 @@ Tiers are build order. Tier 1 alone is a shippable feature.
 | `coin` | sand dollars earned (the "+N" toast, render_sd_toast) | not yet: no cue in the bank; the toast is silent. A purchase plays `confirm` |
 | `low_battery` | gauge falls to 10% | once per discharge, with the low-battery modal and the persistent pill (section 4a) |
 | `error` | save failed, reset prompt | |
+| `crab_find` | the strawberry crab's dig comes up with a sand dollar (TEV_CRAB_FIND, 0.3.9.1) | Strato's pick 2026-10-25: working-assets/sounds/achievement-money_edit.wav (`make_sounds.py add`); the keeper's cue to look, since the find waits only 3 minutes in its claw |
 
 Not in scope: music, ambient loops, a per-decision sound (the LLM decides
 every ~4 s per fish; that would be constant noise), any sound in drowse.
@@ -216,9 +217,12 @@ void audio_port_sleep(void);                          // amp low, codec down, AL
   user guide covers the soft-ramp bits) stays on.
 - **Rate limits:** per-id cooldown from the tables above, plus a global cap
   of 6 cues per second (excess dropped, never queued late).
-- **Night:** when the tank light is off, Tier 2 cues are muted and Tier 1
-  cues play at -12 dB. Drowse/sleep: nothing, and `audio_port_sleep()` runs
-  before the sleep call.
+- **Light off:** no change - a dark tank sounds like a lit one (0.3.7).
+  Until then Tier 2 cues were muted and Tier 1 played at -12 dB, a rule from
+  the idle day/night cycle that outlived it: since the double-tap the light
+  is the keeper's choice while watching (Strato 2026-10-18: eating and the
+  hold-approach went silent). Drowse/sleep: nothing, and `audio_port_sleep()`
+  runs before the sleep call.
 - **Volume:** three levels, saved in NVS (`tank/snd`). Default: normal.
   Set on the settings page (render_settings; the milestones page's SETTINGS
   button opens it), by the director (`snd off|quiet|normal`), or the sim's

@@ -127,7 +127,7 @@ void friends_close(void) {
     conn=BLE_HS_CONN_HANDLE_NONE; connecting=false; secure=false; remote_handle=0; peer=0;
 }
 void friends_open(tank_t *t) {
-    if (active || setup_active() || touch_port_confirm_up()) return;
+    if (active || setup_active() || touch_port_confirm_up() || touch_port_shelf() || touch_port_touch_lock()) return;
     /* Debug stashes can roll a save back. Never trade from a staged tank. */
     nvs_handle_t h; size_t parked_len=0;
     if (nvs_open("tank",NVS_READONLY,&h)==ESP_OK) {

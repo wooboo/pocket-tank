@@ -19,6 +19,7 @@ const char *net_port_manifest_url(void);
 bool net_port_set_manifest_url(const char *url);
 #include "friends.h"
 #include "touch_port.h"
+#include "advanced.h"
 #include "battery_port.h"
 #include "display_port.h"
 #include "board_pins.h"
@@ -28,6 +29,7 @@ bool net_port_set_manifest_url(const char *url);
 #include "codec_port.h"
 #include "audio_port.h"
 #include "imu_port.h"
+#include "update_mode.h"
 #include "audio.h"
 #include "notice.h"
 #include "esp_timer.h"
@@ -39,6 +41,8 @@ bool net_port_set_manifest_url(const char *url);
 #endif
 
 static const char *TAG = "director";
+static void *pk_alloc(size_t n) { return heap_caps_malloc(n, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT); }   /* (pkcheck's scratch frame) */
+static void pk_free(void *p) { heap_caps_free(p); }
 
 /* the real tank's save, parked while a staged tank (fresh / stages) lives in
  * its place: NVS blob "bk" beside progression's "save" in namespace "tank".
@@ -120,9 +124,9 @@ static void clear_pellets(tank_t *t) {
 static void show_state(const tank_t *t) {
     for (int i = 0; i < t->n_fish; i++) {
         const fish_t *f = &t->fish[i];
-        ESP_LOGI(TAG, "%d %-6s %-5s age %.1fh size %.2f hunger %.1f energy %.1f stress %.1f curiosity %.1f trust %.1f ms %03x  %s at %.0f,%.0f",
+        ESP_LOGI(TAG, "%d %-6s %-5s age %.1fh size %.2f hunger %.1f energy %.1f stress %.1f curiosity %.1f trust %.1f social %.3f (born %.2f) bold %.3f (born %.2f) ms %03x  %s at %.0f,%.0f",
                  i, f->name, STAGE_NAMES[f->stage], progression_age_s(t, i) / 3600.0f, f->size,
-                 f->hunger, f->energy, f->stress, f->curiosity, f->trust, (unsigned)f->ms_bits,
+                 f->hunger, f->energy, f->stress, f->curiosity, f->trust, f->sociable, f->sociable0, f->bold, f->bold0, (unsigned)f->ms_bits,
                  GOAL_NAMES[f->goal.id], f->x, f->y);
     }
     int pellets = 0, cells = 0;
@@ -142,6 +146,14 @@ static void show_state(const tank_t *t) {
              t->sd_unlocks & SD_ITEM_CASTLE ? " castle" : "", t->sd_unlocks & SD_ITEM_CORAL ? " coral" : "", t->sd_unlocks & SD_ITEM_CLUSTER ? " cluster" : "",
              t->sd_unlocks & SD_ITEM_SHRIMP ? " shrimp" : "", t->sd_unlocks & SD_ITEM_URCHIN ? " urchin" : "", t->sd_unlocks & SD_ITEM_SEAHORSE ? " seahorse" : "",
              t->sd_unlocks ? "" : " -", (int)t->algae_colonies, t->trim_px / PX_PER_CM);
+    if (t->sd_shelved)                                  /* the decoration shelf (0.3.9): owned, out of the water, growing on */
+        ESP_LOGI(TAG, "on the shelf:%s%s%s%s%s%s", t->sd_shelved & SD_ITEM_PLANT ? " plant" : "", t->sd_shelved & SD_ITEM_CASTLE ? " castle" : "",
+                 t->sd_shelved & SD_ITEM_CORAL ? " coral" : "", t->sd_shelved & SD_ITEM_CLUSTER ? " cluster" : "", t->sd_shelved & SD_ITEM_PUMPKIN ? " pumpkin" : "",
+                 t->sd_shelved & SD_ITEM_VOLCANO ? " volcano" : "");
+    if (t->sd_locked)                                   /* LOCKED pieces (0.3.9): a held finger passes them by */
+        ESP_LOGI(TAG, "locked in place:%s%s%s%s%s%s", t->sd_locked & SD_ITEM_PLANT ? " plant" : "", t->sd_locked & SD_ITEM_CASTLE ? " castle" : "",
+                 t->sd_locked & SD_ITEM_CORAL ? " coral" : "", t->sd_locked & SD_ITEM_CLUSTER ? " cluster" : "", t->sd_locked & SD_ITEM_PUMPKIN ? " pumpkin" : "",
+                 t->sd_locked & SD_ITEM_VOLCANO ? " volcano" : "");
     if (t->sd_unlocks & SD_ITEM_URCHIN)                 /* where it is, what it is after */
         ESP_LOGI(TAG, "urchin at x %.0f | %s | appetite %.3f | %.0f cm grazed so far (keeps the grass over %.2f)", t->urchin_x,
                  tank_urchin_chewing(t) ? "chewing" : t->urchin_frond >= 0 ? "off to the tall grass" : t->urchin_rest > 0 ? "resting" : "ambling",
@@ -194,19 +206,23 @@ static void help(void) {
     ESP_LOGI(TAG, "fed [level=1] (everyone full, trickle back on) | set <hunger|energy|stress|curiosity|trust> <0-10> [fish name|idx]");
     ESP_LOGI(TAG, "feed [n=3] [x] (keeper drops pellets; trickle back on) | trickle on|off | pellets clear");
     ESP_LOGI(TAG, "algae <steps|clear> | veg <bed 0-2|all> <0.03-1> | light (toggle) | auto | sleep <hours> | save");
+    ESP_LOGI(TAG, "rim on|off (a piece's shadow on the fronds over its rim: the look's A/B, 0.3.9.4)");
+    ESP_LOGI(TAG, "shot <x0> <y0> <w> <h> (the last frame's pixels in the box, hex rows; tools/shot.py makes a picture)");
     ESP_LOGI(TAG, "STAGED TANKS (the real one is parked first): fresh (new tank, two fry) | stages (fry juv adult elder) | stage <fish|all> <fry|juv|adult|elder>");
     ESP_LOGI(TAG, "stash (park the real tank now) | restore (bring it back) | age <fish> <hours>");
     ESP_LOGI(TAG, "milestones [off] (the page, on cue; on the device: tap the open stats card)");
+    ESP_LOGI(TAG, "crab [x <px> | roost [castle|volcano] | tap | scare | find | shoo [gap [n]]] (the strawberry crab, 0.3.9: where it is and what it is doing; set it down; send it to roost now; claws up; three taps - it runs for cover; find = it digs up a sand dollar within seconds; shoo = a pellet gap px off (45; n = a cluster of 1..4), the shrimp on it, the crab going for it - near enough it shoos them, from far off they win)");
     ESP_LOGI(TAG, "fry [open|roll|buy <0-2>] (the shop's fry: open = as if a fish was sold; roll = a fresh three now)");
-    ESP_LOGI(TAG, "shop [off] (the sand dollar page) | dollars [n] (grant n; the balance and the chore counts) | buy plant|snail|castle|coral|cluster|shrimp|urchin|seahorse (at the price) | seahorse on|off (drawn or not: the fps A/B) | place [plant|castle|coral] [x [behind|among|front]] (the piece's spot; no x = the page; the castle has no among) | coral <0-7|rrggbb> (its colour) | coral grow <g> (its growth, 1 = the fan, 1.25 = the crown) | cluster look <0-2> | cluster grow <g> (1 = full size, 2 = every tentacle) | sell plant|castle|coral|cluster (20%% back)");
+    ESP_LOGI(TAG, "shop [off] (the sand dollar page) | dollars [n] (grant n; the balance and the chore counts) | buy plant|snail|castle|coral|cluster|shrimp|urchin|seahorse (at the price) | seahorse on|off (drawn or not: the fps A/B) | place [plant|castle|coral] [x [behind|among|front]] (the piece's spot; no x = the page; the castle has no among) | coral <0-7|rrggbb> (its colour) | coral grow <g> (its growth, 1 = the fan, 1.25 = the crown) | cluster look <0-2> | cluster grow <g> (1 = full size, 2 = every tentacle) | sell plant|castle|coral|cluster (20%% back) | shelve|unshelve <piece> | lock|unlock <piece> (a held finger passes a locked piece by)");
     ESP_LOGI(TAG, "friends open|close|confirm|give N|fish N|accept|decline (nearby BLE gifts)");
     ESP_LOGI(TAG, "reset (the keeper's confirm prompt, as BOOT + tap opens it) | reset yes|no (answer it here) - YES WIPES EVERY SAVE, a parked tank too");
     ESP_LOGI(TAG, "setup [off] (the first-run flow: welcome, names, colours; off drops the panel - the birth flow too) | name <fish|idx> <newname> (up to %d letters, saved)", FISH_NAME_MAX);
     ESP_LOGI(TAG, "battery <pct> [charging|full|plugged]|real (a STAGED gauge: on battery at pct - the card's pill, and at 10 or less the low-battery notice + cue + the pill that stays - or on the cable: the bolt, the sweep while charging, the pill for a few seconds; not saved) | battery page [off] (the battery page, as a tap on the pill opens it) | battery (its numbers) | snd battery (just the notice + cue)");
     ESP_LOGI(TAG, "kbd [wheel|grid|pages] (the name page's design: the wheel, or one of the two rejected keyboards of 09-13 - not saved, a boot is the wheel)");
     ESP_LOGI(TAG, "touch [bias <px>] [log on|off] [lift <ms>] [said on|off] (finger-landing correction: reported touches move up by px; not saved; also the raw span seen since boot)");
+    ESP_LOGI(TAG, "advanced [off] (the hidden ADVANCED page: battery size + touch calibration; on the glass: settings, BOOT held 5 s, then a tap)");
     ESP_LOGI(TAG, "charge [mA] (the charger live: state, VBUS, die temperature; a current tried until the next boot) | pmic (AXP2101 dump) | pmic on|off <aldo1|aldo2..4|bldo1|bldo2|cpusldo|dcdc2..5|dldo1|dldo2> (experiments; boot trims the unused ones) | pmic trim");
-    ESP_LOGI(TAG, "bright <0-255> (panel now; not saved) | level 100|60|30 (the keeper's setting, saved)");
+    ESP_LOGI(TAG, "bright <0-255> (panel now; not saved) | level 5..100 by 5 (the keeper's setting, saved)");
     ESP_LOGI(TAG, "batlog [clear] (the tank's own battery log: SoC/VBAT every 5 min awake, 30 min asleep, mA derived - read it after a night on battery) | codec (ES8311 registers) | clock (the clock: RTC chip or the internet's time, and whether tonight is a power-off) | sleepcfg [mask] (the round board's deep-sleep savings: 1 touch, 2 panel, 4 IMU, 8 QSPI held; 15 = all, the default) | deepsleep [N] (N: 5 s grace then deep sleep with an N s timer wake - one batlog window per N, BOOT wakes it; no N: the keeper's sleep, grace then power-off) | poweroff (save + PMIC cut now) | keytime [N] (N s of timing every PWR press - is a tap under the PMIC's 128 ms power-on hold?)");
     ESP_LOGI(TAG, "overgrown (grass to the ceiling + fouled glass; fish stress climbs) | court (stage the fry: in ~10-20 s the pair courts in the grass, then it is born) | arrive (the fry, now)");
     ESP_LOGI(TAG, "wifi (the saved network) | wifi set ssid=<name> pass=<secret> | wifi forget | ota (slots, channel) | ota check (save + restart into update mode, as CHECK FOR UPDATES) | ota url <manifest url>|default (the test channel)");
@@ -262,6 +278,49 @@ static void run(tank_t *t, char *line) {
         if (argc > 1 && !strcmp(argv[1], "forget")) { net_port_creds_forget(); return; }
         if (net_port_creds_get(ssid, pass)) ESP_LOGI(TAG, "network: %s (%s)", ssid, pass[0] ? "with a password" : "open");
         else ESP_LOGI(TAG, "no network saved (wifi set ssid=<name> pass=<secret>, or the wizard on the glass)");
+    } else if (!strcmp(c, "shelf")) {                         /* shelf: as BOOT twice; shelf list|new|swap|pause|dormant|name|remove: stage MY TANKS (b-roll) */
+        if (argc < 2) device_shelf_toggle(); else device_shelf_cmd(argc - 1, argv + 1);
+    } else if (!strcmp(c, "depth")) {                        /* SWIM DEPTH (0.3.9.4): `depth` the fish's; `depth <i> front|behind|through [bed]` sets
+                                                                 one now (staging: no clear-of-the-grass wait), `bed` puts it in the first bed's middle */
+        static const char *DN[3] = { "front", "behind", "through" };
+        if (!t) return;
+        if (argc >= 3) {
+            int i = atoi(argv[1]), d = !strcmp(argv[2], "behind") ? FISH_DEPTH_BEHIND : !strcmp(argv[2], "through") ? FISH_DEPTH_THROUGH : FISH_DEPTH_FRONT;
+            if (i >= 0 && i < t->n_fish) {
+                fish_t *f = &t->fish[i]; f->gdepth = f->gdepth_want = f->gdepth_rest = (uint8_t)d;
+                if (argc >= 4 && !strcmp(argv[3], "bed")) {
+                    float x0, x1, top; int n; tank_veg_bed(t, 0, &x0, &x1, &top, &n);
+                    f->x = (x0 + x1) / 2; f->y = top + (TANK_BOT - 16 - top) * 0.45f; f->speed = f->target_speed = 0;
+                }
+            }
+        }
+        for (int i = 0; i < t->n_fish; i++) ESP_LOGI(TAG, "depth: %d %s grass %s (wants %s), pieces %s (wants %s) at %.0f,%.0f", i, t->fish[i].name, DN[t->fish[i].gdepth % 3],
+                                                     t->fish[i].gdepth_want < 3 ? DN[t->fish[i].gdepth_want] : "-", DN[t->fish[i].pdepth % 3],
+                                                     t->fish[i].pdepth_want < 3 ? DN[t->fish[i].pdepth_want] : "-", t->fish[i].x, t->fish[i].y);
+        ESP_LOGI(TAG, "depth: shrimp %s / %s, seahorse %s, crab %s, snail %s, urchin %s (against the grass; the shrimp's second: the pieces)",
+                 DN[t->shr_gdepth % 3], DN[t->shr_pdepth % 3], DN[t->sh_gdepth % 3], DN[t->cr_gdepth % 3], DN[t->snail_gdepth % 3], DN[t->urchin_gdepth % 3]);
+        if (argc >= 3 && !strcmp(argv[1], "critters")) {      /* `depth critters front|behind|through`: every critter now (staging) */
+            uint8_t d = !strcmp(argv[2], "behind") ? FISH_DEPTH_BEHIND : !strcmp(argv[2], "through") ? FISH_DEPTH_THROUGH : FISH_DEPTH_FRONT;
+            t->shr_gdepth = t->shr_gdepth_want = t->sh_gdepth = t->sh_gdepth_want = d;
+            t->cr_gdepth = t->cr_gdepth_want = t->snail_gdepth = t->snail_gdepth_want = t->urchin_gdepth = t->urchin_gdepth_want = d;
+            ESP_LOGI(TAG, "depth: every critter %s the grass", argv[2]);
+        }
+    } else if (!strcmp(c, "pkcheck")) {                      /* pkcheck [item]: does the grass loop hold grass over a piece's body? (8 = the pumpkin) */
+        int item = argc > 1 ? atoi(argv[1]) : 8, b = 0, f = 0;
+        int worst = render_debug_piece_grass(item, &b, &f, pk_alloc, pk_free);
+        ESP_LOGI(TAG, "pkcheck: item %d - the loop holds grass on its body in %d bands and %d fine moments, at worst %d px (-1: no such piece / no loop)", item, b, f, worst);
+    } else if (!strcmp(c, "depthoff")) {                     /* depthoff on|off: SWIM DEPTH off (every animal in front, as before 0.3.9.4) - the A/B */
+        render_depth_off(argc > 1 && !strcmp(argv[1], "on"));
+        ESP_LOGI(TAG, "depthoff: swim depth %s", argc > 1 && !strcmp(argv[1], "on") ? "OFF - every animal in front, as before" : "on");
+    } else if (!strcmp(c, "pdepth")) {                       /* SWIM DEPTH phase 2: `pdepth <i> front|behind [x]` - against the pieces, now (staging);
+                                                                 x: put it there, at the pieces' middle height */
+        if (!t || argc < 3) return;
+        int i = atoi(argv[1]);
+        if (i < 0 || i >= t->n_fish) return;
+        fish_t *f = &t->fish[i]; f->pdepth = f->pdepth_want = !strcmp(argv[2], "behind") ? FISH_DEPTH_BEHIND : FISH_DEPTH_FRONT;
+        if (argc >= 4) { f->x = (float)atof(argv[3]); f->y = TANK_BOT - 70; f->speed = f->target_speed = 0; }
+        ESP_LOGI(TAG, "pdepth: %d %s %s the pieces at %.0f,%.0f", i, f->name, f->pdepth ? "behind" : "in front of", f->x, f->y);
+    } else if (!strcmp(c, "touchlock")) { device_touch_lock(argc > 1 ? !strcmp(argv[1], "on") : -1);   /* THE TOUCH LOCK, as MY TANKS's padlock */
     } else if (!strcmp(c, "ota")) {                           /* update mode and its channel */
         const esp_partition_t *run = esp_ota_get_running_partition(), *boot = esp_ota_get_boot_partition();
         if (argc > 1 && !strcmp(argv[1], "check")) { if (!t) { ESP_LOGW(TAG, "already in update mode"); return; }
@@ -269,7 +328,7 @@ static void run(tank_t *t, char *line) {
         if (argc > 1 && !strcmp(argv[1], "calib")) { update_debug_calib(); ESP_LOGI(TAG, "ota calib: nine crosshairs, a press each (the log fits the mapping)"); return; }
         if (argc > 2 && !strcmp(argv[1], "flip")) {            /* update mode never reads the IMU: the crosshairs with the board the other way up */
             if (t) { ESP_LOGW(TAG, "ota flip: update mode only (the tank turns with the IMU)"); return; }
-            bool inv = !strcmp(argv[2], "on"); display_port_set_inverted(inv); touch_port_set_inverted(inv);
+            bool inv = !strcmp(argv[2], "on"); update_mode_hold_way(inv ? 2 : 0);
             ESP_LOGI(TAG, "ota flip %s: the picture is %s", inv ? "on" : "off", inv ? "turned over" : "upright"); return; }
         if (argc > 1 && !strcmp(argv[1], "kbd")) { update_debug_keyboard(); ESP_LOGI(TAG, "ota kbd: the keyboard page (calibration; the saved network is untouched)"); return; }
         if (argc > 1 && !strcmp(argv[1], "page")) { ESP_LOGI(TAG, "update mode: %s, page %d, %d characters typed", update_active() ? "active" : "not active", update_page(), (int)strlen(update_typed())); return; }   /* never the text: it may be the saved passphrase */
@@ -337,15 +396,30 @@ static void run(tank_t *t, char *line) {
             int16_t a[3]; int m; imu_port_last(a, &m);
             float ux, uy; imu_port_bubble_up(&ux, &uy);
             ESP_LOGI(TAG, "imu poll: g=[%6d %6d %6d] motion %5d %s | bubble up [%.2f %.2f] inverted %d | water %.2f bend %.2f",
-                     a[0], a[1], a[2], m, imu_port_moving() ? "MOVING" : "still", ux, uy, imu_port_inverted(), imu_port_water_push(), t->veg_bend[0]);
+                     a[0], a[1], a[2], m, imu_port_moving() ? "MOVING" : "still", ux, uy, imu_port_inverted(), imu_port_water_push(tank_orient(t, imu_port_quarter())), t->veg_bend[0]);
             vTaskDelay(pdMS_TO_TICKS(250));
         }
+    } else if (!strcmp(c, "turn")) {            /* on a side (0.3.9.3): turn [0-3 | madctl <hex> | gap <x> <y> | sign] */
+        if (argc > 1 && argv[1][0] >= '0' && argv[1][0] <= '3' && !argv[1][1]) {
+            imu_port_seed_quarter(argv[1][0] - '0');   /* as if the IMU said so: it holds lying flat, a real turn takes over */
+        } else if (argc > 2 && !strcmp(argv[1], "madctl")) display_port_side_tune((int)strtol(argv[2], NULL, 16), -1, -1);
+        else if (argc > 3 && !strcmp(argv[1], "gap")) display_port_side_tune(-1, atoi(argv[2]), atoi(argv[3]));
+        else if (argc > 1 && !strcmp(argv[1], "sign")) imu_port_side_sign_flip();
+        else if (argc > 2 && !strcmp(argv[1], "probe")) { display_port_probe(!strcmp(argv[2], "on")); ESP_LOGI(TAG, "turn probe %s", argv[2]); }
+        int m, gx, gy; bool on; display_port_side_info(&m, &gx, &gy, &on);
+        ESP_LOGI(TAG, "turn: the IMU says %d, the picture shows %d%s | sides %s, side MADCTL 0x%02x, gap %d,%d", imu_port_quarter(), t->orient_q,
+                 t->orient_lock ? " (ROTATION locked)" : "", display_port_quarters() ? "on" : "off (not this build's own board)", m, gx, gy);
     } else if (!strcmp(c, "screen")) {          /* a worn tank's way up (tank.h tank_screen_*): screen [normal|turned] */
         if (argc > 1) { tank_screen_set(t, !strcmp(argv[1], "turned")); progression_settings_changed(); }
         ESP_LOGI(TAG, "screen: %s%s", tank_screen_turned(t) ? "TURNED" : "NORMAL", TANK_WORN ? "" : " - not a worn build: never turned");
     } else if (!strcmp(c, "settings")) {
         bool on = argc < 2 || strcmp(argv[1], "off");
         touch_port_show_settings(on); ESP_LOGI(TAG, "settings page %s", on ? "up (CLOSE ends it)" : "closed");
+    } else if (!strcmp(c, "advanced")) {        /* the hidden ADVANCED page (0.3.9.2) without the BOOT chord: advanced [off] */
+        bool on = argc < 2 || strcmp(argv[1], "off");
+        if (on) touch_port_open_advanced(); else adv_close();
+        ESP_LOGI(TAG, "advanced page %s | battery %d mAh -> %d mA (the board's own %d mAh) | touch %s", on ? "up (BACK ends it)" : "closed",
+                 adv_cell(), adv_charge_ma(adv_cell()), ADV_CELL_STOCK, touch_fit_is_none(adv_touch_fit()) ? "the board's own map" : "the keeper's map");
     } else if (!strcmp(c, "milestones")) {
         bool on = argc < 2 || strcmp(argv[1], "off");
         touch_port_show_milestones(on); ESP_LOGI(TAG, "milestones page %s", on ? "up (CLOSE button ends it)" : "closed");
@@ -369,15 +443,35 @@ static void run(tank_t *t, char *line) {
         ESP_LOGI(TAG, "sand dollars %d (earned %d) | colonies %d | %.0f cm trimmed", (int)t->sd_balance, (int)t->sd_earned,
                  (int)t->algae_colonies, t->trim_px / PX_PER_CM);
     } else if (!strcmp(c, "buy") && argc > 1) {      /* buy plant|snail|...|shrimp: the shop's sale, at the price */
-        int item = !strcmp(argv[1], "plant") ? 0 : !strcmp(argv[1], "snail") ? 1 : !strcmp(argv[1], "castle") ? 2 : !strcmp(argv[1], "coral") ? 3 : !strcmp(argv[1], "cluster") ? 4 : !strcmp(argv[1], "shrimp") ? 5 : !strcmp(argv[1], "urchin") ? 6 : !strcmp(argv[1], "seahorse") ? 7 : !strcmp(argv[1], "pumpkin") ? 8 : -1;
-        if (item < 0) ESP_LOGW(TAG, "buy plant|snail|castle|coral|cluster|shrimp|urchin|seahorse|pumpkin");
+        int item = !strcmp(argv[1], "plant") ? 0 : !strcmp(argv[1], "snail") ? 1 : !strcmp(argv[1], "castle") ? 2 : !strcmp(argv[1], "coral") ? 3 : !strcmp(argv[1], "cluster") ? 4 : !strcmp(argv[1], "shrimp") ? 5 : !strcmp(argv[1], "urchin") ? 6 : !strcmp(argv[1], "seahorse") ? 7 : !strcmp(argv[1], "pumpkin") ? 8 : !strcmp(argv[1], "volcano") ? 9 : !strcmp(argv[1], "crab") ? 10 : -1;
+        if (item < 0) ESP_LOGW(TAG, "buy plant|snail|castle|coral|cluster|shrimp|urchin|seahorse|pumpkin|volcano|crab");
         else if (progression_buy(t, item)) ESP_LOGI(TAG, "%s unlocked, %d sand dollars left%s", SD_ITEMS[item].name, (int)t->sd_balance,
                                                     tank_decor_placeable(item) ? " (`place` opens the placement page)" : "");
         else ESP_LOGW(TAG, "%s refused: owned, not sold by this build, or %d < %d", SD_ITEMS[item].name, (int)t->sd_balance, SD_ITEMS[item].price);
+    } else if (!strcmp(c, "crab")) {                 /* crab [x <px> | roost [castle|volcano] | tap | scare]: the strawberry crab (0.3.9) - set it down, send it to roost now, poke it, scare it */
+        static const char *const M[] = { "resting", "walking", "digging", "heading for a shelter", "roosting", "going for food", "eating", "climbing" };   /* (climbing + cr_nibble: nibbling the rock) */
+        if (!(t->sd_unlocks & SD_ITEM_CRAB) || t->cr_x < 0) ESP_LOGW(TAG, "no crab in the tank (`buy crab`)");
+        else {
+            if (argc > 2 && !strcmp(argv[1], "x")) { t->cr_x = (float)atof(argv[2]); t->cr_y = 0; t->cr_tilt = 0; t->cr_mode = CR_REST; t->cr_mode_s = 0; t->cr_timer = 20; t->cr_cave = -1; }
+            else if (argc > 1 && !strcmp(argv[1], "roost")) {
+                int cave = argc > 2 ? (!strcmp(argv[2], "castle") ? 2 : !strcmp(argv[2], "volcano") ? 9 : -1) : -1;
+                if (!tank_crab_roost(t, cave)) ESP_LOGW(TAG, "crab: no %s in the water to roost in (or it is climbing)", argc > 2 ? argv[2] : "castle or volcano");
+            } else if (argc > 1 && !strcmp(argv[1], "tap")) tank_crab_tap(t, t->cr_x + 20);
+            else if (argc > 1 && !strcmp(argv[1], "climb")) { if (!tank_crab_climb(t)) ESP_LOGW(TAG, "crab: no volcano in the water to climb (or no crab, or it is climbing)"); }
+            else if (argc > 1 && !strcmp(argv[1], "scare")) tank_crab_scare(t, t->cr_x + 20);
+            else if (argc > 1 && !strcmp(argv[1], "shoo")) { if (!tank_crab_pellet_race(t, argc > 2 ? (float)atof(argv[2]) : 45.0f, argc > 3 ? atoi(argv[3]) : 1)) ESP_LOGW(TAG, "crab: no room for a pellet (or it is climbing)"); }   /* 0.3.9.1: the race for a pellet */
+            else if (argc > 1 && !strcmp(argv[1], "find")) { t->cr_find_cool = 0; t->cr_y = 0; t->cr_tilt = 0; t->cr_cave = -1; t->cr_mode = CR_DIG; t->cr_mode_s = 0; t->cr_timer = 60; t->cr_find = 0; tank_handled(t); }   /* the next pick comes up with it (0.3.9.1: the keeper "here"; the light must be on) */
+            ESP_LOGI(TAG, "crab: %s at x %.0f (floor %.0f..%.0f), facing %s%s%s", t->cr_mode == CR_CLIMB && t->cr_nibble > 0 ? "climbing, nibbling the rock" : t->cr_mode < 8 ? M[t->cr_mode] : "?", t->cr_x, (double)TANK_FX0, (double)TANK_FX1,
+                     t->cr_facing > 0 ? "right" : "left", t->cr_cave == 2 ? ", the castle" : t->cr_cave == 9 ? ", the volcano" : "", t->cr_find > 0 ? ", HOLDING A SAND DOLLAR (tap it)" : t->cr_poke > 0 ? ", claws up" : t->cr_scurry ? ", running" : t->cr_hide > 0 ? ", hiding in the dark" : "");
+            if (t->cr_full > 0) ESP_LOGI(TAG, "crab: full - fallen pellets do not tempt it for %.0f s more", t->cr_full);
+            ESP_LOGI(TAG, "crab: %u pellets found, %u sand dollars dug up (%u paid), next find due in %.0f min of lived time (then it waits for the keeper: the light on, a touch in the last 5 min)", (unsigned)t->cr_eaten, (unsigned)t->cr_found, (unsigned)t->cr_found_paid, t->cr_find_cool / 60);
+            if (tank_decor_in(t, 2)) ESP_LOGI(TAG, "crab: the castle's arch is at x %.0f", tank_decor_x(t, 2));
+            if (tank_decor_in(t, 9)) ESP_LOGI(TAG, "crab: the volcano's cave is at x %.0f", tank_decor_x(t, 9));
+        }
     } else if (!strcmp(c, "order")) {                 /* order [plant|castle|coral|cluster|pumpkin forward|back]: the pieces' stack, back to front; a step moves one */
         if (argc > 2) {
-            int item = !strcmp(argv[1], "plant") ? 0 : !strcmp(argv[1], "castle") ? 2 : !strcmp(argv[1], "coral") ? 3 : !strcmp(argv[1], "cluster") ? 4 : !strcmp(argv[1], "pumpkin") ? 8 : -1;
-            if (item < 0) { ESP_LOGW(TAG, "order plant|castle|coral|cluster|pumpkin forward|back"); return; }
+            int item = !strcmp(argv[1], "plant") ? 0 : !strcmp(argv[1], "castle") ? 2 : !strcmp(argv[1], "coral") ? 3 : !strcmp(argv[1], "cluster") ? 4 : !strcmp(argv[1], "pumpkin") ? 8 : !strcmp(argv[1], "volcano") ? 9 : -1;
+            if (item < 0) { ESP_LOGW(TAG, "order plant|castle|coral|cluster|pumpkin|volcano forward|back"); return; }
             if (tank_decor_shift(t, item, !strcmp(argv[2], "back") ? -1 : 1)) progression_save(t);
             else ESP_LOGW(TAG, "%s: nothing to pass that way at its depth", SD_ITEMS[item].name);
         }
@@ -385,6 +479,28 @@ static void run(tank_t *t, char *line) {
         for (int i = 0; i < n; i++) l += snprintf(line + l, sizeof line - l, "%s%s (%s, rank %d)", i ? " < " : "", SD_ITEMS[items[i]].name,
                                                     tank_decor_z(t, items[i]) == DECOR_Z_BACK ? "behind" : tank_decor_z(t, items[i]) == DECOR_Z_FRONT ? "in front" : "among", tank_decor_rank(t, items[i]));
         ESP_LOGI(TAG, "order, back to front: %s", n ? line : "(no pieces)");
+    } else if (!strcmp(c, "shot")) {                  /* shot <x0> <y0> <w> <h>: the last frame's pixels in that box, a row a line as RGB565 hex (tools: a
+                                                         picture of what the glass shows, for a look the sim cannot stage - 0.3.9.4, the pumpkin's edges) */
+        const uint16_t *f = device_last_frame();
+        int x0 = argc > 1 ? atoi(argv[1]) : 0, y0 = argc > 2 ? atoi(argv[2]) : 0, w = argc > 3 ? atoi(argv[3]) : 120, hh = argc > 4 ? atoi(argv[4]) : 120;
+        if (x0 < 0) x0 = 0;
+        if (y0 < 0) y0 = 0;
+        if (w > 200) w = 200;
+        if (x0 + w > TANK_W) w = TANK_W - x0;
+        if (y0 + hh > TANK_H) hh = TANK_H - y0;
+        if (!f || w <= 0 || hh <= 0) { ESP_LOGW(TAG, "shot: no frame yet, or an empty box"); return; }
+        static char line[4 * 200 + 1];
+        printf("shot %d %d %d %d\n", x0, y0, w, hh);
+        for (int y = y0; y < y0 + hh; y++) {
+            for (int x = 0; x < w; x++) { uint16_t v = f[y * TANK_W + x0 + x]; snprintf(line + 4 * x, 5, "%04x", (unsigned)((v >> 8) | (v << 8)) & 0xffffu); }   /* (the frame is byte-swapped for the panel) */
+            printf("shotrow %d %s\n", y, line);
+            if ((y & 7) == 7) vTaskDelay(1);
+        }
+        printf("shot end\n");
+    } else if (!strcmp(c, "rim")) {                   /* rim on|off: a piece's contact shadow falling on the fronds painted over its rim (0.3.9.4) - the look's A/B (not saved) */
+        static bool rim_off;
+        if (argc > 1) { rim_off = !strcmp(argv[1], "off"); render_debug_rim_off(rim_off); }
+        ESP_LOGI(TAG, "rim shade: %s", rim_off ? "OFF - the fronds bright over a piece's shadow, as before 0.3.9.4" : "on - a piece's shadow falls on the fronds behind it");
     } else if (!strcmp(c, "pumpkin")) {               /* pumpkin [on|off]: drawn and lit or not (not saved) - the frame-rate A/B; and its season */
         if (argc > 1) render_set_pumpkin_hidden(!strcmp(argv[1], "off"));
         ESP_LOGI(TAG, "pumpkin: %s, %s | %s | the display line every 10 s has the fps and the render ms",
@@ -421,10 +537,23 @@ static void run(tank_t *t, char *line) {
             for (int i = 0; i < k; i++) ESP_LOGI(TAG, "next fry: %s - %s %s (%s)%s", rq[i].title, rq[i].words, rq[i].words2, rq[i].progress, rq[i].met ? " MET" : "");
         }
     } else if (!strcmp(c, "sell") && argc > 1) {     /* sell plant|castle|coral|cluster: the sale back at 20% (never the snail) */
-        int item = !strcmp(argv[1], "plant") ? 0 : !strcmp(argv[1], "castle") ? 2 : !strcmp(argv[1], "coral") ? 3 : !strcmp(argv[1], "cluster") ? 4 : !strcmp(argv[1], "pumpkin") ? 8 : -1;
-        if (item < 0) ESP_LOGW(TAG, "sell plant|castle|coral|cluster|pumpkin (the snail stays)");
+        int item = !strcmp(argv[1], "plant") ? 0 : !strcmp(argv[1], "castle") ? 2 : !strcmp(argv[1], "coral") ? 3 : !strcmp(argv[1], "cluster") ? 4 : !strcmp(argv[1], "pumpkin") ? 8 : !strcmp(argv[1], "volcano") ? 9 : -1;
+        if (item < 0) ESP_LOGW(TAG, "sell plant|castle|coral|cluster|pumpkin|volcano (the snail stays)");
         else if (progression_sell(t, item)) ESP_LOGI(TAG, "%s sold back for %d, balance %d", SD_ITEMS[item].name, progression_sell_value(item), (int)t->sd_balance);
         else ESP_LOGW(TAG, "%s: not in the tank", SD_ITEMS[item].name);
+    } else if ((!strcmp(c, "shelve") || !strcmp(c, "unshelve")) && argc > 1) {   /* shelve|unshelve plant|castle|coral|cluster|pumpkin: the decoration shelf (0.3.9) */
+        int item = !strcmp(argv[1], "plant") ? 0 : !strcmp(argv[1], "castle") ? 2 : !strcmp(argv[1], "coral") ? 3 : !strcmp(argv[1], "cluster") ? 4 : !strcmp(argv[1], "pumpkin") ? 8 : !strcmp(argv[1], "volcano") ? 9 : -1;
+        bool off = !strcmp(c, "shelve");
+        if (item < 0) ESP_LOGW(TAG, "%s plant|castle|coral|cluster|pumpkin|volcano", c);
+        else if (off ? progression_shelve(t, item) : progression_unshelve(t, item))
+            ESP_LOGI(TAG, "%s %s (kept as it is%s)", SD_ITEMS[item].name, off ? "on the shelf" : "back in the tank, on top of its depth", off && (item == 0 || item == 3 || item == 4) ? ", still growing" : "");
+        else ESP_LOGW(TAG, "%s: %s", SD_ITEMS[item].name, off ? "not in the tank" : "not on the shelf");
+    } else if ((!strcmp(c, "lock") || !strcmp(c, "unlock")) && argc > 1) {   /* lock|unlock plant|castle|coral|cluster|pumpkin|volcano: the LOCK on a piece (0.3.9) */
+        int item = !strcmp(argv[1], "plant") ? 0 : !strcmp(argv[1], "castle") ? 2 : !strcmp(argv[1], "coral") ? 3 : !strcmp(argv[1], "cluster") ? 4 : !strcmp(argv[1], "pumpkin") ? 8 : !strcmp(argv[1], "volcano") ? 9 : -1;
+        bool on = !strcmp(c, "lock");
+        if (item < 0) ESP_LOGW(TAG, "%s plant|castle|coral|cluster|pumpkin|volcano", c);
+        else if (progression_lock(t, item, on)) ESP_LOGI(TAG, "%s %s (a held finger %s)", SD_ITEMS[item].name, on ? "LOCKED in place" : "unlocked", on ? "passes it by; its page opens from the shop's MOVE" : "opens its page again");
+        else ESP_LOGW(TAG, "%s: %s", SD_ITEMS[item].name, tank_decor_owned(t, item) ? (on ? "already locked" : "not locked") : "not owned");
     } else if (!strcmp(c, "cluster") && argc > 1) {  /* cluster look <0-2> | cluster grow <0..2> (1 = full size, 2 = every tentacle) */
         if (!(t->sd_unlocks & SD_ITEM_CLUSTER)) { ESP_LOGW(TAG, "no cluster in the tank (`buy cluster`)"); return; }
         if (!strcmp(argv[1], "look") && argc > 2) { tank_cluster_set_scheme(t, atoi(argv[2])); progression_save(t); ESP_LOGI(TAG, "cluster look %s, saved", CLUSTER_SCHEMES[tank_cluster_scheme(t)].name); }
@@ -438,15 +567,17 @@ static void run(tank_t *t, char *line) {
         else if (argc > 1 && !strcmp(argv[1], "coral")) { item = 3; a = 2; }
         else if (argc > 1 && !strcmp(argv[1], "cluster")) { item = 4; a = 2; }
         else if (argc > 1 && !strcmp(argv[1], "pumpkin")) { item = 8; a = 2; }
+        else if (argc > 1 && !strcmp(argv[1], "volcano")) { item = 9; a = 2; }
         else if (argc > 1 && !strcmp(argv[1], "plant")) { a = 2; }
-        const char *what = item == 2 ? "castle" : item == 3 ? "coral" : item == 4 ? "cluster" : item == 8 ? "pumpkin" : "plant";
-        if (!(t->sd_unlocks & (item == 2 ? SD_ITEM_CASTLE : item == 3 ? SD_ITEM_CORAL : item == 4 ? SD_ITEM_CLUSTER : item == 8 ? SD_ITEM_PUMPKIN : SD_ITEM_PLANT))) { ESP_LOGW(TAG, "no %s in the tank (`buy %s`)", what, what); return; }
+        const char *what = item == 2 ? "castle" : item == 3 ? "coral" : item == 4 ? "cluster" : item == 8 ? "pumpkin" : item == 9 ? "volcano" : "plant";
+        if (!tank_decor_owned(t, item)) { ESP_LOGW(TAG, "no %s in the tank (`buy %s`)", what, what); return; }
+        if (!tank_decor_in(t, item)) { ESP_LOGW(TAG, "the %s is on the shelf (`unshelve %s`)", what, what); return; }
         if (argc <= a) { touch_port_show_shop(false); setup_begin_place(t, item); ESP_LOGI(TAG, "placement page up (drag on the glass, DEPTH, DONE)"); return; }
         int z = tank_decor_z(t, item);
         if (argc > a + 1) z = !strcmp(argv[a + 1], "behind") || !strcmp(argv[a + 1], "back") ? DECOR_Z_BACK : !strcmp(argv[a + 1], "front") ? DECOR_Z_FRONT : DECOR_Z_MIDDLE;
         tank_decor_set(t, item, (float)atof(argv[a]), z); progression_save(t); z = tank_decor_z(t, item);
         ESP_LOGI(TAG, "%s at x %.0f, %s, saved", what, tank_decor_x(t, item),
-                 item == 2 ? (z == DECOR_Z_BACK ? "BEHIND the grass" : "IN FRONT of the grass") : z == DECOR_Z_BACK ? "BEHIND the fish" : z == DECOR_Z_FRONT ? "IN FRONT of the fish" : "AMONG the fish");
+                 item == 2 || item == 9 ? (z == DECOR_Z_BACK ? "BEHIND the grass" : "IN FRONT of the grass") : z == DECOR_Z_BACK ? "BEHIND the fish" : z == DECOR_Z_FRONT ? "IN FRONT of the fish" : "AMONG the fish");
     } else if (!strcmp(c, "charge")) {               /* charge [mA]: the charger live - a current tried (not saved), what the chip and the source say */
         if (argc > 1) ESP_LOGI(TAG, "charge current %s mA: %s", argv[1], battery_port_set_charge_ma(atoi(argv[1])) ? "set (until the next boot)" : "REFUSED");
         battery_port_charge_report();
@@ -455,6 +586,43 @@ static void run(tank_t *t, char *line) {
             ESP_LOGI(TAG, "rail %s %s: %s", argv[2], argv[1], battery_port_set_rail(argv[2], !strcmp(argv[1], "on")) ? "ok" : "REFUSED");
         else if (argc > 1 && !strcmp(argv[1], "trim")) battery_port_trim_rails();
         else battery_port_dump();
+    } else if (!strcmp(c, "grasscache")) {           /* grasscache [0|1] [ms]: the back grass from a cached scene, rebuilt every ms (2026-10-24, not saved) */
+        if (argc > 1) render_set_grass_cache_on(atoi(argv[1]) != 0, argc > 2 ? atoi(argv[2]) : 0);
+        ESP_LOGI(TAG, "grasscache: %s, every %d ms", render_grass_cache_on() ? "ON" : "off", render_grass_cache_ms());
+    } else if (!strcmp(c, "grassloop")) {            /* grassloop [on|off]: the back grass from the loop (0.3.9.3, render.c THE GRASS LOOP; not saved) */
+        if (argc > 1) render_grass_loop_on(!strcmp(argv[1], "on"));
+        ESP_LOGI(TAG, "grassloop: %s", render_grass_loop_is_on() ? "ON" : "off");
+    } else if (!strcmp(c, "vegthin")) {              /* vegthin 0|1: a COST PROBE - every third grass frond not drawn (the tank still has it) */
+        extern int g_veg_thin; if (argc > 1) g_veg_thin = atoi(argv[1]);
+        ESP_LOGI(TAG, "vegthin: %d", g_veg_thin);
+    } else if (!strcmp(c, "vegstep")) {              /* vegstep [1|2]: the grass row by row, or in row pairs (2026-10-24, not saved) */
+        if (argc > 1) render_set_veg_step(atoi(argv[1]));
+        ESP_LOGI(TAG, "vegstep: %d (%s)", render_veg_step(), render_veg_step() == 2 ? "row pairs: ~half the spans" : "row by row");
+    } else if (!strcmp(c, "vegbench")) {             /* vegbench: a bed's fronds 20x, with and without the stores (CPU vs PSRAM) */
+        uint16_t *buf = heap_caps_malloc((size_t)TANK_W * TANK_H * 2, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+        if (!buf) { ESP_LOGW(TAG, "vegbench: no RAM"); return; }
+        for (int b = 0; b < tank_veg_beds(t); b++) { int64_t fu, du[3]; int sp; render_veg_bench(t, buf, b, esp_timer_get_time, &fu, du, &sp);
+            ESP_LOGI(TAG, "vegbench: bed %d: %d spans: full %.2f us/span | no stores %.2f | no stores, no vignette %.2f | no span_final at all %.2f", b, sp, sp ? fu / (float)sp : 0, sp ? du[0] / (float)sp : 0, sp ? du[1] / (float)sp : 0, sp ? du[2] / (float)sp : 0); }
+        free(buf);
+    } else if (!strcmp(c, "membench")) {             /* membench: what a store costs in PSRAM vs internal RAM (2026-10-23: is the grass pixel-bound?) */
+        uint16_t *ps = heap_caps_malloc(512 * 1024, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT), *in = heap_caps_malloc(8 * 1024, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);   /* (internal RAM is tight: 8 KB) */
+        if (!ps || !in) { ESP_LOGW(TAG, "membench: no RAM"); free(ps); free(in); return; }
+        volatile uint16_t *vp = ps, *vi = in; int64_t t0, t1; uint32_t sum = 0;
+        t0 = esp_timer_get_time(); for (int i = 0; i < 65536; i++) vp[i] = (uint16_t)i; t1 = esp_timer_get_time();
+        ESP_LOGI(TAG, "membench: 64k sequential 16-bit stores to PSRAM: %lld us", t1 - t0);
+        t0 = esp_timer_get_time(); for (int i = 0; i < 65536; i++) vp[(i * 331) & 0x3ffff] = (uint16_t)i; t1 = esp_timer_get_time();
+        ESP_LOGI(TAG, "membench: 64k scattered 16-bit stores to PSRAM (a line each): %lld us", t1 - t0);
+        t0 = esp_timer_get_time(); for (int i = 0; i < 16384; i++) { uint32_t o = (i * 331) & 0x3fffc; vp[o] = 1; vp[o + 1] = 2; vp[o + 2] = 3; vp[o + 3] = 4; } t1 = esp_timer_get_time();
+        ESP_LOGI(TAG, "membench: 16k scattered 4-px spans to PSRAM (64k stores): %lld us", t1 - t0);
+        t0 = esp_timer_get_time(); for (int i = 0; i < 65536; i++) sum += vp[(i * 331) & 0x3ffff]; t1 = esp_timer_get_time();
+        ESP_LOGI(TAG, "membench: 64k scattered 16-bit loads from PSRAM: %lld us (%u)", t1 - t0, (unsigned)sum);
+        t0 = esp_timer_get_time(); for (int i = 0; i < 65536; i++) sum += vp[i]; t1 = esp_timer_get_time();
+        ESP_LOGI(TAG, "membench: 64k sequential 16-bit loads from PSRAM: %lld us (%u)", t1 - t0, (unsigned)sum);
+        t0 = esp_timer_get_time(); for (int i = 0; i < 65536; i++) vi[(i * 331) & 0xfff] = (uint16_t)i; t1 = esp_timer_get_time();
+        ESP_LOGI(TAG, "membench: 64k scattered 16-bit stores to internal RAM: %lld us", t1 - t0);
+        t0 = esp_timer_get_time(); for (int i = 0; i < 16384; i++) { uint32_t o = (i * 331) & 0xffc; vi[o] = 1; vi[o + 1] = 2; vi[o + 2] = 3; vi[o + 3] = 4; } t1 = esp_timer_get_time();
+        ESP_LOGI(TAG, "membench: 16k scattered 4-px spans to internal RAM: %lld us", t1 - t0);
+        free(ps); free(in);
     } else if (!strcmp(c, "bright") && argc > 1) {
         int v = atoi(argv[1]); if (v < 0) v = 0; if (v > 255) v = 255;
         display_port_set_brightness((uint8_t)v);
@@ -523,7 +691,7 @@ static void run(tank_t *t, char *line) {
         if (argc > 1 && !strcmp(argv[1], "clear")) { batlog_clear(); ESP_LOGI(TAG, "battery log cleared"); }
         else batlog_print();
     } else if (!strcmp(c, "level") && argc > 1) {
-        if (!brightness_set_level(atoi(argv[1]))) ESP_LOGW(TAG, "level is 100, 60 or 30");
+        if (!brightness_set_level(atoi(argv[1]))) ESP_LOGW(TAG, "level is 5 .. 100 in steps of 5");
     } else if (!strcmp(c, "reset")) {
         if (argc < 2) { touch_port_confirm_open(); return; }
         int ans = !strcasecmp(argv[1], "yes") ? 1 : !strcasecmp(argv[1], "no") ? -1 : 0;
@@ -694,7 +862,7 @@ static void improv_send(uint8_t type, const uint8_t *data, int n) {
      * answer away until the tank's next log line ended (seconds apart on a quiet tank): asked
      * four times, answered four times, not one answer taken. Seen in the bytes Chrome received
      * (a diagnostic page) after the tank's own trace showed it answering every ask. */
-    uint8_t p[120]; int k = 0;
+    uint8_t p[152]; int k = 0;
     if (n < 0 || n > (int)sizeof p - 12) return;
     p[k++] = '\n';
     memcpy(p + k, "IMPROV", 6); k += 6; p[k++] = 1; p[k++] = type; p[k++] = (uint8_t)n;
@@ -714,7 +882,7 @@ static void improv_state(void) {
     improv_send(1, &st, 1);
 }
 static void improv_result(uint8_t cmd, const char *const *strs, int n) {   /* an RPC result: cmd, len, then length-prefixed strings */
-    uint8_t d[96]; int k = 2;
+    uint8_t d[128]; int k = 2;                                /* (0.3.9.3: room for the boards in the name, a long build too) */
     for (int i = 0; i < n; i++) { int l = (int)strlen(strs[i]); if (k + 1 + l > (int)sizeof d) break; d[k++] = (uint8_t)l; memcpy(d + k, strs[i], l); k += l; }
     d[0] = cmd; d[1] = (uint8_t)(k - 2);
     improv_send(4, d, k);
@@ -753,7 +921,20 @@ static void improv_handle(void) {
         /* the version is the installer manifest's own string (make_installer.py release_version:
            "v0.3.0 alpha (build 1a2b3c4)"): the page hides its update item when the two are equal */
         char ver[48]; snprintf(ver, sizeof ver, "v" PT_RELEASE " " PT_RELEASE_STAGE " (build %s)", version_port_string());
-        const char *info[4] = { "Pocket Tank", ver, "esp32-s3", "Pocket Tank" };
+        /* the device name carries the boards (0.3.9.3): "Pocket Tank|<the board it is>|<the board this
+           version is for>" - the install page's guard reads them (a watch running the 1.8's version is
+           offered the watch's; a pick that is not this board is stopped). The dialog shows the part
+           before the first "|" (make_installer.py) */
+        /* The installer's connect resets the board and asks at once, from the early task, which can
+           be ahead of the chip probe in display_port_init: wait for it (2 s at most; the page asks
+           for 4 s - make_installer.py). The name is put together without printf: the early task's
+           stack is 3 KB, and it is alive while the display takes its internal RAM */
+        for (int i = 0; i < 40 && !board_port_probed(); i++) vTaskDelay(pdMS_TO_TICKS(50));
+        const char *hw = board_port_hw();
+        char name[48] = "Pocket Tank|";
+        strncat(name, hw ? hw : "", sizeof name - strlen(name) - 1);
+        strncat(name, "|" PT_BOARD, sizeof name - strlen(name) - 1);
+        const char *info[4] = { "Pocket Tank", ver, "esp32-s3", name };
         improv_result(3, info, 4);
     } else if (cmd == 4) {
         if (s_imp_radio) s_imp_form = true;

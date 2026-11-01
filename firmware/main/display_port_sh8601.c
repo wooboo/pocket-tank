@@ -23,6 +23,7 @@
 #include "display_port.h"
 #include "board_pins.h"
 #include "tank.h"
+#include "render.h"
 #include "driver/spi_master.h"
 #include "driver/i2c_master.h"
 #include "esp_lcd_panel_io.h"
@@ -34,6 +35,9 @@
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
+#include "freertos/task.h"
+#include "esp_async_memcpy.h"
+#include "esp32s3/rom/cache.h"
 #include <string.h>
 #include <math.h>
 
@@ -60,6 +64,62 @@ static inline void stripe_take(void) {
     s_prof_wait += esp_timer_get_time() - t;
 }
 void display_port_flush_prof(int64_t *wait_us, int64_t *send_us) { *wait_us = s_prof_wait; *send_us = s_prof_send; s_prof_wait = s_prof_send = 0; }
+/* ---- the ASYNCHRONOUS flush (2026-10-23; Strato: "15 fps is too sluggish",
+ * and the same for every board). The flush was the CPU: every frame it read
+ * the whole framebuffer out of PSRAM into the DMA stripes - 16-21 ms on every
+ * board, 30-40% of a frame - and the next frame waited for it. Now a FLUSH
+ * TASK owns the frame once it is drawn: the GDMA (esp_async_memcpy, its own
+ * channel) copies each stripe's rows out of PSRAM into the stripe buffer, the
+ * task swaps the bytes in place in internal RAM (a few ms a frame, in small
+ * pieces), and the SPI DMA takes it to the wire - while the tank task renders
+ * the next frame into the other buffer. The tank task hands a frame over
+ * (display_port_flush_async) and, before it writes a buffer again, asks for
+ * its flush to be over (display_port_flush_wait); a callback tells it a
+ * buffer has left the wire, so the scene prefetch into it can start at once.
+ * What the DMA cannot gather - the 1.8's 90-degree turn, a 180-degree flip,
+ * the bowl's FIT filter - is still a CPU fill, on the flush task: it overlaps
+ * the wire and the waits, not the render. */
+static TaskHandle_t s_fl_task;
+static async_memcpy_handle_t s_fl_amc;          /* the stripe copies' GDMA channel (NULL: CPU fills, as before) */
+static SemaphoreHandle_t s_fl_req, s_fl_done, s_fl_copied;
+static const uint16_t *volatile s_fl_fb;        /* the frame on its way out (NULL: none) */
+static void (*s_fl_cb)(const uint16_t *fb, void *arg); static void *s_fl_arg;
+static int64_t s_prof_copy;                     /* waiting on the GDMA copies */
+#define FL_DMA_ROWS 16                          /* rows a DMA stripe: 16 x (W x 2) bytes is a multiple of 64 on every glass (W even) */
+/* MEASURED on the square 2026-10-23 (4 elders, grown grass): the GDMA copies
+ * take 24 ms a frame (PSRAM to internal at ~19 MB/s) and fight the scene
+ * prefetch's DMA and the render for the PSRAM bus - the frame went from 70
+ * to 80 ms. The bus, not the CPU, is the wall on these boards (docs: "an
+ * overlay pixel is bound by PSRAM traffic"). So the copies stay OFF until the
+ * whole-frame prefetch is gone (a dirty restore instead); the flush task
+ * with CPU fills is a wash (it preempts the render) but costs nothing. */
+#define FL_DMA_COPIES 0
+#define FL_PSRAM_DIRECT 0                        /* the stripes sent straight from the PSRAM framebuffer (2026-10-23, with the frame in the
+                                                 * panel's byte order so the colours were right): the esp_lcd SPI path from PSRAM is not a free
+                                                 * DMA - on the flush task above the tank task it took 28 ms a frame and slowed the tick and
+                                                 * the render by as much (67 ms a frame, as before); below the tank task it starved (79 ms).
+                                                 * The CPU fill, 19 ms, is the cheapest way to feed the wire from PSRAM on this chip. */
+#define FL_PRELOAD 0                             /* EXPERIMENT 2026-10-23: the S3's data cache preload engine pulling the NEXT stripe's rows
+                                                 * out of PSRAM while the CPU swaps this one: the fill went from 19 to 26 ms. No. */
+static bool fl_copy_cb(async_memcpy_handle_t h, async_memcpy_event_t *e, void *arg);
+static bool fl_copy(void *dst, const void *src, size_t n) {   /* a stripe's rows out of PSRAM; n rounded up to the cache line (the frame's
+                                                               * allocation is, so the last stripe's spill reads inside it) */
+    n = (n + 63) & ~(size_t)63;
+    int64_t t = esp_timer_get_time();
+    if (esp_async_memcpy(s_fl_amc, dst, (void *)src, n, fl_copy_cb, NULL) != ESP_OK) return false;
+    xSemaphoreTake(s_fl_copied, portMAX_DELAY);
+    s_prof_copy += esp_timer_get_time() - t;
+    return true;
+}
+static bool fl_copy_cb(async_memcpy_handle_t h, async_memcpy_event_t *e, void *arg) {
+    (void)h; (void)e; (void)arg;
+    BaseType_t hp = pdFALSE;
+    xSemaphoreGiveFromISR(s_fl_copied, &hp);
+    return hp == pdTRUE;
+}
+static inline void fl_swap(uint32_t *o, int words) {        /* two px a word, in internal RAM */
+    for (int x = 0; x < words; x++) { uint32_t v = o[x]; o[x] = ((v & 0x00FF00FFu) << 8) | ((v >> 8) & 0x00FF00FFu); }
+}
 static i2c_master_bus_handle_t s_i2c;
 static bool s_v2;
 static bool s_round;                            /* the 1.75C: no expander, a round 466 px CO5300 (and the 1.75: s_175) */
@@ -85,10 +145,77 @@ static bool s_round_clear;                      /* the glass around the window i
 static uint8_t s_fw[4][4][4];                   /* FIT: [row in group][px in group] -> weights /32 of a[k] a[k+1] b[k] b[k+1] */
 
 void display_port_set_inverted(bool inverted) { s_inverted = inverted; }
+/* ---- on a side (0.3.9.3): the square and the pendant stood on any edge ----
+ * A quarter turn is the panel's own MADCTL - the row/column exchange - so it
+ * costs the flush nothing; turned over stays the flush's 180 above, and the
+ * other side is the two at once. Sent by the flush task between frames (the
+ * DCS write waits out the stripes still on the wire). The side's MADCTL and
+ * gap are per board, tried on the glass; director `turn` tries others live. */
+#define R_MADCTL      0x00                      /* the pendant's way up: the panel's reset value (its init never sends 0x36) */
+#define R_MADCTL_SIDE 0x60                      /* a quarter clockwise: rows and columns exchanged */
+#define S_MADCTL_SIDE 0x00
+static volatile int s_side;                     /* wanted: the picture a quarter turn clockwise on the glass */
+static int s_side_sent = -1;                    /* what the panel has (-1: send it, a fresh init) */
+static int s_madctl_side = -1;                  /* -1: the board's own (R_ / S_MADCTL_SIDE) */
+static int s_side_gx = -1, s_side_gy = -1;      /* the side's gap: -1 = the board's own (below) */
+static int panel_x_gap(void);
+static void dcs(uint8_t cmd, const uint8_t *param, size_t n);
+bool display_port_quarters(void) {
+#if defined(TANK_ROUND)
+    return s_round;
+#elif defined(TANK_SQUARE)
+    return s_square;
+#else
+    return false;                               /* a picture that is not square has no side to stand on */
+#endif
+}
+void display_port_set_quarter(int q) {
+    s_inverted = (q & 2) != 0;
+    s_side = display_port_quarters() && (q & 1);
+}
+static uint8_t madctl_side(void) { return s_madctl_side >= 0 ? (uint8_t)s_madctl_side : s_square ? S_MADCTL_SIDE : R_MADCTL_SIDE; }
+static void side_gap(int *gx, int *gy) {        /* the square's panel has no gap (the pendant turns in its flush, side_apply) */
+    *gx = s_side_gx >= 0 ? s_side_gx : 0;
+    *gy = s_side_gy >= 0 ? s_side_gy : panel_x_gap();
+}
+static void side_apply(void) {
+    if (!display_port_quarters() || s_side == s_side_sent) return;
+#ifdef TANK_ROUND
+    /* the pendant turns its picture in the flush instead (round_flush): on its side the panel takes no row
+     * address past the picture's own 466, so its 6 px offset - the round glass's edge - could never be drawn
+     * (Strato's photos, 10-30: a strip never drawn along the top with the USB on the left, whatever the gap) */
+    s_side_sent = s_side;
+    return;
+#endif
+    uint8_t m = s_side ? madctl_side() : s_square ? s_madctl : R_MADCTL;
+    int gx = panel_x_gap(), gy = 0;
+    if (s_side) side_gap(&gx, &gy);
+    dcs(0x36, &m, 1);
+    esp_lcd_panel_set_gap(s_panel, gx, gy);
+    s_side_sent = s_side;
+}
+void display_port_side_tune(int madctl, int gx, int gy) {
+    if (madctl >= 0) s_madctl_side = madctl & 0xFF;
+    if (gx >= 0) s_side_gx = gx;
+    if (gy >= 0) s_side_gy = gy;
+    s_side_sent = -1;                           /* the next frame sends it */
+}
+void display_port_side_info(int *madctl, int *gx, int *gy, bool *on) {
+    *madctl = madctl_side(); side_gap(gx, gy); *on = s_side;
+}
 bool board_is_round(void) { return s_round; }
 bool board_is_175(void) { return s_175; }
 bool board_is_watch(void) { return s_watch; }
 bool board_is_square(void) { return s_square; }
+/* the board this IS, by the chips that answered (the probe below), as a release
+ * board id (version.h PT_BOARD): NULL when the probe could not tell - the 1.8's
+ * path taken on the PMIC alone, or a dead bus. The 1.75 / 1.75-B runs the bowl's
+ * image, so it reads as the bowl. */
+static volatile bool s_probed;                  /* the chips were asked (display_port_init) */
+bool board_port_probed(void) { return s_probed; }
+const char *board_port_hw(void) {
+    return s_square ? "square216" : s_watch ? "watch206" : s_round ? "round175c" : s_expander ? "amoled18" : NULL;
+}
 int  board_pwr_sense_pin(void) { return s_175 ? -1 : s_round ? R_PIN_PWR_SENSE : s_watch ? W_PIN_PWR_SENSE : s_square ? S_PIN_PWR_SENSE : -1; }
 void display_port_frame_origin(int *px, int *py) { *px = s_fx; *py = s_fy; }
 /* the boards whose resets are GPIOs (the 1.75C, the watch): the pads held through a deep sleep */
@@ -191,6 +318,18 @@ static void expander_power_up(void) {
     i2c_master_transmit(dev, config, 2, 100);
     i2c_master_transmit(dev, out_lo, 2, 100); vTaskDelay(pdMS_TO_TICKS(20));
     i2c_master_transmit(dev, out_hi, 2, 100); vTaskDelay(pdMS_TO_TICKS(120));
+    i2c_master_bus_rm_device(dev);
+}
+
+/* the 1.8's TF card select is the expander's EXIO7 (bit 7): low = selected.
+ * The resets stay high. (sd_spike.c holds it low for a whole card visit.) */
+void board_sd_select(bool on) {
+    if (!s_expander || s_175) return;
+    i2c_device_config_t cfg = { .dev_addr_length = I2C_ADDR_BIT_LEN_7, .device_address = I2C_ADDR_EXPANDER, .scl_speed_hz = 400000 };
+    i2c_master_dev_handle_t dev;
+    if (i2c_master_bus_add_device(s_i2c, &cfg, &dev) != ESP_OK) return;
+    uint8_t out[2] = { 0x01, (uint8_t)(on ? 0x07 : 0x87) };
+    i2c_master_transmit(dev, out, 2, 100);
     i2c_master_bus_rm_device(dev);
 }
 
@@ -312,6 +451,7 @@ bool display_port_init(void) {
         s_square = probe(I2C_ADDR_CST9217);
         if (s_square) s_watch = false;
     }
+    s_probed = true;                                 /* board_port_hw() means it from here (the installer's question waits for it) */
     if (!s_expander && !mic && !probe(0x34)) {
         ESP_LOGE(TAG, "nothing answers on the I2C bus (no expander, no ES7210, no PMIC): the board cannot be told, the panel stays dark - "
                       "power the board off and on (unplug USB; with a battery, hold PWR until it cuts, then press it)");
@@ -422,6 +562,7 @@ bool display_port_init(void) {
  * The round board has no switch on the panel's rail: display off + sleep-in
  * (the wake resets and re-inits it all the same). */
 void display_port_sleep(void) {
+    display_port_flush_wait(NULL);                  /* a frame on its way out first */
     if (s_panel) esp_lcd_panel_disp_on_off(s_panel, false);
     if (held_pins()) { dcs(0x10, NULL, 0); gpio_set_level(pin_tp_rst(), 0); return; }   /* ... and the touch chip held in reset, as the 1.8's expander holds its own (the watch: the same) */
     i2c_device_config_t cfg = { .dev_addr_length = I2C_ADDR_BIT_LEN_7, .device_address = I2C_ADDR_EXPANDER, .scl_speed_hz = 400000 };
@@ -437,6 +578,7 @@ void display_port_sleep(void) {
  * over the still-open QSPI/I2C buses - no reboot needed. init_cmds is file-
  * static, so the driver's retained pointer stays valid for this re-init. */
 void display_port_wake(void) {
+    display_port_flush_wait(NULL);
     if (!s_panel) return;
     if (!held_pins()) expander_power_up();
     else gpio_set_level(pin_tp_rst(), 1);           /* the touch chip is reporting again by the time the panel is up */
@@ -444,6 +586,7 @@ void display_port_wake(void) {
     esp_lcd_panel_init(s_panel);
     esp_lcd_panel_set_gap(s_panel, panel_x_gap(), 0);
     if (s_square && s_madctl != S_MADCTL) dcs(0x36, &s_madctl, 1);   /* a way up tried from the director outlives the re-init */
+    s_side_sent = -1;                               /* ... and a side: the next frame sends it again */
     display_port_set_brightness(s_brightness);      /* init_cmds put it back at 255 */
     esp_lcd_panel_disp_on_off(s_panel, true);
     s_round_clear = true;                           /* a reset panel's memory is not black */
@@ -466,17 +609,17 @@ uint8_t display_port_brightness(void) { return s_brightness; }
  * a px costs four multiplies. The frame's 448 and 368 are 2 px short of 90
  * and 74 whole groups: the last column and row repeat. Flipped: the same
  * picture turned 180 degrees in its window. */
-#define RGB_SPREAD(c) ((((uint32_t)(c)) | ((uint32_t)(c) << 16)) & 0x07E0F81Fu)
+#define RGB_SPREAD(c) ((((uint32_t)FB_SWAP16(c)) | ((uint32_t)FB_SWAP16(c) << 16)) & 0x07E0F81Fu)   /* (a frame pixel, native: unswapped under PT_FB_SWAP) */
 typedef uint32_t __attribute__((may_alias)) u32a_t;       /* a pair of frame px read as one word */
-static inline uint16_t be565(uint32_t c) { return (uint16_t)(((c & 0xFF) << 8) | ((c >> 8) & 0xFF)); }
+static inline uint16_t be565(uint32_t c) { return PT_FB_SWAP ? (uint16_t)c : (uint16_t)(((c & 0xFF) << 8) | ((c >> 8) & 0xFF)); }   /* (with PT_FB_SWAP the frame is in the panel's order; FIT's filter unswaps as it mixes) */
 #ifndef TANK_ROUND
 static void round_row_full(const uint16_t *fb, int j, uint16_t *out) {
     if (!s_inverted) {
         const uint16_t *s = fb + j * TANK_W;
-        for (int x = 0; x < TANK_W; x++) out[x] = be565(s[x]);
+        for (int x = 0; x < TANK_W; x++) out[x] = PT_FB_SWAP ? s[x] : be565(s[x]);
     } else {
         const uint16_t *s = fb + (TANK_H - 1 - j) * TANK_W + TANK_W - 1;
-        for (int x = 0; x < TANK_W; x++) out[x] = be565(s[-x]);
+        for (int x = 0; x < TANK_W; x++) out[x] = PT_FB_SWAP ? s[-x] : be565(s[-x]);
     }
 }
 static void round_row_fit(const uint16_t *fb, int j, uint16_t *out) {
@@ -494,7 +637,7 @@ static void round_row_fit(const uint16_t *fb, int j, uint16_t *out) {
         else for (int i = 0; i < 5; i++) { int xi = i < 3 ? i : 2; ea[i] = RGB_SPREAD(a[xi]); eb[i] = RGB_SPREAD(b[xi]); }   /* x 445..447, the last repeated */
         for (int k = 0; k < 4; k++, o += step) {
             uint32_t v = ((ea[k] * w[k][0] + ea[k + 1] * w[k][1] + eb[k] * w[k][2] + eb[k + 1] * w[k][3]) >> 5) & 0x07E0F81Fu;
-            *o = be565(v | (v >> 16));
+            { uint32_t m = v | (v >> 16); *o = (uint16_t)(((m & 0xFF) << 8) | ((m >> 8) & 0xFF)); }   /* mixed native -> the panel's order */
         }
     }
 }
@@ -526,6 +669,16 @@ static void round_flush(const uint16_t *fb) {
         int w = x1 - x0;
         stripe_take();
         uint16_t *stripe = s_stripe[cur];
+        if (s_side) {                                  /* on a side (0.3.9.3): turned here, not by the panel (side_apply) - a
+                                                          column of the stripe is a run of one frame row, read in order */
+            const int step = s_inverted ? -1 : 1;
+            for (int px = x0; px < x0 + w; px++) {
+                const uint16_t *s = s_inverted ? fb + px * TANK_W + (TANK_W - 1 - y0)      /* the other side: the turn and the flip */
+                                               : fb + (TANK_H - 1 - px) * TANK_W + y0;      /* a quarter clockwise */
+                uint16_t *o = stripe + (px - x0);
+                for (int r = 0; r < n; r++, s += step, o += w) { uint16_t v = *s; *o = PT_FB_SWAP ? v : (uint16_t)((v << 8) | (v >> 8)); }
+            }
+        } else
         for (int r = 0; r < n; r++) {
             uint16_t *o = stripe + r * w;
             /* two px a step (2026-10-03: the fill was 20 of the flush's 22 ms, the wire never the wait):
@@ -534,10 +687,10 @@ static void round_flush(const uint16_t *fb) {
             uint32_t *o32 = (uint32_t *)o;
             if (!s_inverted) {
                 const u32a_t *s = (const u32a_t *)(fb + (y0 + r) * TANK_W + x0);
-                for (int x = 0; x < w / 2; x++) { uint32_t v = s[x]; o32[x] = ((v & 0x00FF00FFu) << 8) | ((v >> 8) & 0x00FF00FFu); }
+                for (int x = 0; x < w / 2; x++) { uint32_t v = s[x]; o32[x] = PT_FB_SWAP ? v : ((v & 0x00FF00FFu) << 8) | ((v >> 8) & 0x00FF00FFu); }
             } else {
                 const u32a_t *s = (const u32a_t *)(fb + (TANK_H - 1 - y0 - r) * TANK_W + (TANK_W - 2 - x0));   /* the pair ending at the mirrored px */
-                for (int x = 0; x < w / 2; x++) { uint32_t v = s[-x]; v = (v >> 16) | (v << 16); o32[x] = ((v & 0x00FF00FFu) << 8) | ((v >> 8) & 0x00FF00FFu); }
+                for (int x = 0; x < w / 2; x++) { uint32_t v = s[-x]; v = (v >> 16) | (v << 16); o32[x] = PT_FB_SWAP ? v : ((v & 0x00FF00FFu) << 8) | ((v >> 8) & 0x00FF00FFu); }
             }
         }
         round_send(x0, y0, w, n, stripe);
@@ -580,36 +733,106 @@ static void round_flush(const uint16_t *fb) {
  * FRAME_ROWS of it a stripe (the last may be short), at (s_fx, s_fy): the
  * whole panel on the 1.8 and on the watch's own build. */
 #if defined(TANK_WATCH) || defined(TANK_SQUARE)
+static void native_flush(const uint16_t *fb);
 /* The watch's own build: the frame is the panel's 410 x 502, row for row -
  * no turn. As many whole rows as fit a stripe buffer (28; 24 of the square's
  * 480); flipped, the same picture turned 180 degrees. */
+static void native_flush_dma(const uint16_t *fb) {               /* the rows out of PSRAM by DMA, swapped in place, sent */
+    int cur = 0;
+#if FL_PSRAM_DIRECT
+    for (int s0 = 0; s0 < TANK_H; s0 += FL_DMA_ROWS) {
+        const int n = TANK_H - s0 < FL_DMA_ROWS ? TANK_H - s0 : FL_DMA_ROWS;
+        round_send(0, s0, TANK_W, n, fb + s0 * TANK_W);
+    }
+    return;
+#endif
+    for (int s0 = 0; s0 < TANK_H; s0 += FL_DMA_ROWS) {           /* source blocks, each at a cache-line offset */
+        const int n = TANK_H - s0 < FL_DMA_ROWS ? TANK_H - s0 : FL_DMA_ROWS;
+        stripe_take();
+        uint16_t *stripe = s_stripe[cur];
+        if (!fl_copy(stripe, fb + s0 * TANK_W, (size_t)n * TANK_W * 2)) { native_flush(fb); return; }   /* (the CPU way, whole) */
+        int y0 = s0;
+        if (!s_inverted) { if (!PT_FB_SWAP) fl_swap((uint32_t *)stripe, n * TANK_W / 2); }
+        else {                                                   /* the 180-degree flip: the block's pixels in reverse order IS the block
+                                                                  * turned (rows and pixels at once), swapped on the way; it lands where the
+                                                                  * turned frame has it */
+            uint16_t *a = stripe, *b = stripe + n * TANK_W - 1;
+            for (; a < b; a++, b--) { uint16_t va = *a, vb = *b; *a = PT_FB_SWAP ? vb : (uint16_t)((vb << 8) | (vb >> 8)); *b = PT_FB_SWAP ? va : (uint16_t)((va << 8) | (va >> 8)); }
+            y0 = TANK_H - s0 - n;
+        }
+        round_send(0, y0, TANK_W, n, stripe);
+        cur ^= 1;
+    }
+}
 static void native_flush(const uint16_t *fb) {
     int cur = 0;
     const int rows = (STRIPE_BYTES / (TANK_W * 2)) & ~1;
+    uint32_t autoload = 0;
+    if (FL_PRELOAD) { autoload = Cache_Start_DCache_Preload((uint32_t)fb, (uint32_t)(rows * TANK_W * 2), 0); while (!Cache_DCache_Preload_Done()) { } }
     for (int y0 = 0; y0 < TANK_H; y0 += rows) {
         const int n = TANK_H - y0 < rows ? TANK_H - y0 : rows;
+        if (FL_PRELOAD && y0 + rows < TANK_H) {        /* the next stripe's rows into the cache while this one is swapped */
+            int n2 = TANK_H - (y0 + rows) < rows ? TANK_H - (y0 + rows) : rows;
+            Cache_Start_DCache_Preload((uint32_t)(fb + (y0 + rows) * TANK_W), (uint32_t)(n2 * TANK_W * 2), 0);
+        }
         stripe_take();
         uint16_t *stripe = s_stripe[cur];
         for (int r = 0; r < n; r++) {
             uint32_t *o = (uint32_t *)(stripe + r * TANK_W);        /* two px a store (TANK_W is even, the stripe 4-aligned) */
             if (!s_inverted) {                                      /* ... and two px a load (2026-10-03, as the bowl's fill) */
                 const u32a_t *s = (const u32a_t *)(fb + (y0 + r) * TANK_W);
-                for (int x = 0; x < TANK_W / 2; x++) { uint32_t v = s[x]; o[x] = ((v & 0x00FF00FFu) << 8) | ((v >> 8) & 0x00FF00FFu); }
+                for (int x = 0; x < TANK_W / 2; x++) { uint32_t v = s[x]; o[x] = PT_FB_SWAP ? v : ((v & 0x00FF00FFu) << 8) | ((v >> 8) & 0x00FF00FFu); }
             } else {
                 const u32a_t *s = (const u32a_t *)(fb + (TANK_H - 1 - y0 - r) * TANK_W + TANK_W - 2);
-                for (int x = 0; x < TANK_W / 2; x++) { uint32_t v = s[-x]; v = (v >> 16) | (v << 16); o[x] = ((v & 0x00FF00FFu) << 8) | ((v >> 8) & 0x00FF00FFu); }
+                for (int x = 0; x < TANK_W / 2; x++) { uint32_t v = s[-x]; v = (v >> 16) | (v << 16); o[x] = PT_FB_SWAP ? v : ((v & 0x00FF00FFu) << 8) | ((v >> 8) & 0x00FF00FFu); }
             }
         }
         round_send(0, y0, TANK_W, n, stripe);
         cur ^= 1;
     }
+    if (FL_PRELOAD) Cache_End_DCache_Preload(autoload);
 }
 #endif
-void display_port_flush(const uint16_t *fb) {
+/* director `turn probe` (0.3.9.3, the pendant's strip on a side): the panel's whole memory white once, then
+ * every frame two px bands of eight colours along the picture's four edges, the outermost first - red,
+ * yellow, green, cyan, blue, magenta, white, orange - so a photo shows what the glass cuts off and what it
+ * shows of memory never drawn (white) */
+static volatile bool s_probe, s_probe_white;
+void display_port_probe(bool on) { s_probe = on; s_probe_white = on; s_side_sent = -1; }
+static void probe_rect(int x, int y, int w, int h, uint16_t rgb565) {
+    uint16_t v = (uint16_t)((rgb565 >> 8) | (rgb565 << 8));   /* the panel takes it big-endian */
+    static int cur;
+    int rows = (STRIPE_BYTES / (w * 2)); if (rows > h) rows = h;
+    for (int y0 = 0; y0 < h; y0 += rows) {
+        int n = h - y0 < rows ? h - y0 : rows;
+        stripe_take();                            /* (the ping-pong: a buffer back from the wire) */
+        for (int i = 0; i < w * n; i++) s_stripe[cur][i] = v;
+        round_send(x, y + y0, w, n, s_stripe[cur]);
+        cur ^= 1;
+    }
+}
+static void probe_draw(void) {
+    if (s_probe_white) {
+        s_probe_white = false;
+        esp_lcd_panel_set_gap(s_panel, 0, 0);
+        probe_rect(0, 0, 480, 480, 0xFFFF);
+        s_side_sent = -1; side_apply();
+    }
+    static const uint16_t BANDS[8] = { 0xF800, 0xFFE0, 0x07E0, 0x07FF, 0x001F, 0xF81F, 0xFFFF, 0xFC00 };
+    for (int b = 0; b < 8; b++) {
+        int e = b * 2;
+        probe_rect(0, e, TANK_W, 2, BANDS[b]); probe_rect(0, TANK_H - 2 - e, TANK_W, 2, BANDS[b]);
+        probe_rect(e, 0, 2, TANK_H, BANDS[b]); probe_rect(TANK_W - 2 - e, 0, 2, TANK_H, BANDS[b]);
+    }
+}
+static void flush_now(const uint16_t *fb) {
     if (!s_panel || !s_stripe_free) return;
+    side_apply();
+    if (s_probe) { probe_draw(); return; }
     if (s_round) { round_flush(fb); return; }
 #if defined(TANK_WATCH) || defined(TANK_SQUARE)
-    native_flush(fb); return;
+    if (s_fl_amc || FL_PSRAM_DIRECT) native_flush_dma(fb); else native_flush(fb);
+    return;
 #else
     int cur = 0;
     if (s_border_clear) {                              /* the whole panel black, once: the frame covers its part again below */
@@ -634,7 +857,7 @@ void display_port_flush(const uint16_t *fb) {
             uint32_t *dst = (uint32_t *)(stripe + px);
             for (int r = 0; r < n; r++) {
                 uint16_t a = s0[n - 1 - r], b = s1[n - 1 - r];   /* x = x1 - r */
-                a = (uint16_t)((a << 8) | (a >> 8)); b = (uint16_t)((b << 8) | (b >> 8));
+                if (!PT_FB_SWAP) { a = (uint16_t)((a << 8) | (a >> 8)); b = (uint16_t)((b << 8) | (b >> 8)); }   /* (the frame is in the panel's order already) */
                 dst[r * (FRAME_PW / 2)] = (uint32_t)a | ((uint32_t)b << 16);
             }
         }
@@ -646,7 +869,7 @@ void display_port_flush(const uint16_t *fb) {
             uint32_t *dst = (uint32_t *)(stripe + px);
             for (int r = 0; r < n; r++) {
                 uint16_t a = s0[r], b = s1[r];
-                a = (uint16_t)((a << 8) | (a >> 8)); b = (uint16_t)((b << 8) | (b >> 8));
+                if (!PT_FB_SWAP) { a = (uint16_t)((a << 8) | (a >> 8)); b = (uint16_t)((b << 8) | (b >> 8)); }   /* (the frame is in the panel's order already) */
                 dst[r * (FRAME_PW / 2)] = (uint32_t)a | ((uint32_t)b << 16);
             }
         }
@@ -654,4 +877,53 @@ void display_port_flush(const uint16_t *fb) {
         cur ^= 1;
     }
 #endif
+}
+
+static int64_t s_fl_us; static int s_fl_frames;
+/* the flush task: one frame at a time, as handed over */
+static void fl_task(void *arg) {
+    (void)arg;
+    for (;;) {
+        xSemaphoreTake(s_fl_req, portMAX_DELAY);
+        const uint16_t *fb = s_fl_fb;
+        int64_t t0 = esp_timer_get_time();
+        flush_now(fb);
+        s_fl_us += esp_timer_get_time() - t0; s_fl_frames++;
+        s_fl_fb = NULL;
+        if (s_fl_cb) s_fl_cb(fb, s_fl_arg);
+        xSemaphoreGive(s_fl_done);
+    }
+}
+void display_port_flush_wait(const uint16_t *fb) {           /* until no flush of fb (NULL: of any frame) is in flight */
+    if (!s_fl_task) return;
+    if (fb && s_fl_fb != fb && s_fl_fb != NULL) return;      /* another frame is out: fb is free */
+    if (s_fl_fb == NULL) return;
+    xSemaphoreTake(s_fl_done, portMAX_DELAY);               /* the task gives it once per frame; taken here, it is ours */
+    xSemaphoreGive(s_fl_done);
+}
+bool display_port_flush_async(const uint16_t *fb, void (*done)(const uint16_t *fb, void *arg), void *arg) {
+    if (!s_panel) return false;
+    if (!s_fl_task) {                                       /* the first call sets the task up (after the panel and the SPI have their DMA) */
+        s_fl_req = xSemaphoreCreateBinary(); s_fl_done = xSemaphoreCreateBinary(); s_fl_copied = xSemaphoreCreateBinary();
+        async_memcpy_config_t cfg = ASYNC_MEMCPY_DEFAULT_CONFIG();
+        cfg.backlog = 2; cfg.sram_trans_align = 4; cfg.psram_trans_align = 64;
+        if (!FL_DMA_COPIES || esp_async_memcpy_install(&cfg, &s_fl_amc) != ESP_OK) { s_fl_amc = NULL; ESP_LOGW(TAG, "flush: no GDMA channel for the stripe copies - CPU fills on the flush task"); }
+        if (xTaskCreatePinnedToCore(fl_task, "flush", 4096, NULL, 5, &s_fl_task, 0) != pdPASS) { s_fl_task = NULL; return false; }
+        xSemaphoreGive(s_fl_done);
+        ESP_LOGI(TAG, "flush: asynchronous, %s", s_fl_amc ? "the stripes copied by GDMA" : "CPU fills");
+    }
+    if (s_border_clear || s_round_clear) return false;      /* a clear owed: the plain flush does it */
+    display_port_flush_wait(NULL);                          /* one frame on its way at a time */
+    xSemaphoreTake(s_fl_done, 0);                           /* (it was given: ours now, until the task gives it back) */
+    s_fl_fb = fb; s_fl_cb = done; s_fl_arg = arg;
+    xSemaphoreGive(s_fl_req);
+    return true;
+}
+void display_port_flush(const uint16_t *fb) {               /* the plain flush, whole, here and now */
+    display_port_flush_wait(NULL);
+    flush_now(fb);
+}
+void display_port_flush_async_prof(int64_t *task_us, int *frames, int64_t *copy_us) {
+    *task_us = s_fl_us; *frames = s_fl_frames; *copy_us = s_prof_copy; s_fl_us = s_prof_copy = 0; s_fl_frames = 0;
+    if (*frames) ESP_LOGI(TAG, "flush: task %s, gdma %s, inverted %d, dma rows %d", s_fl_task ? "up" : "none", s_fl_amc ? "yes" : "NO", (int)s_inverted, FL_DMA_ROWS);
 }

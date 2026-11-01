@@ -73,3 +73,6 @@ CONFIG_ESP32S3_DATA_CACHE_LINE_64B=y
 
 # NimBLE host buffers use PSRAM; controller and DMA retain internal SRAM.
 CONFIG_BT_NIMBLE_MEM_ALLOC_MODE_EXTERNAL=y
+# the tank switcher (docs/tank-switcher.md): the SD card library uses long names (/pocketank/tanks/...); off, FAT is 8.3 only
+CONFIG_FATFS_LFN_HEAP=y
+CONFIG_FATFS_MAX_LFN=255
