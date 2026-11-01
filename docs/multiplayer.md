@@ -22,11 +22,13 @@ gifts change the spendable balance, not lifetime care earnings.
 For a hardware check without moving dollars or fish:
 
 ```sh
-python tools/test_friends_hardware.py --a /dev/cu.usbmodemAAA --b /dev/cu.usbmodemBBB --log /tmp/pairing.txt --pair-only
+python tools/test_friends_hardware.py --a /dev/cu.usbmodemAAA --b /dev/cu.usbmodemBBB --log /tmp/pairing.txt --pair-only --require-llm
 ```
 
 It verifies matching codes, confirmation on both devices, cancellation,
-reopening, unchanged balances and clean radio shutdown.
+reopening, unchanged balances and clean radio shutdown. `--require-llm` also
+requires the live decision counter to advance on both devices after pairing;
+this detects an advisor task that did not start under memory pressure.
 
 ## Transfers and recovery
 

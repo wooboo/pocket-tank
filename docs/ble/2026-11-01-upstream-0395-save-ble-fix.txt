@@ -1,0 +1,12 @@
+/dev/cu.usbmodem311101
+I (191064) display: frame 64.4 ms = polls 1.0 + tick 2.1 + prefetch wait 0.0 + render 48.0 + flush 12.4 + tail 0.5 + sleep 0.5 | flush: fill 10.6, wire wait 0.0, send calls 1.7
+I (191080) display: the fish stage split: fish 3.1 | snail+urchin 1.9 | front pieces back 0.7 | front grass 0.0 | front overlays 2.3 | front lanes 0.0 | arch shade 0.3 ms
+I (191095) pocket-tank: t=348s 4 fish goals: explore explore explore explore | asks 57 decisions 0 last 0 ms 0.0 tok/s | starve-ignored 0 | heap int 51 KB psram 4227 KB | battery 100% 4170 mV bright 91
+I (191115) director: fish count=4 out=0 in=0 offered=0 name=-
+I (191118) director: friends active=0 page=3 code=378454 peer=0000000000000000 balance=280 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+I (191162) director: saved
+
+/dev/cu.usbmodem31201
+I (134967) director: fish count=4 out=0 in=0 offered=0 name=-
+I (134967) director: friends active=0 page=3 code=378454 peer=0000000000000000 balance=391 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+I (135003) director: saved

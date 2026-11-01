@@ -1,0 +1,45 @@
+I (40345) display: fb mid 0x0082 corner 0x0000 | scene mid 0x0082 ep 2 | night 1 prefetch 1
+I (40346) display: 12.2 fps | render 60.0 ms flush 18.0 ms | scene 3.0 shafts 0.0 veg 17.4 fd/bub 8.3 fish 20.8 vig 4.4 algae 5.4 | card 0.0 ms x0 | veg 0.54 0.53 0.55
+I (40357) display: frame 81.9 ms = polls 1.0 + tick 2.3 + prefetch wait 0.0 + render 60.0 + flush 18.0 + tail 0.4 + sleep 0.5 | flush: fill 16.1, wire wait 0.0, send calls 1.8
+I (40373) pocket-tank: t=97s 4 fish goals: rest seek_food rest rest | asks 12 decisions 7 last 3833 ms 11.2 tok/s | starve-ignored 0 | heap int 49 KB psram 4604 KB | battery 86% 4148 mV bright 91
+I (41230) advisor: zone 2 hunger 9 energy 9 stress 0 curiosity 6 bold 9 social 1 stage elder trust 4 bored 3 food none friend near 8 bubble far 7 reef far 6 wall near 12 last explore time night -> rest urgency 0 p=0.95  [3894 ms, 11.0 tok/s]
+I (41240) advisor: prof ms: matmul 2169 attn 475 norm/quant 124 rope 30 swiglu 324 decode 761
+I (45124) advisor: zone 2 hunger 9 energy 9 stress 0 curiosity 5 bold 9 social 1 stage elder trust 4 bored 0 food none friend near 4 bubble mid 3 reef far 1 wall near 8 last rest time night -> rest urgency 0 p=0.98  [3848 ms, 11.2 tok/s]
+I (45134) advisor: prof ms: matmul 2123 attn 491 norm/quant 104 rope 27 swiglu 331 decode 759
+I (49048) advisor: zone 1 hunger 9 energy 8 stress 0 curiosity 4 bold 9 social 1 stage elder trust 7 bored 0 food none friend near 2 bubble mid 5 reef far 4 wall near 11 last seek_food time night -> explore urgency 4 p=0.03  [3848 ms, 11.2 tok/s]
+I (49059) advisor: prof ms: matmul 2124 attn 492 norm/quant 106 rope 27 swiglu 329 decode 758
+I (50346) display: fb mid 0x0082 corner 0x0000 | scene mid 0x0082 ep 2 | night 1 prefetch 1
+I (50346) display: 12.4 fps | render 58.4 ms flush 17.7 ms | scene 2.9 shafts 0.0 veg 16.9 fd/bub 8.1 fish 20.1 vig 4.5 algae 5.2 | card 0.0 ms x0 | veg 0.54 0.53 0.55
+I (50358) display: frame 80.5 ms = polls 1.0 + tick 2.0 + prefetch wait 0.0 + render 58.4 + flush 17.7 + tail 0.4 + sleep 0.5 | flush: fill 15.8, wire wait 0.0, send calls 1.8
+I (50373) pocket-tank: t=107s 4 fish goals: rest explore rest rest | asks 12 decisions 10 last 3848 ms 11.2 tok/s | starve-ignored 0 | heap int 49 KB psram 4604 KB | battery 86% 4150 mV bright 91
+I (51518) director: v0.3.6 alpha (build 899fe45) running from ota_0, next boot ota_0 | manifest https://github.com/mediacutlet/pocket-tank/releases/latest/download/latest-amoled18.json | ota check (= CHECK FOR UPDATES) | ota url <url>|default
+I (53069) director: 0 zori   elder age 271.4h size 1.45 hunger 10.0 energy 10.0 stress 0.0 curiosity 4.4 trust 7.1 ms 1f3f  rest at 134,27
+I (53071) director: 1 chip   elder age 270.8h size 1.31 hunger 10.0 energy 8.1 stress 0.0 curiosity 4.8 trust 7.1 ms 1f3f  explore at 181,50
+I (53083) director: 2 dolt   elder age 271.5h size 1.36 hunger 10.0 energy 10.0 stress 0.0 curiosity 4.8 trust 7.5 ms 1f3f  rest at 129,74
+I (53095) director: 3 nori   elder age 200.1h size 1.45 hunger 10.0 energy 10.0 stress 0.0 curiosity 5.7 trust 4.4 ms 1f3f  rest at 214,51
+I (53108) director: low-battery shelter: off
+I (53112) director: pellets 0 | trickle off (AUTO FEED off) | ravenous 1 | night idle 43s | veg 0.54 0.53 0.55 | algae cells 70/644 | courting dolt+zori | arrival -
+I (53126) director: sand dollars 280 (earned 2305) | shop: plant snail castle coral cluster shrimp urchin seahorse | colonies 400 | 10937 cm trimmed
+I (53139) director: urchin at x 326 | ambling | appetite 0.006 | 12056 cm grazed so far (keeps the grass over 0.40)
+I (53149) director: seahorse at 278,246 | A BLADE | 11.16 days with you, 3 hitches, +0.28 trust passed on | 3 pellets snapped (2 paid; next pays in 0 s)
+I (53162) director: snail at 136,200 heading 180 deg | after cell 343 at 120,200 (film 7) | 70 cells on the glass | 5675 grazed so far
+I (53175) director: bed 0 fronds (x from 19, pitch 12): 0.54 0.53 0.54 0.53 0.54 0.54 0.53 0.52 0.55 0.53 0.55 0.55 0.54 0.54 0.52
+I (53186) director: bed 1 fronds (x from 376, pitch 12): 0.53 0.52 0.53 0.53 0.54
+I (53193) director: bed 2 fronds (x from 278, pitch 12): 0.56 0.55 0.53 0.52 0.54 0.56 0.55 0.56
+I (53202) director: bed 3 leaves (x from 201, pitch 14): 0.89 0.86 0.93 0.87
+I (53208) director: plant placed: centre x 222 (the keeper's), depth BEHIND the fish
+I (53216) director: castle placed: centre x 122 (the keeper's), IN FRONT of the grass (the fish swim through)
+I (53225) director: coral placed: centre x 282 (the keeper's), IN FRONT, colour 8a5be0, growth 1.25 of 1.25 (the crown is out)
+I (53237) director: reef cluster placed: centre x 346 (the keeper's), BEHIND, look LAGOON, growth 2.00 of 2 (in full bloom)
+I (53247) director: nursery bed 3 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (53256) director: battery 86% charging, VBAT 4150 mV | brightness 91/255 (level 60%)
+I (53264) pocket-tank: battery page: 86% CHARGING | since the cable moved 2M (at 85%), screen on - | full in 10M | a full charge ~140 min (drain 42.6 %/h, charge 77.3 %/h)
+I (54596) director: fish count=4 out=0 in=0 offered=0 name=-
+I (54597) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0
+I (56103) director: roster 0 name=zori id=cadb9a72f3f25d16:2 age=976884.4 body=78d67d accent=ffbd59 paid=15 parents=,
+I (56104) director: roster 1 name=chip id=cadb9a72f3f25d16:3 age=974724.1 body=f48fb1 accent=ffbd59 paid=15 parents=dolt,zori
+I (56114) director: roster 2 name=dolt id=cadb9a72f3f25d16:1 age=977440.9 body=f48fb1 accent=ffe08a paid=15 parents=,
+I (56125) director: roster 3 name=nori id=2c59b054d853a61f:1 age=720266.9 body=a799ff accent=78d67d paid=7 parents=,
+I (56135) director: fish count=4 out=0 in=0 offered=0 name=-
+I (56140) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0
+I (57702) director: saved

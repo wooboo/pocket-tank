@@ -1,0 +1,41 @@
+I (40320) display: fb mid 0x0082 corner 0x0000 | scene mid 0x0082 ep 2 | night 1 prefetch 1
+I (40321) display: 13.6 fps | render 51.6 ms flush 18.0 ms | scene 3.1 shafts 0.0 veg 11.4 fd/bub 7.9 fish 19.5 vig 4.0 algae 5.0 | card 0.0 ms x0 | veg 0.54 0.53 0.55
+I (40332) display: frame 73.5 ms = polls 1.0 + tick 1.9 + prefetch wait 0.0 + render 51.6 + flush 18.0 + tail 0.3 + sleep 0.5 | flush: fill 16.1, wire wait 0.0, send calls 1.8
+I (40348) pocket-tank: t=42s 4 fish goals: rest rest seek_food rest | asks 75 decisions 7 last 3943 ms 10.6 tok/s | starve-ignored 4 | heap int 49 KB psram 4604 KB | battery 92% 4191 mV bright 91
+I (42278) advisor: zone 3 hunger 9 energy 8 stress 0 curiosity 2 bold 9 social 2 stage elder trust 7 bored 0 food none friend far 4 bubble far 4 reef mid 2 wall near 11 last seek_food time night -> rest urgency 0 p=0.96  [3948 ms, 10.9 tok/s]
+I (42288) advisor: prof ms: matmul 2167 attn 507 norm/quant 111 rope 29 swiglu 330 decode 792
+I (50307) display: fb mid 0x0082 corner 0x0000 | scene mid 0x0082 ep 2 | night 1 prefetch 1
+I (50308) display: 17.5 fps | render 39.3 ms flush 14.8 ms | scene 2.3 shafts 0.0 veg 8.5 fd/bub 6.1 fish 14.9 vig 3.4 algae 3.4 | card 0.0 ms x0 | veg 0.54 0.53 0.55
+I (50319) display: frame 57.2 ms = polls 0.9 + tick 1.3 + prefetch wait 0.0 + render 39.3 + flush 14.8 + tail 0.3 + sleep 0.4 | flush: fill 13.0, wire wait 0.0, send calls 1.8
+I (50335) pocket-tank: t=52s 4 fish goals: rest rest rest rest | asks 75 decisions 8 last 3948 ms 10.9 tok/s | starve-ignored 4 | heap int 49 KB psram 4604 KB | battery 92% 4194 mV bright 91
+I (51546) director: v0.3.6 alpha (build 899fe45) running from ota_0, next boot ota_0 | manifest https://github.com/mediacutlet/pocket-tank/releases/latest/download/latest-amoled18.json | ota check (= CHECK FOR UPDATES) | ota url <url>|default
+I (53113) director: 0 sol    elder age 201.8h size 1.51 hunger 6.3 energy 10.0 stress 0.0 curiosity 0.0 trust 6.0 ms 1f3f  rest at 163,176
+I (53115) director: 1 gira   elder age 265.3h size 1.57 hunger 6.3 energy 10.0 stress 0.0 curiosity 4.0 trust 8.8 ms 1f3f  rest at 107,170
+I (53127) director: 2 help   elder age 260.1h size 1.25 hunger 10.0 energy 10.0 stress 0.0 curiosity 2.5 trust 7.4 ms 1f3f  rest at 388,232
+I (53139) director: 3 misa   elder age 206.8h size 1.57 hunger 10.0 energy 10.0 stress 0.0 curiosity 4.3 trust 3.3 ms 1f3f  rest at 182,258
+I (53151) director: low-battery shelter: off
+I (53156) director: pellets 0 | trickle off (AUTO FEED off) | ravenous 0 | night idle 43s | veg 0.54 0.53 0.55 | algae cells 59/644 | courting gira+help | arrival -
+I (53170) director: sand dollars 391 (earned 1088) | shop: plant snail castle coral cluster shrimp urchin seahorse | colonies 193 | 7962 cm trimmed
+I (53183) director: urchin at x 326 | ambling | appetite 0.006 | 12064 cm grazed so far (keeps the grass over 0.40)
+I (53193) director: seahorse at 278,246 | A BLADE | 11.15 days with you, 0 hitches, +0.00 trust passed on | 0 pellets snapped (0 paid; next pays in 0 s)
+I (53206) director: snail at 158,139 heading -122 deg | after cell 176 at 136,104 (film 135) | 59 cells on the glass | 5132 grazed so far
+I (53219) director: bed 0 fronds (x from 19, pitch 12): 0.54 0.53 0.54 0.53 0.54 0.54 0.53 0.52 0.55 0.53 0.55 0.56 0.54 0.55 0.53
+I (53230) director: bed 1 fronds (x from 376, pitch 12): 0.53 0.52 0.53 0.53 0.54
+I (53237) director: bed 2 fronds (x from 278, pitch 12): 0.56 0.55 0.53 0.52 0.54 0.56 0.56 0.56
+I (53246) director: bed 3 leaves (x from 208, pitch 14): 0.89 0.86 0.93 0.87
+I (53252) director: plant placed: centre x 229 (the default), depth AMONG the fish
+I (53260) director: castle placed: centre x 262 (the keeper's), BEHIND the grass
+I (53267) director: coral placed: centre x 66 (the keeper's), IN FRONT, colour ff7a1e, growth 1.25 of 1.25 (the crown is out)
+I (53278) director: reef cluster placed: centre x 330 (the default), IN FRONT, look LAGOON, growth 1.80 of 2 (full size, blooming)
+I (53289) director: nursery bed 3 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (53298) director: battery 92% charging, VBAT 4195 mV | brightness 91/255 (level 60%)
+I (53306) pocket-tank: battery page: 92% CHARGING | since the cable moved 9D 20H (at 2%), screen on - | full in 10M | a full charge ~200 min (drain 30.0 %/h, charge 58.3 %/h)
+I (54615) director: fish count=4 out=0 in=0 offered=0 name=-
+I (54616) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=391 out=0 in=0
+I (56248) director: roster 0 name=sol id=2c59b054d853a61f:2 age=726343.1 body=f48fb1 accent=ffe08a paid=7 parents=,
+I (56249) director: roster 1 name=gira id=cadb9a72f3f25d16:4 age=955031.6 body=f48fb1 accent=ffbd59 paid=15 parents=dolt,zori
+I (56259) director: roster 2 name=help id=cadb9a72f3f25d16:5 age=936510.5 body=f48fb1 accent=ffbd59 paid=7 parents=dolt,zori
+I (56270) director: roster 3 name=misa id=cadb9a72f3f25d16:6 age=744318.0 body=f48fb1 accent=ffbd59 paid=7 parents=chip,zori
+I (56281) director: fish count=4 out=0 in=0 offered=0 name=-
+I (56286) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=391 out=0 in=0
+I (57845) director: saved

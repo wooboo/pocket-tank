@@ -1,0 +1,24 @@
+# pocket-tank preflight 2026-11-01_133134_494146 on /dev/cu.usbmodem311101
+E (71730) gdma-link: gdma_new_link_list(97): no mem for link lisI (192781) batlog: 1 samples (h:mm since the first | SoC | VBAT | bright | state | mA since previous)
+I (192781) batlog:     0:00 |  99% | 4140 mV |   0 | asleep | bed
+I (192785) batlog:   (SoC is 1% = 2 mAh; short awake windows are coarse, a night is not)
+I (196827) director: 0 zori   elder age 271.6h size 1.45 hunger 10.0 energy 1.9 stress 0.0 curiosity 10.0 trust 7.1 social 0.051 (born 0.15) bold 0.949 (born 0.80) ms 1f3f  explore at 175,45
+I (196833) director: 1 chip   elder age 271.0h size 1.31 hunger 10.0 energy 1.5 stress 0.0 curiosity 10.0 trust 7.1 social 0.123 (born 0.55) bold 0.948 (born 0.59) ms 1f3f  explore at 208,32
+I (196850) director: 2 dolt   elder age 271.8h size 1.36 hunger 10.0 energy 1.0 stress 0.0 curiosity 10.0 trust 7.5 social 0.928 (born 0.76) bold 0.946 (born 0.25) ms 1f3f  explore at 122,57
+I (196867) director: 3 nori   elder age 200.3h size 1.45 hunger 10.0 energy 2.1 stress 0.0 curiosity 10.0 trust 4.4 social 0.102 (born 0.28) bold 0.949 (born 0.85) ms 1f3f  explore at 212,74
+I (196884) director: low-battery shelter: off
+I (196888) director: pellets 0 | trickle off (AUTO FEED off) | ravenous 1 | night idle 187s | veg 0.54 0.54 0.55 | algae cells 0/644 | courting dolt+zori | arrival -
+I (196902) director: sand dollars 280 (earned 2305) | shop: plant snail castle coral cluster shrimp urchin seahorse | colonies 400 | 10937 cm trimmed
+I (196915) director: urchin at x 284 | ambling | appetite 0.026 | 12066 cm grazed so far (keeps the grass over 0.40)
+I (196926) director: seahorse at 278,245 | A BLADE | 11.17 days with you, 3 hitches, +0.28 trust passed on | 3 pellets snapped (2 paid; next pays in 0 s)
+I (196939) director: snail at 206,348 heading 180 deg | no target, cell -1 at -1,-1 (film 0) | 0 cells on the glass | 5745 grazed so far
+I (196951) director: bed 0 fronds (x from 19, pitch 12): 0.55 0.54 0.55 0.54 0.55 0.54 0.54 0.53 0.55 0.53 0.55 0.56 0.54 0.55 0.53
+I (196962) director: bed 1 fronds (x from 376, pitch 12): 0.54 0.53 0.53 0.54 0.55
+I (196970) director: bed 2 fronds (x from 278, pitch 12): 0.57 0.56 0.53 0.53 0.54 0.56 0.56 0.56
+I (196978) director: bed 3 leaves (x from 201, pitch 14): 0.89 0.86 0.93 0.87
+I (196985) director: plant placed: centre x 222 (the keeper's), depth BEHIND the fish
+I (196993) director: castle placed: centre x 122 (the keeper's), IN FRONT of the grass (the fish swim through)
+I (197003) director: coral placed: centre x 282 (the keeper's), IN FRONT, colour 8a5be0, growth 1.25 of 1.25 (the crown is out)
+I (197014) director: reef cluster placed: centre x 346 (the keeper's), BEHIND, look LAGOON, growth 2.00 of 2 (in full bloom)
+I (197025) director: nursery bed 3 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (197034) director: battery 100% on the cable, full, VBAT 4166 mV | brightness 91/255 (level 60%)

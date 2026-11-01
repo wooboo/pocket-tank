@@ -1,0 +1,13 @@
+/dev/cu.usbmodem311101
+I (202596) director: fish count=4 out=0 in=0 offered=0 name=-
+I (202596) director: friends active=0 page=3 code=481397 peer=0000000000000000 balance=280 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+I (202634) director: saved
+I (203328) advisor: zone 6 hunger 9 energy 8 stress 0 curiosity 7 bold 9 social 1 stage elder trust 7 bored 0 food none friend far 5 bubble far 4 reef mid 2 wall near 10 last seek_food time night -> rest urgency 0 p=0.96  [3734 ms, 11.5 tok/s]
+I (203339) advisor: prof ms: matmul 2652 attn 572 norm/quant 110 rope 30 swiglu 357 decode 0
+
+/dev/cu.usbmodem31201
+I (153811) director: fish count=4 out=0 in=0 offered=0 name=-
+I (153811) director: friends active=0 page=3 code=481397 peer=0000000000000000 balance=391 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+I (153847) director: saved
+I (155303) advisor: zone 2 hunger 9 energy 9 stress 0 curiosity 6 bold 9 social 0 stage elder trust 3 bored 0 food none friend near 5 bubble mid 9 reef far 8 wall near 3 last rest time night -> rest urgency 0 p=0.98  [3810 ms, 11.3 tok/s]
+I (155313) advisor: prof ms: matmul 2667 attn 622 norm/quant 119 rope 31 swiglu 357 decode 0

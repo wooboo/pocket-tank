@@ -1,0 +1,68 @@
+I (9234) update: provisioning over: the page never asked
+I (9234) rtc: system clock set from RTC: 2026-10-24 18:17
+I (9235) model: trailer: model v3m, 7557640 bytes - good
+I (9245) advisor: bench: dot100k 12999 us | batch44 flash 51364 us ram 50864 us | decode flash 7118 us ram 5189 us
+I (9384) advisor: model dim 384 layers 8 vocab 54 seq 64, schema v4, sampled decoding
+I (9390) pocket-tank: model partition 8192 KB mmap'd, advisor LLM
+I (9396) pocket-tank: after the advisor: internal heap 47 KB free
+I (9404) pocket-tank: dirty mask PSRAM
+I (9405) pocket-tank: card cache PSRAM
+I (9409) pocket-tank: swim depth: 209 KB in PSRAM
+I (9415) codec: ES8311 @0x18 powered down (SYS0D f8 -> F8)
+I (9419) codec: ES8311 @0x18 : RESET 1f CLKMGR 00 SYS0D f8 (analog down, vref off, vmid 0) SYS0E 7f DAC 02
+I (9429) audio: 19 of 26 cues, bank 566 KB in flash, volume 1; warm while handled (touch / IMU), down 5 s after
+I (9445) pocket-tank: shelf: MY TANK on the glass (tank 1, place 0), 0 on the shelf, 119 places free
+I (9452) pocket-tank: cold boot: 0.0 h lived through since the save | hunger[0] 4.8 | battery 92% 4198 mV
+I (9456) pocket-tank: the save was written by v3.9.5
+I (9460) pocket-tank: population 4 (cap 5): zori + chip ...
+I (9952) display: stats card: redraw 16.7 ms, blit 5.6 ms per frame
+I (9952) pocket-tank: app_main done: internal heap 41 KB free (largest block 17 KB); the tank task starts once this stack is freed
+I (9959) main_task: Returned from app_main()
+I (10159) pocket-tank: starting the tank task: internal heap 58 KB free (largest block 17 KB)
+I (10159) pocket-tank: tank task up | heap int 30 KB
+I (10161) imu: g=[-603 645 -18071] quarter=0
+I (10437) imu: g=[-579 650 -18043] quarter=0
+I (10695) imu: g=[-593 654 -18070] quarter=0
+I (13865) advisor: zone 3 hunger 4 energy 9 stress 0 curiosity 1 bold 9 social 0 stage elder trust 7 bored 0 food none friend near 11 bubble far 8 reef mid 5 wall mid 2 last explore time day -> visit_bubbles urgency 4 p=0.96  [3698 ms, 11.6 tok/s]
+I (13876) advisor: prof ms: matmul 2590 attn 589 norm/quant 121 rope 31 swiglu 354 decode 0
+I (17638) advisor: zone 2 hunger 9 energy 9 stress 0 curiosity 5 bold 9 social 1 stage elder trust 7 bored 0 food none friend mid 8 bubble far 11 reef far 8 wall mid 2 last explore time day -> explore urgency 4 p=0.84  [3697 ms, 11.6 tok/s]
+I (17648) advisor: prof ms: matmul 2592 attn 590 norm/quant 117 rope 30 swiglu 354 decode 0
+I (20318) display: fb mid 0x2501 corner 0x0000 | scene mid 0x2501 ep 1 | night 0 prefetch 0
+I (20318) display: 11.5 fps | render 67.6 ms flush 16.3 ms | scene 6.6 shafts 0.0 veg 35.7 fd/bub 9.6 fish 0.0 vig 2.3 algae 4.0 | card 0.0 ms x0 | veg 0.54 0.53 0.55
+I (20330) display: swim depth: 1.19 ms a frame (0.19 ms a hidden fish, 6.2 of them a frame)
+I (20338) display: frame 86.8 ms = polls 1.1 + tick 1.9 + prefetch wait 0.0 + render 67.6 + flush 16.3 + tail 0.0 + sleep 0.5 | flush: fill 14.4, wire wait 0.0, send calls 1.9
+I (20353) display: the fish stage split: fish 3.6 | snail+urchin 3.9 | front pieces back 1.3 | front grass 0.0 | front overlays 3.1 | front lanes 0.0 | arch shade 0.6 ms
+I (20368) pocket-tank: t=100s 4 fish goals: visit_bubbles explore explore explore | asks 6 decisions 2 last 3697 ms 11.6 tok/s | starve-ignored 0 | heap int 20 KB psram 4244 KB | battery 93% 4199 mV bright 153
+I (21408) advisor: zone 4 hunger 9 energy 9 stress 0 curiosity 4 bold 9 social 8 stage elder trust 7 bored 0 food none friend mid 8 bubble near 7 reef far 8 wall mid 2 last explore time day -> visit_bubbles urgency 4 p=0.24  [3689 ms, 11.7 tok/s]
+I (21419) advisor: prof ms: matmul 2585 attn 591 norm/quant 114 rope 31 swiglu 354 decode 0
+I (24694) director: fish count=4 out=0 in=0 offered=0 name=-
+I (24694) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0
+I (25159) advisor: zone 5 hunger 9 energy 9 stress 0 curiosity 3 bold 9 social 1 stage elder trust 4 bored 1 food none friend near 7 bubble mid 6 reef mid 1 wall mid 2 last explore time day -> explore urgency 4 p=0.75  [3705 ms, 11.6 tok/s]
+I (25170) advisor: prof ms: matmul 2590 attn 593 norm/quant 123 rope 32 swiglu 353 decode 0
+I (25172) codec: ES8311 up (SYS0D 03 DAC 00)
+I (25419) audio: up in 255 ms
+I (26726) friends: [DEBUG-ble] internal=19747 largest=11776
+I (26726) BLE_INIT: BT controller compile version [1bb2f50]
+I (26727) BLE_INIT: Using main XTAL as clock source
+I (26731) BLE_INIT: Feature Config, ADV:1, BLE_50:1, DTM:1, SCAN:1, CCA:0, SMP:1, CONNECT:1
+E (26739) BLE_INIT: Malloc failed
+E (26741) BLE_INIT: esp_bt_controller_init -4
+
+E (26746) BLE_INIT: controller init failed
+
+E (26750) friends: [DEBUG-ble] init=ESP_ERR_NO_MEM (0x101) internal=19571 largest=11264
+W (26758) friends: BLUETOOTH COULD NOT START
+I (26761) director: fish count=4 out=0 in=0 offered=0 name=-
+I (26767) director: friends active=1 page=4 code=000000 peer=0000000000000000 balance=280 out=0 in=0 BLUETOOTH COULD NOT START
+I (28818) director: fish count=4 out=0 in=0 offered=0 name=-
+I (28818) director: friends active=1 page=4 code=000000 peer=0000000000000000 balance=280 out=0 in=0 BLUETOOTH COULD NOT START
+I (29122) advisor: zone 6 hunger 9 energy 9 stress 0 curiosity 5 bold 9 social 1 stage elder trust 7 bored 0 food none friend near 2 bubble far 4 reef mid 12 wall mid 9 last explore time night -> rest urgency 0 p=0.97  [3612 ms, 11.9 tok/s]
+I (29133) advisor: prof ms: matmul 2523 attn 573 norm/quant 120 rope 28 swiglu 354 decode 0
+I (30420) display: fb mid 0x2501 corner 0x0000 | scene mid 0x2501 ep 3 | night 0 prefetch 0
+I (30420) display: 9.2 fps | render 86.8 ms flush 16.7 ms | scene 7.2 shafts 0.0 veg 36.3 fd/bub 10.7 fish 0.0 vig 2.9 algae 4.1 | card 0.0 ms x0 | veg 0.54 0.53 0.55
+I (30432) display: swim depth: 1.79 ms a frame (0.29 ms a hidden fish, 6.2 of them a frame)
+I (30440) display: frame 108.2 ms = polls 1.8 + tick 2.0 + prefetch wait 0.0 + render 86.8 + flush 16.7 + tail 0.8 + sleep 0.5 | flush: fill 14.9, wire wait 0.0, send calls 1.8
+I (30455) display: the fish stage split: fish 4.1 | snail+urchin 4.1 | front pieces back 1.4 | front grass 0.0 | front overlays 3.1 | front lanes 0.0 | arch shade 0.6 ms
+I (30470) pocket-tank: t=110s 4 fish goals: visit_bubbles rest visit_bubbles explore | asks 14 decisions 5 last 3612 ms 11.9 tok/s | starve-ignored 0 | heap int 20 KB psram 4244 KB | battery 93% 4199 mV bright 153
+I (30884) director: fish count=4 out=0 in=0 offered=0 name=-
+I

@@ -1,0 +1,249 @@
+E (32320) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (32321) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (32606) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (32607) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (32888) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (32888) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (33174) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (33174) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (33455) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (33456) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (33740) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (33740) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (34023) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (34024) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (34309) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (34310) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (34595) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (34595) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (34880) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (34881) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (35168) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (35168) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (35455) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (35455) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (35739) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (35739) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (36022) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (36023) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (36308) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (36308) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (36595) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (36596) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (36880) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (36880) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (37166) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (37166) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (37453) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (37453) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (37741) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (37741) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (38028) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (38028) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (38316) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (38316) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (38605) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (38606) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (38894) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (38894) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (39184) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (39184) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (39474) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (39475) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (39764) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (39764) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (40053) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (40054) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (40380) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (40381) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+I (40393) display: fb mid 0xe329 corner 0x0000 | scene mid 0x8200 ep 2 | night 1 prefetch 0
+I (40394) display: 13.9 fps | render 55.9 ms flush 12.5 ms | scene 4.8 shafts 0.0 veg 25.6 fd/bub 6.6 fish 0.0 vig 4.3 algae 3.4 | card 0.0 ms x0 | veg 0.54 0.53 0.55
+I (40405) display: swim depth: 2.94 ms a frame (0.79 ms a hidden fish, 3.7 of them a frame)
+I (40414) display: frame 72.1 ms = polls 1.0 + tick 1.7 + prefetch wait 0.0 + render 55.9 + flush 12.5 + tail 0.5 + sleep 0.5 | flush: fill 10.4, wire wait 0.0, send calls 2.1
+I (40429) display: the fish stage split: fish 4.8 | snail+urchin 1.9 | front pieces back 1.2 | front grass 0.0 | front overlays 2.3 | front lanes 0.0 | arch shade 0.3 ms
+I (40444) pocket-tank: t=101s 4 fish goals: explore explore explore explore | asks 10 decisions 0 last 0 ms 0.0 tok/s | starve-ignored 0 | heap int 7 KB psram 4228 KB | battery 97% 4198 mV bright 91
+E (40740) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (40740) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (41032) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (41032) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (41324) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (41324) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (41615) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (41616) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (41908) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (41908) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (42199) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (42200) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (42492) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (42493) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (42783) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (42784) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (43076) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (43076) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (43367) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (43368) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (43660) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (43661) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (43951) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (43951) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+I (44187) director: fish count=4 out=0 in=0 offered=0 name=-
+I (44188) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0
+E (44247) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (44247) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (44537) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (44537) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (44826) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (44826) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (45117) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (45117) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (45406) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (45407) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+E (45698) gdma-link: gdma_new_link_list(97): no mem for link list items
+E (45698) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+I (45713) friends: starting Bluetooth: internal=55303 largest=49152
+I (45713) BLE_INIT: BT controller compile version [1bb2f50]
+I (45713) BLE_INIT: Using main XTAL as clock source
+I (45718) BLE_INIT: Feature Config, ADV:1, BLE_50:1, DTM:1, SCAN:1, CCA:0, SMP:1, CONNECT:1
+I (45726) BLE_INIT: Bluetooth MAC: 90:70:69:fe:4e:c6
+I (45731) phy_init: phy_version 711,97bcf0a2,Aug 25 2025,19:04:10
+I (45771) NimBLE: GAP procedure initiated: stop advertising.
+
+I (45772) friends: pair window open; free internal heap 16767
+I (45772) director: fish count=4 out=0 in=0 offered=0 name=-
+I (45776) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+I (45788) NimBLE: GAP procedure initiated: advertise;
+I (45793) NimBLE: disc_mode=2
+I (45795) NimBLE:  adv_channel_map=0 own_addr_type=0 adv_filter_policy=0 adv_itvl_min=0 adv_itvl_max=0
+I (45804) NimBLE:
+
+I (45807) NimBLE: GAP procedure initiated: discovery;
+I (45811) NimBLE: own_addr_type=0 filter_policy=0 passive=1 limited=0 filter_duplicates=1
+I (45819) NimBLE: duration=forever
+I (45822) NimBLE:
+
+I (45833) codec: ES8311 up (SYS0D 03 DAC 00)
+I (46080) audio: up in 255 ms
+I (47363) director: fish count=4 out=0 in=0 offered=0 name=-
+I (47363) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+I (48872) NimBLE: GAP procedure initiated: stop advertising.
+
+I (48874) friends: Bluetooth stopped; free internal heap 52903
+I (48875) director: fish count=4 out=0 in=0 offered=0 name=-
+I (48877) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+I (50385) display: fb mid 0x8200 corner 0x0000 | scene mid 0x8200 ep 4 | night 1 prefetch 0
+I (50386) display: 11.8 fps | render 67.3 ms flush 12.5 ms | scene 6.7 shafts 0.0 veg 25.3 fd/bub 7.4 fish 0.0 vig 4.1 algae 3.4 | card 0.0 ms x0 | veg 0.54 0.53 0.55
+I (50397) display: swim depth: 3.25 ms a frame (0.68 ms a hidden fish, 4.7 of them a frame)
+I (50405) display: frame 84.8 ms = polls 2.2 + tick 1.5 + prefetch wait 0.0 + render 67.3 + flush 12.5 + tail 0.6 + sleep 0.5 | flush: fill 10.5, wire wait 0.0, send calls 1.9
+I (50421) display: the fish stage split: fish 5.0 | snail+urchin 2.2 | front pieces back 1.2 | front grass 0.0 | front overlays 2.3 | front lanes 0.0 | arch shade 0.5 ms
+I (50435) pocket-tank: t=111s 4 fish goals: explore explore explore explore | asks 21 decisions 0 last 0 ms 0.0 tok/s | starve-ignored 0 | heap int 21 KB psram 4228 KB | battery 97% 4199 mV bright 91
+I (50455) friends: starting Bluetooth: internal=52879 largest=30720
+I (50459) BLE_INIT: BT controller compile version [1bb2f50]
+I (50464) BLE_INIT: Using main XTAL as clock source
+I (50469) BLE_INIT: Feature Config, ADV:1, BLE_50:1, DTM:1, SCAN:1, CCA:0, SMP:1, CONNECT:1
+I (50477) BLE_INIT: Bluetooth MAC: 90:70:69:fe:4e:c6
+I (50486) NimBLE: GAP procedure initiated: stop advertising.
+
+I (50488) friends: pair window open; free internal heap 14543
+I (50493) director: fish count=4 out=0 in=0 offered=0 name=-
+I (50498) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+I (50510) NimBLE: GAP procedure initiated: advertise;
+I (50514) NimBLE: disc_mode=2
+I (50517) NimBLE:  adv_channel_map=0 own_addr_type=0 adv_filter_policy=0 adv_itvl_min=0 adv_itvl_max=0
+I (50526) NimBLE:
+
+I (50528) NimBLE: GAP procedure initiated: discovery;
+I (50533) NimBLE: own_addr_type=0 filter_policy=0 passive=1 limited=0 filter_duplicates=1
+I (50541) NimBLE: duration=forever
+I (50544) NimBLE:
+
+I (51961) director: fish count=4 out=0 in=0 offered=0 name=-
+I (51961) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+I (53459) NimBLE: GAP procedure initiated: stop advertising.
+
+I (53462) friends: Bluetooth stopped; free internal heap 52883
+W (53462) friends: no controller reserve: internal=52883 largest=21504
+I (53465) director: fish count=4 out=0 in=0 offered=0 name=-
+I (53471) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+I (55021) friends: starting Bluetooth: internal=52879 largest=31744
+I (55021) BLE_INIT: BT controller compile version [1bb2f50]
+I (55021) BLE_INIT: Using main XTAL as clock source
+I (55026) BLE_INIT: Feature Config, ADV:1, BLE_50:1, DTM:1, SCAN:1, CCA:0, SMP:1, CONNECT:1
+I (55034) BLE_INIT: Bluetooth MAC: 90:70:69:fe:4e:c6
+I (55043) NimBLE: GAP procedure initiated: stop advertising.
+
+I (55045) friends: pair window open; free internal heap 14539
+I (55050) director: fish count=4 out=0 in=0 offered=0 name=-
+I (55055) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+I (55067) NimBLE: GAP procedure initiated: advertise;
+I (55071) NimBLE: disc_mode=2
+I (55074) NimBLE:  adv_channel_map=0 own_addr_type=0 adv_filter_policy=0 adv_itvl_min=0 adv_itvl_max=0
+I (55083) NimBLE:
+
+I (55085) NimBLE: GAP procedure initiated: discovery;
+I (55089) NimBLE: own_addr_type=0 filter_policy=0 passive=1 limited=0 filter_duplicates=1
+I (55098) NimBLE: duration=forever
+I (55101) NimBLE:
+
+I (56508) director: fish count=4 out=0 in=0 offered=0 name=-
+I (56509) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+I (58098) NimBLE: GAP procedure initiated: stop advertising.
+
+I (58101) friends: Bluetooth stopped; free internal heap 52879
+I (58101) director: fish count=4 out=0 in=0 offered=0 name=-
+I (58103) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+I (59576) friends: starting Bluetooth: internal=52879 largest=30720
+I (59576) BLE_INIT: BT controller compile version [1bb2f50]
+I (59576) BLE_INIT: Using main XTAL as clock source
+I (59581) BLE_INIT: Feature Config, ADV:1, BLE_50:1, DTM:1, SCAN:1, CCA:0, SMP:1, CONNECT:1
+I (59589) BLE_INIT: Bluetooth MAC: 90:70:69:fe:4e:c6
+I (59598) NimBLE: GAP procedure initiated: stop advertising.
+
+I (59600) friends: pair window open; free internal heap 14543
+I (59605) director: fish count=4 out=0 in=0 offered=0 name=-
+I (59610) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+I (59622) NimBLE: GAP procedure initiated: advertise;
+I (59626) NimBLE: disc_mode=2
+I (59629) NimBLE:  adv_channel_map=0 own_addr_type=0 adv_filter_policy=0 adv_itvl_min=0 adv_itvl_max=0
+I (59638) NimBLE:
+
+I (59640) NimBLE: GAP procedure initiated: discovery;
+I (59645) NimBLE: own_addr_type=0 filter_policy=0 passive=1 limited=0 filter_duplicates=1
+I (59653) NimBLE: duration=forever
+I (59656) NimBLE:
+
+I (60530) display: fb mid 0x2501 corner 0x0000 | scene mid 0x2501 ep 9 | night 0 prefetch 0
+I (60531) display: 9.8 fps | render 82.8 ms flush 12.6 ms | scene 10.5 shafts 0.0 veg 24.9 fd/bub 8.6 fish 0.0 vig 2.2 algae 3.3 | card 0.0 ms x0 | veg 0.54 0.53 0.55
+I (60542) display: swim depth: 2.29 ms a frame (0.57 ms a hidden fish, 4.0 of them a frame)
+I (60551) display: frame 102.1 ms = polls 4.1 + tick 1.6 + prefetch wait 0.0 + render 82.8 + flush 12.6 + tail 0.7 + sleep 0.5 | flush: fill 10.8, wire wait 0.0, send calls 1.8
+I (60566) display: the fish stage split: fish 3.9 | snail+urchin 2.7 | front pieces back 1.0 | front grass 0.0 | front overlays 2.3 | front lanes 0.0 | arch shade 0.3 ms
+I (60581) pocket-tank: t=121s 4 fish goals: explore explore explore explore | asks 39 decisions 0 last 0 ms 0.0 tok/s | starve-ignored 0 | heap int 14 KB psram 4200 KB | battery 97% 4199 mV bright 153
+I (61228) director: fish count=4 out=0 in=0 offered=0 name=-
+I (61228) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+I (62814) NimBLE: GAP procedure initiated: stop advertising.
+
+I (62816) friends: Bluetooth stopped; free internal heap 52883
+W (62817) friends: no controller reserve: internal=52883 largest=21504
+I (62820) director: fish count=4 out=0 in=0 offered=0 name=-
+I (62826) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+I (64253) director: 0 zori   elder age 271.5h size 1.45 hunger 8.5 energy 8.4 stress 0.0 curiosity 10.0 trust 7.1 social 0.051 (born 0.15) bold 0.949 (born 0.80) ms 1f3f  explore at 175,86
+I (64259) director: 1 chip   elder age 270.9h size 1.31 hunger 3.8 energy 8.1 stress 0.0 curiosity 10.0 trust 7.1 social 0.123 (born 0.55) bold 0.949 (born 0.59) ms 1f3f  explore at 218,84
+I (64276) director: 2 dolt   elder age 271.7h size 1.36 hunger 10.0 energy 7.9 stress 0.0 curiosity 10.0 trust 7.5 social 0.928 (born 0.76) bold 0.947 (born 0.25) ms 1f3f  explore at 168,130
+I (64292) director: 3 nori   elder age 200.2h size 1.45 hunger 10.0 energy 8.4 stress 0.0 curiosity 10.0 trust 4.4 social 0.102 (born 0.28) bold 0.950 (born 0.85) ms 1f3f  explore at 148,275
+I (64309) director: low-battery shelter: off
+I (64313) director: pellets 0 | trickle off (AUTO FEED off) | ravenous 0 | night idle 54s | veg 0.54 0.53 0.55 | algae cells 23/644 | courting dolt+zori | arrival -
+I (64328) director: sand dollars 280 (earned 2305) | shop: plant snail castle coral cluster shrimp urchin seahorse | colonies 400 | 10937 cm trimmed
+I (64341) director: urchin at x 218 | ambling | appetite 0.007 | 12063 cm grazed so far (keeps the grass over 0.40)
+I (64351) director: seahorse at 278,245 | A BLADE | 11.17 days with you, 3 hitches, +0.28 trust passed on | 3 pellets snapped (2 paid; next pays in 0 s)
+I (64364) director: snail at 175,338 heading 0 deg | after cell 630 at 232,360 (film 180) | 23 cells on the glass | 5722 grazed so far
+I (64376) director: bed 0 fronds (x from 19, pitch 12): 0.55 0.54 0.55 0.54 0.54 0.54 0.53 0.52 0.55 0.53 0.55 0.56 0.54 0.55 0.53
+I (64387) director: bed 1 fronds (x from 376, pitch 12): 0.53 0.53 0.53 0.54 0.54
+I (64395) director: bed 2 fronds (x from 278, pitch 12): 0.56 0.55 0.53 0.53 0.54 0.56 0.56 0.56
+I (64403) director: bed 3 leaves (x from 201, pitch 14): 0.89 0.86 0.93 0.87
+I (64410) director: plant placed: centre x 222 (the keeper's), depth BEHIND the fish
+I (64417) director: castle placed: centre x 122 (the keeper's), IN FRONT of the grass (the fish swim through)
+I (64427) director: coral placed: centre x 282 (the keeper's), IN FRONT, colour 8a5be0, growth 1.25 of 1.25 (the crown is out)
+I (64438) director: reef cluster placed: centre x 346 (the keeper's), BEHIND, look LAGOON, growth 2.00 of 2 (in full bloom)
+I (64449) director: nursery bed 3 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (64458) director: battery 97% charging, VBAT 4199 mV | brightness 91/255 (level 60%)
+I (64465) pocket-tank: battery page: 97% CHARGING | since the cable moved 18M (at 85%), screen on - | full in 5M | a full charge ~140 min (drain 42.6 %/h, charge 77.3 %/h)
+I (65787) director: saved

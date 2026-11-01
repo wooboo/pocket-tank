@@ -1,0 +1,365 @@
+COMMAND 0: friends close
+COMMAND 0: setup off
+COMMAND 1: friends close
+COMMAND 1: setup off
+0: E (51749) async_mcp.gdma: mcp_gdma_memcpy(399): failed to createE (137807) gdma-link: gdma_new_link_list(97): no mem for link list items
+1: E (85268) gdma-link: gdma_new_link_list(97): no mem for link lisE (89049) gdma-link: gdma_new_link_list(97): no mem for link list items
+1: E (89049) async_mcp.gdma: mcp_gdma_memcpy(399): failed to create RX link list
+1: I (89064) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (89064) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=391 out=0 in=0
+1: I (89067) director: setup panel dropped
+0: E (137808) async_mcp.gdma: mcp_gdma_memcpy(399): failed to create RX link list
+0: I (137821) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (137822) director: friends active=0 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0
+0: I (137825) director: setup panel dropped
+1: E (89133) gdma-link: gdma_new_link_list(97): no mem for link list items
+1: E (89134) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+0: E (137884) gdma-link: gdma_new_link_list(97): no mem for link list items
+0: E (137884) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+1: E (89326) gdma-link: gdma_new_link_list(97): no mem for link list items
+1: E (89326) async_mcp.gdma: mcp_gdma_memcpy(399): failed to create RX link list
+0: E (138089) gdma-link: gdma_new_link_list(97): no mem for link list items
+0: E (138090) async_mcp.gdma: mcp_gdma_memcpy(399): failed to create RX link list
+1: E (89400) gdma-link: gdma_new_link_list(97): no mem for link list items
+1: E (89400) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+0: E (138158) gdma-link: gdma_new_link_list(97): no mem for link list items
+0: E (138159) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+1: E (89595) gdma-link: gdma_new_link_list(97): no mem for link list items
+1: E (89595) async_mcp.gdma: mcp_gdma_memcpy(399): failed to create RX link list
+0: E (138363) gdma-link: gdma_new_link_list(97): no mem for link list items
+0: E (138363) async_mcp.gdma: mcp_gdma_memcpy(399): failed to create RX link list
+1: E (89668) gdma-link: gdma_new_link_list(97): no mem for link list items
+1: E (89669) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+0: E (138433) gdma-link: gdma_new_link_list(97): no mem for link list items
+0: E (138433) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+1: E (89862) gdma-link: gdma_new_link_list(97): no mem for link list items
+1: E (89863) async_mcp.gdma: mcp_gdma_memcpy(399): failed to create RX link list
+1: E (89936) gdma-link: gdma_new_link_list(97): no mem for link list items
+1: E (89936) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+0: E (138721) gdma-link: gdma_new_link_list(97): no mem for link list items
+0: E (138721) async_mcp.gdma: mcp_gdma_memcpy(399): failed to create RX link list
+COMMAND 0: friends open
+COMMAND 1: friends open
+COMMAND 0: friends
+COMMAND 1: friends
+0: E (138821) gdma-link: gdma_new_link_list(97): no mem for link list items
+0: E (138822) async_mcp.gdma: mcp_gdma_memcpy(359): failed to create TX link list
+0: I (138837) friends: starting Bluetooth: internal=55915 largest=49152
+0: I (138837) BLE_INIT: BT controller compile version [1bb2f50]
+1: I (90085) friends: starting Bluetooth: internal=55915 largest=49152
+1: I (90085) BLE_INIT: BT controller compile version [1bb2f50]
+1: I (90085) BLE_INIT: Using main XTAL as clock source
+1: I (90090) BLE_INIT: Feature Config, ADV:1, BLE_50:1, DTM:1, SCAN:1, CCA:0, SMP:1, CONNECT:1
+1: I (90098) BLE_INIT: Bluetooth MAC: 90:70:69:fe:4c:fa
+1: I (90103) phy_init: phy_version 711,97bcf0a2,Aug 25 2025,19:04:10
+0: I (138838) BLE_INIT: Using main XTAL as clock source
+0: I (138842) BLE_INIT: Feature Config, ADV:1, BLE_50:1, DTM:1, SCAN:1, CCA:0, SMP:1, CONNECT:1
+0: I (138851) BLE_INIT: Bluetooth MAC: 90:70:69:fe:4e:c6
+0: I (138856) phy_init: phy_version 711,97bcf0a2,Aug 25 2025,19:04:10
+1: I (90146) NimBLE: GAP procedure initiated: stop advertising.
+1:
+1: I (90147) friends: pair window open; free internal heap 17379
+1: I (90147) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (90151) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=391 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+0: I (138898) NimBLE: GAP procedure initiated: stop advertising.
+0:
+0: I (138900) friends: pair window open; free internal heap 17387
+0: I (138900) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (138904) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+0: I (138916) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (90163) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (90168) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=391 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+1: I (90180) NimBLE: GAP procedure initiated: advertise;
+1: I (90184) NimBLE: disc_mode=2
+1: I (90187) NimBLE:  adv_channel_map=0 own_addr_type=0 adv_filter_policy=0 adv_itvl_min=0 adv_itvl_max=0
+1: I (90196) NimBLE:
+1:
+1: I (90198) NimBLE: GAP procedure initiated: discovery;
+0: I (138921) director: friends active=1 page=0 code=000000 peer=0000000000000000 balance=280 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+0: I (138933) NimBLE: GAP procedure initiated: advertise;
+0: I (138938) NimBLE: disc_mode=2
+0: I (138940) NimBLE:  adv_channel_map=0 own_addr_type=0 adv_filter_policy=0 adv_itvl_min=0 adv_itvl_max=0
+0: I (138949) NimBLE:
+0:
+0: I (138952) NimBLE: GAP procedure initiated: discovery;
+0: I (138956) NimBLE: own_addr_type=0 filter_policy=0 passive=1 limited=0 filter_duplicates=1
+0: I (138964) NimBLE: duration=forever
+0: I (138968) NimBLE:
+0:
+1: I (90203) NimBLE: own_addr_type=0 filter_policy=0 passive=1 limited=0 filter_duplicates=1
+1: I (90211) NimBLE: duration=forever
+1: I (90214) NimBLE:
+1:
+1: I (90225) codec: ES8311 up (SYS0D 03 DAC 00)
+0: I (139000) codec: ES8311 up (SYS0D 03 DAC 00)
+1: I (90472) audio: up in 255 ms
+0: I (139237) audio: up in 266 ms
+0: I (139322) NimBLE: GAP procedure initiated: stop advertising.
+0:
+0: I (139323) NimBLE: GAP procedure initiated: connect;
+0: I (139323) NimBLE: peer_addr_type=0 peer_addr=
+0: I (139326) NimBLE: 90:70:69:fe:4c:fa
+0: I (139329) NimBLE:  scan_itvl=16 scan_window=16 itvl_min=24 itvl_max=40 latency=0 supervision_timeout=256 min_ce_len=0 max_ce_len=0 own_addr_type=0
+0: I (139342) NimBLE:
+0:
+1: I (90651) display: fb mid 0x2501 corner 0x0000 | scene mid 0x2501 ep 3 | night 0 prefetch 0
+1: I (90652) display: 14.2 fps | render 52.6 ms flush 13.1 ms | scene 8.9 shafts 0.0 veg 23.5 fd/bub 7.0 fish 0.0 vig 3.6 algae 0.1 | card 0.0 ms x0 | veg 0.54 0.54 0.55
+1: I (90664) display: swim depth: 1.24 ms a frame (0.19 ms a hidden fish, 6.5 of them a frame)
+1: I (90672) display: frame 70.3 ms = polls 2.1 + tick 1.9 + prefetch wait 0.0 + render 52.6 + flush 13.1 + tail 0.5 + sleep 0.5 | flush: fill 10.6, wire wait 0.0, send calls 2.4
+1: I (90687) display: the fish stage split: fish 2.8 | snail+urchin 1.9 | front pieces back 0.4 | front grass 1.5 | front overlays 1.8 | front lanes 0.0 | arch shade 0.0 ms
+1: I (90702) pocket-tank: t=289s 4 fish goals: follow_friend rest rest rest | asks 18 decisions 14 last 3689 ms 11.7 tok/s | starve-ignored 0 | heap int 13 KB psram 4184 KB | battery 100% 4173 mV bright 153
+1: I (90723) NimBLE: GAP procedure initiated: stop advertising.
+1:
+0: I (139483) NimBLE: GAP procedure initiated: stop advertising.
+0:
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (139860) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (139860) director: friends active=1 page=2 code=000000 peer=0000000000000000 balance=280 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (91199) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (91199) director: friends active=1 page=2 code=000000 peer=0000000000000000 balance=391 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (91461) friends: compare code 899169
+0: I (140241) friends: compare code 899169
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (140903) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (140903) director: friends active=1 page=1 code=899169 peer=0000000000000000 balance=280 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (92232) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (141039) display: fb mid 0x2501 corner 0x0000 | scene mid 0x2501 ep 3 | night 0 prefetch 0
+0: I (141039) display: 10.7 fps | render 72.9 ms flush 14.1 ms | scene 10.0 shafts 0.0 veg 32.0 fd/bub 8.9 fish 0.0 vig 3.3 algae 1.5 | card 0.0 ms x0 | veg 0.54 0.54 0.55
+0: I (141051) display: swim depth: 1.17 ms a frame (0.26 ms a hidden fish, 4.5 of them a frame)
+0: I (141059) display: frame 93.1 ms = polls 2.7 + tick 2.8 + prefetch wait 0.0 + render 72.9 + flush 14.1 + tail 0.6 + sleep 0.5 | flush: fill 11.9, wire wait 0.0, send calls 2.2
+0: I (141075) display: the fish stage split: fish 2.9 | snail+urchin 4.0 | front pieces back 0.9 | front grass 0.0 | front overlays 2.6 | front lanes 0.0 | arch shade 0.4 ms
+0: I (141090) pocket-tank: t=290s 4 fish goals: rest rest rest rest | asks 25 decisions 20 last 3653 ms 11.8 tok/s | starve-ignored 0 | heap int 13 KB psram 4184 KB | battery 100% 4162 mV bright 153
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (92232) director: friends active=1 page=1 code=899169 peer=0000000000000000 balance=391 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (93261) director: fish count=4 out=0 in=0 offered=0 name=-
+COMMAND 0: friends confirm
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (141994) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (141994) director: friends active=1 page=1 code=899169 peer=0000000000000000 balance=280 out=0 in=0 CONNECTING TO NEARBY TANK
+0: I (142002) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (142005) director: friends active=1 page=2 code=899169 peer=0000000000000000 balance=280 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (142016) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (142022) director: friends active=1 page=2 code=899169 peer=0000000000000000 balance=280 out=0 in=0 WAITING FOR YOUR FRIEND
+COMMAND 1: friends close
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (142033) advisor: zone 2 hunger 9 energy 9 stress 0 curiosity 7 bold 9 social 1 stage elder trust 4 bored 0 food none friend near 3 bubble mid 11 reef far 8 wall mid 4 last rest time night -> rest urgency 0 p=0.98  [3584 ms, 12.0 tok/s]
+0: I (142054) advisor: prof ms: matmul 2522 attn 582 norm/quant 103 rope 29 swiglu 334 decode 0
+0: I (142141) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (142141) director: friends active=1 page=2 code=899169 peer=0000000000000000 balance=280 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (93261) director: friends active=1 page=1 code=899169 peer=0000000000000000 balance=391 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (93430) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (93430) director: friends active=1 page=1 code=899169 peer=0000000000000000 balance=391 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (93436) NimBLE: GAP procedure initiated: stop advertising.
+1:
+1: I (93442) NimBLE: GAP procedure initiated: terminate connection; conn_handle=1 hci_reason=19
+1:
+1: I (93474) friends: Bluetooth stopped; free internal heap 47527
+1: I (93475) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (93475) director: friends active=0 page=1 code=899169 peer=0000000000000000 balance=391 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (93486) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (142279) NimBLE: GAP procedure initiated: stop advertising.
+0:
+0: I (142282) friends: Bluetooth stopped; free internal heap 47523
+0: W (142283) friends: PAIRING DECLINED OR FAILED
+1: I (93491) director: friends active=0 page=1 code=899169 peer=0000000000000000 balance=391 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (93737) advisor: zone 3 hunger 9 energy 9 stress 0 curiosity 8 bold 9 social 2 stage elder trust 7 bored 0 food none friend near 2 bubble mid 10 reef far 9 wall near 3 last rest time day -> explore urgency 4 p=0.90  [3519 ms, 12.2 tok/s]
+1: I (93747) advisor: prof ms: matmul 2480 attn 526 norm/quant 117 rope 27 swiglu 355 decode 0
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (143057) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (143057) director: friends active=1 page=4 code=899169 peer=0000000000000000 balance=280 out=0 in=0 PAIRING DECLINED OR FAILED
+1: I (94355) director: fish count=4 out=0 in=0 offered=0 name=-
+COMMAND 0: friends close
+COMMAND 1: friends close
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (94355) director: friends active=0 page=1 code=899169 peer=0000000000000000 balance=391 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (94458) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (143193) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (143193) director: friends active=0 page=4 code=899169 peer=0000000000000000 balance=280 out=0 in=0 PAIRING DECLINED OR FAILED
+0: I (143199) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (143204) director: friends active=0 page=4 code=899169 peer=0000000000000000 balance=280 out=0 in=0 PAIRING DECLINED OR FAILED
+1: I (94458) director: friends active=0 page=1 code=899169 peer=0000000000000000 balance=391 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (94464) director: fish count=4 out=0 in=0 offered=0 name=-
+COMMAND 0: friends open
+COMMAND 1: friends open
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (94469) director: friends active=0 page=1 code=899169 peer=0000000000000000 balance=391 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (94570) friends: starting Bluetooth: internal=51975 largest=30720
+1: I (94570) BLE_INIT: BT controller compile version [1bb2f50]
+1: I (94571) BLE_INIT: Using main XTAL as clock source
+1: I (94575) BLE_INIT: Feature Config, ADV:1, BLE_50:1, DTM:1, SCAN:1, CCA:0, SMP:1, CONNECT:1
+1: I (94584) BLE_INIT: Bluetooth MAC: 90:70:69:fe:4c:fa
+1: I (94593) NimBLE: GAP procedure initiated: stop advertising.
+1:
+1: I (94594) friends: pair window open; free internal heap 13623
+1: I (94599) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (94604) director: friends active=1 page=0 code=899169 peer=0000000000000000 balance=391 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+1: I (94616) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (94621) director: friends active=1 page=0 code=899169 peer=0000000000000000 balance=391 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+1: I (94633) NimBLE: GAP procedure initiated: advertise;
+1: I (94637) NimBLE: disc_mode=2
+1: I (94640) NimBLE:  adv_channel_map=0 own_addr_type=0 adv_filter_policy=0 adv_itvl_min=0 adv_itvl_max=0
+1: I (94649) NimBLE:
+1:
+1: I (94651) NimBLE: GAP procedure initiated: discovery;
+1: I (94655) NimBLE: own_addr_type=0 filter_policy=0 passive=1 limited=0 filter_duplicates=1
+1: I (94664) NimBLE: duration=forever
+1: I (94667) NimBLE:
+1:
+0: I (143571) friends: starting Bluetooth: internal=51979 largest=30720
+0: I (143572) BLE_INIT: BT controller compile version [1bb2f50]
+0: I (143572) BLE_INIT: Using main XTAL as clock source
+0: I (143577) BLE_INIT: Feature Config, ADV:1, BLE_50:1, DTM:1, SCAN:1, CCA:0, SMP:1, CONNECT:1
+0: I (143585) BLE_INIT: Bluetooth MAC: 90:70:69:fe:4e:c6
+0: I (143595) NimBLE: GAP procedure initiated: stop advertising.
+0:
+0: I (143596) friends: pair window open; free internal heap 13611
+0: I (143601) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (143606) director: friends active=1 page=0 code=899169 peer=0000000000000000 balance=280 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+0: I (143617) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (143623) director: friends active=1 page=0 code=899169 peer=0000000000000000 balance=280 out=0 in=0 HOLD BOOT ON THE OTHER TANK
+0: I (143635) NimBLE: GAP procedure initiated: advertise;
+0: I (143639) NimBLE: disc_mode=2
+0: I (143642) NimBLE:  adv_channel_map=0 own_addr_type=0 adv_filter_policy=0 adv_itvl_min=0 adv_itvl_max=0
+0: I (143651) NimBLE:
+0:
+0: I (143654) NimBLE: GAP procedure initiated: discovery;
+0: I (143658) NimBLE: own_addr_type=0 filter_policy=0 passive=1 limited=0 filter_duplicates=1
+0: I (143666) NimBLE: duration=forever
+0: I (143669) NimBLE:
+0:
+0: I (143989) NimBLE: GAP procedure initiated: stop advertising.
+0:
+0: I (143990) NimBLE: GAP procedure initiated: connect;
+0: I (143990) NimBLE: peer_addr_type=0 peer_addr=
+0: I (143993) NimBLE: 90:70:69:fe:4c:fa
+0: I (143996) NimBLE:  scan_itvl=16 scan_window=16 itvl_min=24 itvl_max=40 latency=0 supervision_timeout=256 min_ce_len=0 max_ce_len=0 own_addr_type=0
+0: I (144009) NimBLE:
+0:
+0: I (144147) NimBLE: GAP procedure initiated: stop advertising.
+0:
+1: I (95519) NimBLE: GAP procedure initiated: stop advertising.
+1:
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (95651) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (144393) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (144393) director: friends active=1 page=2 code=899169 peer=0000000000000000 balance=280 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (95651) director: friends active=1 page=2 code=899169 peer=0000000000000000 balance=391 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (96133) friends: compare code 481397
+0: I (144915) friends: compare code 481397
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (145336) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (145336) director: friends active=1 page=1 code=481397 peer=0000000000000000 balance=280 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (96659) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (145708) advisor: zone 1 hunger 9 energy 9 stress 0 curiosity 7 bold 9 social 0 stage elder trust 7 bored 0 food none friend near 12 bubble mid 12 reef far 10 wall near 6 last rest time day -> explore urgency 4 p=0.85  [3559 ms, 12.1 tok/s]
+0: I (145718) advisor: prof ms: matmul 2495 attn 588 norm/quant 108 rope 30 swiglu 324 decode 0
+1: I (96659) director: friends active=1 page=1 code=481397 peer=0000000000000000 balance=391 out=0 in=0 CONNECTING TO NEARBY TANK
+1: I (97434) advisor: zone 2 hunger 9 energy 9 stress 0 curiosity 8 bold 9 social 0 stage elder trust 3 bored 0 food none friend near 7 bubble mid 8 reef far 7 wall near 2 last rest time night -> rest urgency 0 p=0.97  [3599 ms, 11.9 tok/s]
+1: I (97444) advisor: prof ms: matmul 2526 attn 608 norm/quant 104 rope 30 swiglu 318 decode 0
+COMMAND 0: friends confirm
+COMMAND 1: friends confirm
+COMMAND 0: friends
+COMMAND 1: friends
+1: I (97525) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (97525) director: friends active=1 page=2 code=481397 peer=0000000000000000 balance=391 out=0 in=0 WAITING FOR YOUR FRIEND
+1: I (97530) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (97536) director: friends active=1 page=2 code=481397 peer=0000000000000000 balance=391 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (146286) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (146286) director: friends active=1 page=2 code=481397 peer=0000000000000000 balance=280 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (146292) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (146297) director: friends active=1 page=2 code=481397 peer=0000000000000000 balance=280 out=0 in=0 WAITING FOR YOUR FRIEND
+0: I (146694) NimBLE: GATT procedure initiated: discover characteristics by uuid;
+0: I (146694) NimBLE: start_handle=1 end_handle=65535 uuid=
+1: I (97933) NimBLE: GATT procedure initiated: discover characteristics by uuid;
+1: I (97933) NimBLE: start_handle=1 end_handle=65535 uuid=
+1: I (97934) NimBLE: 02000000-0000-5354-4649-474b4e415451
+1: I (97939) NimBLE:
+1:
+0: I (146695) NimBLE: 02000000-0000-5354-4649-474b4e415451
+0: I (146700) NimBLE:
+0:
+1: I (98206) NimBLE: GATT procedure initiated: write;
+1: I (98207) NimBLE: att_handle=16 len=20
+1:
+0: I (147092) friends: paired with 2c59b054d853a61f
+0: I (147092) NimBLE: GATT procedure initiated: write;
+0: I (147092) NimBLE: att_handle=16 len=20
+0:
+1: I (98464) friends: paired with cadb9a72f3f25d16
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (147231) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (147231) director: friends active=1 page=3 code=481397 peer=2c59b054d853a61f balance=280 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (98595) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (98595) director: friends active=1 page=3 code=481397 peer=cadb9a72f3f25d16 balance=391 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+COMMAND 0: friends close
+COMMAND 1: friends close
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (147365) NimBLE: GAP procedure initiated: stop advertising.
+0:
+0: I (147366) NimBLE: GAP procedure initiated: terminate connection; conn_handle=1 hci_reason=19
+0:
+0: I (147379) friends: Bluetooth stopped; free internal heap 47523
+0: I (147380) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (147380) director: friends active=0 page=3 code=481397 peer=0000000000000000 balance=280 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (147391) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (147397) director: friends active=0 page=3 code=481397 peer=0000000000000000 balance=280 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (98726) NimBLE: GAP procedure initiated: stop advertising.
+1:
+1: I (98729) friends: Bluetooth stopped; free internal heap 47519
+1: I (98730) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (98732) director: friends active=0 page=3 code=481397 peer=0000000000000000 balance=391 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (98743) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (98748) director: friends active=0 page=3 code=481397 peer=0000000000000000 balance=391 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (147756) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (147756) director: friends active=0 page=3 code=481397 peer=0000000000000000 balance=280 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (99102) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (99102) director: friends active=0 page=3 code=481397 peer=0000000000000000 balance=391 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (148568) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (148568) director: friends active=0 page=3 code=481397 peer=0000000000000000 balance=280 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (99898) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (99899) director: friends active=0 page=3 code=481397 peer=0000000000000000 balance=391 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (100612) display: fb mid 0x8200 corner 0x0000 | scene mid 0x8200 ep 6 | night 1 prefetch 0
+1: I (100612) display: 7.3 fps | render 103.8 ms flush 19.5 ms | scene 13.1 shafts 0.0 veg 34.3 fd/bub 11.6 fish 0.0 vig 3.9 algae 0.1 | card 0.0 ms x0 | veg 0.54 0.54 0.55
+1: I (100624) display: swim depth: 1.96 ms a frame (0.63 ms a hidden fish, 3.1 of them a frame)
+1: I (100632) display: frame 137.1 ms = polls 8.5 + tick 3.1 + prefetch wait 0.0 + render 103.8 + flush 19.5 + tail 1.0 + sleep 0.6 | flush: fill 17.6, wire wait 0.0, send calls 1.8
+1: I (100648) display: the fish stage split: fish 4.2 | snail+urchin 4.1 | front pieces back 0.3 | front grass 2.4 | front overlays 2.3 | front lanes 0.0 | arch shade 0.0 ms
+1: I (100663) pocket-tank: t=298s 4 fish goals: follow_friend rest explore rest | asks 29 decisions 16 last 3599 ms 11.9 tok/s | starve-ignored 0 | heap int 50 KB psram 4211 KB | battery 100% 4172 mV bright 91
+0: I (149548) advisor: zone 2 hunger 9 energy 9 stress 0 curiosity 7 bold 9 social 1 stage elder trust 7 bored 0 food none friend near 4 bubble mid 10 reef far 7 wall mid 3 last rest time day -> explore urgency 4 p=0.89  [3653 ms, 11.8 tok/s]
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (149559) advisor: prof ms: matmul 2580 attn 562 norm/quant 118 rope 28 swiglu 352 decode 0
+0: I (149586) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (149586) director: friends active=0 page=3 code=481397 peer=0000000000000000 balance=280 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (100905) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (100905) director: friends active=0 page=3 code=481397 peer=0000000000000000 balance=391 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (101262) advisor: zone 3 hunger 9 energy 7 stress 0 curiosity 7 bold 8 social 9 stage elder trust 5 bored 7 food none friend near 2 bubble mid 4 reef far 3 wall near 9 last follow_friend time day -> explore urgency 4 p=0.94  [3713 ms, 11.6 tok/s]
+1: I (101273) advisor: prof ms: matmul 2599 attn 610 norm/quant 113 rope 30 swiglu 347 decode 0
+COMMAND 0: friends
+COMMAND 1: friends
+0: I (150589) director: fish count=4 out=0 in=0 offered=0 name=-
+0: I (150589) director: friends active=0 page=3 code=481397 peer=0000000000000000 balance=280 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+1: I (101868) director: fish count=4 out=0 in=0 offered=0 name=-
+1: I (101868) director: friends active=0 page=3 code=481397 peer=0000000000000000 balance=391 out=0 in=0 CHOOSE A GIFT FOR YOUR FRIEND
+0: I (151035) display: fb mid 0x8200 corner 0x0000 | scene mid 0x8200 ep 6 | night 1 prefetch 0
+0: I (151035) display: 7.6 fps | render 104.9 ms flush 16.8 ms | scene 12.4 shafts 0.0 veg 38.5 fd/bub 11.8 fish 0.0 vig 2.9 algae 1.6 | card 0.0 ms x0 | veg 0.54 0.54 0.55
+0: I (151047) display: swim depth: 1.44 ms a frame (0.34 ms a hidden fish, 4.3 of them a frame)
+0: I (151055) display: frame 132.1 ms = polls 5.5 + tick 2.9 + prefetch wait 0.0 + render 104.9 + flush 16.8 + tail 0.9 + sleep 0.5 | flush: fill 14.9, wire wait 0.0, send calls 1.9
+0: I (151071) display: the fish stage split: fish 3.6 | snail+urchin 4.1 | front pieces back 1.1 | front grass 0.0 | front overlays 3.1 | front lanes 0.0 | arch shade 0.5 ms
+0: I (151086) pocket-tank: t=300s 4 fish goals: explore explore rest rest | asks 36 decisions 23 last 3653 ms 11.8 tok/s | starve-ignored 0 | heap int 50 KB psram 4211 KB | battery 100% 4164 mV bright 91
+COMMAND 0: friends close
+COMMAND 1: friends close

@@ -198,3 +198,51 @@ the transfer tests' baselines (keeper activity before flashing changed the
 balances from the initial backup). Evidence is under
 `docs/ble/2026-10-18-upstream-036-*`; the validation file contains the checks
 and deployed firmware SHA-256. No battery experiment was started.
+
+## Upstream 0.3.9.5 fork deployment — 2026-11-01
+
+Both USB tanks were updated from v0.3.6 (`899fe45`) to the integrated fork,
+**v0.3.9.5 alpha, build `3fe8521`**, running and booting `ota_0`.
+The signed amoled18 image SHA-256 is
+`bae0f643d9bce01bb369081e79693e140fe8cc1555a2d50e3b4c0dda7ed7e1ca`.
+Every flash used `tools/flash.sh` and passed all four esptool hash checks.
+The model and NVS partitions were not flashed.
+
+Before updating, captured the battery logs, state, passport rosters and saved
+both tanks. Original bootloader/table/app/NVS images, separate NVS copies,
+post-update NVS copies and their SHA-256 manifest are kept in
+`~/.cache/pocket-tank/backups/2026-11-01-0395-vsrz86te/`. The September/October
+BLE save migration retained all eight fish, identities, parent names, colours,
+paid history, age progression and balances:
+
+- `/dev/cu.usbmodem311101`, USB `90:70:69:FE:4E:C4`: zori, chip, dolt, nori;
+  **280 sand dollars**.
+- `/dev/cu.usbmodem31201`, USB `90:70:69:FE:4C:F8`: sol, gira, help, misa;
+  **391 sand dollars**.
+
+Hardware validation found two resource problems that simulator tests cannot
+exercise. The integrated renderer's tasks left only ~19 KB of internal heap
+with an 11.5 KB largest block: controller initialization returned
+`ESP_ERR_NO_MEM`; moving just the bake stack still failed the controller's
+30 KB contiguous EMI allocation. Commit `08c48a4` moves the bake stack to
+PSRAM and reserves controller memory before advisor allocations, reclaiming
+it for the radio and protecting the EMI block for reopening. Four controller
+open/close cycles verified the lifecycle. The initial reservation also exposed
+an unchecked advisor-task creation failure (zero AI decisions); `3fe8521`
+moves that stack to PSRAM too and checks the creation result.
+
+The final physical regression, `tools/test_friends_hardware.py --pair-only
+--require-llm`, passed: the same pairing code on both devices, confirmation on
+both sides, cancellation, reopening, secure connection, clean shutdown and
+unchanged balances. AI decisions advanced on both tanks from `[20, 14]` to
+`[23, 16]` after pairing. No money or fish were transferred by this check.
+
+Both final saves were acknowledged, NVS was read back, and both devices were
+restarted to verify the migrated save loads again. Final checks compare the
+full passport rosters against the pre-update capture, require the exact build,
+no pending transfers, working AI decisions and successful saving. No battery
+experiment was started. Console evidence is in
+`docs/ble/2026-11-01-upstream-0395-*`; the `after-4E-C4` / `after-4C-F8` files
+are the final post-restart checks, and `pairing-ai-final-hardware` records the
+combined BLE/AI regression. Earlier diagnostic traces remain as evidence of
+the hardware failures and their fixes.

@@ -1,0 +1,24 @@
+# pocket-tank preflight 2026-11-01_131046_929900 on /dev/cu.usbmodem31201
+I (152304) batlog: 1 samples (h:mm since the first | SoC | VBAT | bright | state | mA since previous)
+I (152304) batlog:     0:00 |  20% | 3753 mV |   0 | asleep | bed
+I (152308) batlog:   (SoC is 1% = 2 mAh; short awake windows are coarse, a night is not)
+I (156396) director: 0 sol    elder age 201.8h size 1.51 hunger 8.9 energy 9.4 stress 0.0 curiosity 0.0 trust 6.0 ms 1f3f  follow_friend at 304,30
+I (156399) director: 1 gira   elder age 265.3h size 1.57 hunger 9.0 energy 10.0 stress 0.0 curiosity 0.1 trust 8.8 ms 1f3f  rest at 330,92
+I (156411) director: 2 help   elder age 260.2h size 1.25 hunger 10.0 energy 10.0 stress 0.0 curiosity 0.8 trust 7.4 ms 1f3f  rest at 314,53
+I (156423) director: 3 misa   elder age 206.8h size 1.57 hunger 10.0 energy 10.0 stress 0.0 curiosity 1.8 trust 3.3 ms 1f3f  rest at 261,74
+I (156435) director: low-battery shelter: off
+I (156439) director: pellets 0 | trickle off (AUTO FEED off) | ravenous 1 | night idle 146s | veg 0.54 0.53 0.55 | algae cells 46/644 | courting gira+help | arrival -
+I (156454) director: sand dollars 391 (earned 1088) | shop: plant snail castle coral cluster shrimp urchin seahorse | colonies 193 | 7962 cm trimmed
+I (156467) director: urchin at x 114 | ambling | appetite 0.020 | 12065 cm grazed so far (keeps the grass over 0.40)
+I (156477) director: seahorse at 187,252 | A BLADE | 11.15 days with you, 0 hitches, +0.00 trust passed on | 0 pellets snapped (0 paid; next pays in 0 s)
+I (156491) director: snail at 245,30 heading -0 deg | after cell 15 at 248,8 (film 35) | 46 cells on the glass | 5146 grazed so far
+I (156502) director: bed 0 fronds (x from 19, pitch 12): 0.55 0.53 0.55 0.53 0.54 0.54 0.53 0.52 0.55 0.53 0.55 0.56 0.54 0.55 0.53
+I (156514) director: bed 1 fronds (x from 376, pitch 12): 0.53 0.52 0.53 0.53 0.54
+I (156521) director: bed 2 fronds (x from 278, pitch 12): 0.56 0.55 0.53 0.52 0.54 0.56 0.56 0.56
+I (156530) director: bed 3 leaves (x from 208, pitch 14): 0.89 0.86 0.93 0.87
+I (156536) director: plant placed: centre x 229 (the default), depth AMONG the fish
+I (156544) director: castle placed: centre x 262 (the keeper's), BEHIND the grass
+I (156551) director: coral placed: centre x 66 (the keeper's), IN FRONT, colour ff7a1e, growth 1.25 of 1.25 (the crown is out)
+I (156562) director: reef cluster placed: centre x 330 (the default), IN FRONT, look LAGOON, growth 1.80 of 2 (full size, blooming)
+I (156574) director: nursery bed 3 (a bed >= 0.12) | parked real tank: no (this IS the real tank)
+I (156582) director: battery 95% charging, VBAT 4203 mV | brightness 91/255 (level 60%)

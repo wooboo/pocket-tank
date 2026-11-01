@@ -17,11 +17,14 @@ ap.add_argument('--a', required=True, help='tank with at least 10 dollars')
 ap.add_argument('--b', required=True)
 ap.add_argument('--log', required=True)
 ap.add_argument('--pair-only', action='store_true', help='verify pairing and cancellation without transferring dollars')
+ap.add_argument('--require-llm', action='store_true', help='with --pair-only, also require live AI decision progress')
 a = ap.parse_args()
+if a.require_llm and not a.pair_only: ap.error('--require-llm requires --pair-only')
 ports = [serial.Serial(p, 115200, timeout=0) for p in (a.a, a.b)]
 buffers = [b'', b'']
 lines = [[], []]
 status = [None, None]
+inferences = [None, None]
 pattern = re.compile(r'friends active=(\d+) page=(\d+) code=(\d+) peer=([0-9a-f]+) balance=(\d+) out=(\d+) in=(\d+)')
 log = Path(a.log).open('w')
 
@@ -33,6 +36,8 @@ def pump():
             line = raw.decode(errors='replace').strip()
             lines[i].append(line)
             log.write(f'{i}: {line}\n'); log.flush()
+            ai = re.search(r'asks \d+ decisions (\d+)', line)
+            if ai: inferences[i] = int(ai[1])
             m = pattern.search(line)
             if m:
                 v = m.groups()
@@ -100,6 +105,11 @@ try:
         close()
         assert [s['balance'] for s in status] == base
         assert all(not s['out'] and not s['incoming'] for s in status)
+        if a.require_llm:
+            wait(lambda: all(n is not None for n in inferences), 20)
+            previous = inferences.copy()
+            wait(lambda: all(n > old for n, old in zip(inferences, previous)), 45)
+            print('PASS: live AI decisions advanced on both tanks', previous, '->', inferences, flush=True)
         print(json.dumps(dict(result='passed', mode='pair-only', balances=base)), flush=True)
         raise SystemExit(0)
     assert base[0]>=10
