@@ -27,7 +27,7 @@ if [ -z "${TANK_PORT:-}" ] && [ "$(echo "$PORTS" | wc -l)" -gt 1 ]; then
 fi
 export TANK_PORT=${TANK_PORT:-$PORTS}
 PORT=$TANK_PORT
-. ~/esp/esp-idf/export.sh > /dev/null 2>&1 || { echo "flash: ESP-IDF export failed"; exit 1; }
+. "${IDF_PATH:-$HOME/esp/esp-idf}/export.sh" > /dev/null 2>&1 || { echo "flash: ESP-IDF export failed"; exit 1; }
 [ -f firmware/keys/ota_signing_key.pem ] || { echo "flash: no firmware/keys/ota_signing_key.pem - tools/ota_key.sh (and back it up)"; exit 1; }
 python tools/preflight.py
 
