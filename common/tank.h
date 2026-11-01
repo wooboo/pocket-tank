@@ -1063,7 +1063,8 @@ typedef struct {
 } veg_shape_t;
 /* One spine and pixel-row silhouette for drawing, drag arming and scissors. */
 void tank_veg_shape(const tank_t *t, int bed, int frond, veg_shape_t *shape);
-void tank_veg_shape_at(const tank_t *t, int bed, int frond, veg_shape_t *shape, float clock);
+/* segments < 0 uses the live height; the renderer can supply cached heights. */
+void tank_veg_shape_at(const tank_t *t, int bed, int frond, veg_shape_t *shape, float clock, int segments);
 static inline void tank_veg_span(const veg_shape_t *s, int y, float *cx, float *half) {
     float sp = (TANK_BOT - 16 - y) / VEG_SEG_DY;
     if (sp < 0) sp = 0;

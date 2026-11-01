@@ -705,10 +705,11 @@ static float veg_sin(float x) {
     if (!filled) { for (int i = 0; i < 256; i++) lut[i] = sinf(i * (TAU / 256)); filled = true; }
     return lut[(int)(x * (256.0f / TAU)) & 255];
 }
-void tank_veg_shape_at(const tank_t *t, int b, int i, veg_shape_t *s, float clock) {
+void tank_veg_shape_at(const tank_t *t, int b, int i, veg_shape_t *s, float clock, int segments) {
     static const int seeds[VEG_BEDS_MAX] = {0, 7, 3, 5};
     float bx;
-    s->segs = tank_veg_frond(t, b, i, &bx);
+    int live_segments = tank_veg_frond(t, b, i, &bx);
+    s->segs = segments < 0 ? live_segments : segments;
     if (s->segs < 1) s->segs = 1;
     if (s->segs > VEG_MAX_SEGS) s->segs = VEG_MAX_SEGS;
     s->sword = tank_veg_kind(t, b) == VEG_KIND_SWORD;
@@ -730,7 +731,7 @@ void tank_veg_shape_at(const tank_t *t, int b, int i, veg_shape_t *s, float cloc
 }
 
 void tank_veg_shape(const tank_t *t, int b, int i, veg_shape_t *s) {
-    tank_veg_shape_at(t, b, i, s, t->clock);
+    tank_veg_shape_at(t, b, i, s, t->clock, -1);
 }
 
 /* where the pair circles: low inside the nursery bed, a flat loop that weaves

@@ -5,10 +5,12 @@
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 static tank_t tank;
 static uint16_t base[TANK_W*TANK_H], normal[TANK_W*TANK_H], hidden[TANK_W*TANK_H], scene[TANK_W*TANK_H];
 static uint32_t dirty[TANK_H*(TANK_W/32)];
+static void *depth;
 static void populate(bool decor,bool bare) {
     tank_init(&tank,123); tank_new_population(&tank);
     while(tank_add_fish(&tank,0,1)>=0) {}
@@ -47,6 +49,8 @@ static void occlusion(bool coral,bool cached) {
     if(coral) { tank.sd_unlocks|=SD_ITEM_CORAL; tank_coral_place(&tank); tank.coral_x=230; tank.coral_z=DECOR_Z_BACK; tank.coral_growth=1; tank.fish[0].x=230; tank.fish[0].y=TANK_H-42; }
     else { tank_veg_set(&tank,2,.7f); veg_shape_t shape; tank_veg_shape(&tank,2,2,&shape); float half; tank_veg_span(&shape,250,&tank.fish[0].x,&half); tank.fish[0].y=250; }
     tank.fish[0].size=1.5f; tank.fish[0].heading=0;
+    tank.fish[0].gdepth=tank.fish[0].pdepth=FISH_DEPTH_FRONT;
+    render_set_depth_buf(cached?depth:NULL);
     render_set_scene_cache(cached?scene:NULL); render_set_dirty_mask(cached?dirty:NULL);
     for(int i=0;i<50;i++) render_tank(&tank,normal,TANK_W);
     tank.n_fish=0; render_tank(&tank,base,TANK_W); tank.n_fish=1;
@@ -55,10 +59,19 @@ static void occlusion(bool coral,bool cached) {
     for(int i=0;i<TANK_W*TANK_H;i++) covered+=normal[i]!=base[i] && hidden[i]==base[i];
     printf("occlusion %s %s: %d fish pixels covered\n",coral?"coral":"grass",cached?"cached":"plain",covered);
     assert(covered>10);
+    assert(tank.fish[0].gdepth==FISH_DEPTH_FRONT && tank.fish[0].pdepth==FISH_DEPTH_FRONT);
+    if(cached) {
+        tank.low_battery=false;
+        tank.fish[0].gdepth=tank.fish[0].pdepth=FISH_DEPTH_BEHIND;
+        render_tank(&tank,base,TANK_W);
+        assert(!memcmp(hidden,base,sizeof base)); /* shelter uses the same depth as ordinary swimming */
+        tank.fish[0].gdepth=tank.fish[0].pdepth=FISH_DEPTH_FRONT;
+    }
     tank.low_battery=false; render_tank(&tank,hidden,TANK_W);
     assert(memcmp(normal,hidden,sizeof normal)==0); /* normal depth restored */
 }
 int main(void) {
+    depth=malloc(render_depth_buf_bytes()); assert(depth);
     tank_init(&tank,123);
     tank_update_battery(&tank,.16f,false,1); assert(!tank.low_battery);
     tank_update_battery(&tank,.15f,false,1); assert(tank.low_battery);
@@ -74,5 +87,6 @@ int main(void) {
     populate(true,false);
     for(int i=0;i<2000;i++) tank_tick(&tank,.04f,advisor_rules);
     render_tank(&tank,hidden,TANK_W); ppm("/tmp/low-battery-shelter.ppm",hidden);
+    render_set_depth_buf(NULL); free(depth);
     puts("PASS: shelter targets, descent, holding cover, empty-garden fallback, release, startle/setup exceptions, grass/coral occlusion with and without scene cache");
 }
