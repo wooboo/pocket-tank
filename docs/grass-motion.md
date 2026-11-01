@@ -15,7 +15,10 @@ Integration is substepped and bounded, including on slow frames.
 
 `tank_veg_shape` builds one segmented spine, and `tank_veg_span` gives its
 pixel-row silhouette. The renderer, gesture arming, and cutting use this
-geometry. Scissors intersect the actual blade width, including diagonal
+geometry. The upstream loop can supply its held segment heights when drawing
+idle grass and the seahorse's blade; the same shape builder fills the entire
+requested spine. During tilt/settling the loop and its held heights are
+bypassed, so live drawing and cutting agree. Scissors intersect the actual blade width, including diagonal
 strokes and the existing fingertip reach beyond each endpoint. A stroke at
 a bent-away blade's former position does not cut it. Cuts choose the lowest
 crossed row and snap the remaining tip down to the next whole segment

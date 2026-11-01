@@ -246,3 +246,50 @@ experiment was started. Console evidence is in
 are the final post-restart checks, and `pairing-ai-final-hardware` records the
 combined BLE/AI regression. Earlier diagnostic traces remain as evidence of
 the hardware failures and their fixes.
+
+## Upstream 0.3.9.6 and shared shelter depth — 2026-11-01
+
+Both physical tanks now run signed **v0.3.9.6 alpha, build `4f7d63f`**,
+from `ota_0`, with `ota_0` selected for the next boot. Image SHA-256:
+`fd531ef7ea7d5b0a80bd43bdccc3e0272e99c87c1747528125730b1540d4f6e6`.
+The integration includes upstream `7ffac89` while retaining BLE/AI memory
+reservations and both PSRAM task stacks. The new upstream grass loop is on
+by default, with its pacing, held heights, memory planning and flush-window
+bake scheduling.
+
+Low-battery shelter now selects BEHIND grass/piece depths in the shared swim
+depth renderer for that frame. It does not overwrite the fish's selected
+depths. Only the no-cache/no-depth-buffer fallback keeps the old painter pass.
+Grass shapes accept the loop's held segment count; during tilt and settling
+both the loop and held heights are bypassed so live blades and cuts agree.
+
+Validation: 148 simulator selftests across all four board worlds; ten fork
+regression programs under ASan/UBSan; audio checks; Python compilation; and
+signed ESP-IDF 5.5 firmware. Shelter tests exercise depth scratch and compare
+shelter pixels with ordinary BEHIND swimming, check depth restoration, and
+retain coverage for the no-cache fallback.
+
+The first Linux CI run exposed a shop-test fixture issue: a bystander fish
+could cover the leaf used as the placement/depth probe. A GCC build reproduced
+the missing-leaf failure locally. Parking all fish before positioning the probe
+fish, then restoring their coordinates, made the same GCC test pass without
+changing any rendering code or depth assertions.
+
+On both USB tanks, pairing/cancellation/reopening passed and AI decisions
+advanced `[36, 20]` -> `[38, 22]`. At a staged 15%, all eight fish moved below
+the midpoint (observed y 219..332). Crops of actual displayed frames are in
+`docs/media/2026-11-01-0396-shelter-4E-C4.png` and `...-4C-F8.png`; they show
+fish covered by grass/corals. The real gauges were restored (100%, FULL),
+and shelter ended after its existing 30-second recovery hysteresis.
+
+The final restart/load checks retained all passport fields, names, colours,
+paid history and progressing ages. The rosters remain zori/chip/dolt/nori
+and sol/gira/help/misa; balances remain **280 / 391**. Both radios are closed,
+there are no pending transfers and both tanks acknowledged save. Battery
+logs and console evidence are under `docs/batlog/2026-11-01_135*` and
+`docs/ble/2026-11-01-upstream-0396-*`.
+
+Previous signed `3fe8521` firmware/bootloader/table images, each tank's
+pre/post-update NVS and SHA-256 manifest are kept outside Git in
+`~/.cache/pocket-tank/backups/2026-11-01-0396-ld3338wk/`. The model and NVS
+partitions were not flashed. No battery experiment was started.
